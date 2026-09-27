@@ -37,6 +37,11 @@ func _ready() -> void:
 
 
 func _build_model(h: float, w: float) -> void:
+	if data.has("parts"):
+		for part in data["parts"]:
+			_box(part[0], part[1], part[2], part[3] if part.size() > 3 else "")
+		_add_face(data["face"][0], data["face"][1])
+		return
 	var legs := h * 0.35
 	var torso := h * 0.4
 	var head := minf(h * 0.25, w * 1.1)
@@ -44,10 +49,14 @@ func _build_model(h: float, w: float) -> void:
 	_box(Vector3(w * 0.4, legs, w * 0.45), Vector3(w * 0.22, legs / 2.0, 0), data["secondary"])
 	_box(Vector3(w, torso, w * 0.55), Vector3(0, legs + torso / 2.0, 0), data["primary"])
 	_box(Vector3(head, head, head), Vector3(0, legs + torso + head / 2.0, 0), data["primary"].lightened(0.1))
+	_add_face(head, Vector3(0, legs + torso + head / 2.0, -head / 2.0))
 
+
+## Yüz dokusunu verilen noktadaki (ön yüzeyin merkezi) kareye giydirir.
+func _add_face(edge: float, center: Vector3) -> void:
 	var face := MeshInstance3D.new()
 	var quad := QuadMesh.new()
-	quad.size = Vector2(head, head) * 0.98
+	quad.size = Vector2(edge, edge) * 0.98
 	var mat := StandardMaterial3D.new()
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
@@ -56,16 +65,24 @@ func _build_model(h: float, w: float) -> void:
 	face.mesh = quad
 	# Model -Z yönüne bakar; QuadMesh varsayılan olarak +Z'ye baktığı için çevrilir.
 	face.rotation.y = PI
-	face.position = Vector3(0, legs + torso + head / 2.0, -head / 2.0 - 0.005)
+	face.position = center + Vector3(0, 0, -0.005)
 	add_child(face)
 
 
-func _box(size: Vector3, pos: Vector3, color: Color) -> void:
+## texture_name verilirse assets/textures/mobs/<ad>.png her yüzeye yarım blokta bir tekrarlanarak giydirilir.
+func _box(size: Vector3, pos: Vector3, color: Color, texture_name := "") -> void:
 	var mi := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = color
+	var tex_path := FACE_DIR + texture_name + ".png"
+	if texture_name != "" and ResourceLoader.exists(tex_path):
+		mat.albedo_color = Color.WHITE
+		mat.albedo_texture = load(tex_path)
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		mat.uv1_triplanar = true
+		mat.uv1_scale = Vector3.ONE * 2.0
 	mesh.material = mat
 	mi.mesh = mesh
 	mi.position = pos

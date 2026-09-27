@@ -8,11 +8,43 @@ enum Behavior { PASSIVE, NEUTRAL, HOSTILE, ALLY }
 enum Habitat { OVERWORLD, YELLOW_HALLS, TOY_FACTORY }
 
 ## height: toplam boy (blok), width: gövde genişliği, speed: blok/sn, night_only: sadece gece doğar.
+## İsteğe bağlı "parts": [boyut, merkez, renk, (doku)] kutuları ve "face": [kenar, merkez] ile özel model;
+## verilmezse boy/genişlikten genel bir model kurulur. Model -Z yönüne bakar.
 const MOBS := {
 	"tokmak": {"name": "Tokmakçı", "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true,
-		"primary": Color("e8dcc0"), "secondary": Color("b8322f"), "height": 2.4, "width": 0.8, "speed": 3.0},
+		"primary": Color("e8dcc0"), "secondary": Color("b8322f"), "height": 2.4, "width": 0.8, "speed": 3.0,
+		# Konsept: docs/konseptler/mob_tokmak_concept.png — uzun huş kütüğü gövde, kırmızı bere, tokmak ve fener.
+		"parts": [
+			[Vector3(0.14, 0.4, 0.14), Vector3(-0.15, 0.2, 0), Color("e8dcc0"), "birch_bark"],
+			[Vector3(0.14, 0.4, 0.14), Vector3(0.15, 0.2, 0), Color("e8dcc0"), "birch_bark"],
+			[Vector3(0.6, 1.9, 0.5), Vector3(0, 1.35, 0), Color("e8dcc0"), "birch_bark"],
+			[Vector3(0.62, 0.1, 0.52), Vector3(0, 0.95, 0), Color("6e4a2a")],
+			[Vector3(0.36, 0.14, 0.3), Vector3(0, 2.37, 0), Color("b8322f")],
+			[Vector3(0.2, 0.1, 0.18), Vector3(0.1, 2.48, 0), Color("b8322f")],
+			[Vector3(0.1, 0.9, 0.1), Vector3(-0.36, 1.35, 0), Color("ddd0b0")],
+			[Vector3(0.1, 0.9, 0.1), Vector3(0.36, 1.35, 0), Color("ddd0b0")],
+			[Vector3(0.07, 0.8, 0.07), Vector3(0.36, 1.1, -0.12), Color("6e4a2a")],
+			[Vector3(0.3, 0.24, 0.24), Vector3(0.36, 1.5, -0.12), Color("8a6238")],
+			[Vector3(0.14, 0.18, 0.14), Vector3(-0.3, 0.8, -0.2), Color("f2b33a")],
+		],
+		"face": [0.56, Vector3(0, 1.98, -0.25)]},
 	"tuylupasa": {"name": "Tüylüpaşa", "behavior": Behavior.PASSIVE, "habitat": Habitat.OVERWORLD,
-		"primary": Color("3f8f8a"), "secondary": Color("e39a2d"), "height": 0.8, "width": 0.6, "speed": 2.0},
+		"primary": Color("4f8a86"), "secondary": Color("e3833a"), "height": 1.05, "width": 0.6, "speed": 2.0,
+		# Konsept: docs/konseptler/mob_tuylupasa_concept.png — teal gövde, huş renkli kafa, altın yelek, üç tüylü sorguç.
+		"parts": [
+			[Vector3(0.05, 0.12, 0.05), Vector3(-0.1, 0.06, 0), Color("e3833a")],
+			[Vector3(0.05, 0.12, 0.05), Vector3(0.1, 0.06, 0), Color("e3833a")],
+			[Vector3(0.5, 0.42, 0.42), Vector3(0, 0.33, 0), Color("4f8a86")],
+			[Vector3(0.36, 0.14, 0.02), Vector3(0, 0.46, -0.215), Color("c9a02e")],
+			[Vector3(0.08, 0.32, 0.36), Vector3(-0.29, 0.34, 0), Color("447a76")],
+			[Vector3(0.08, 0.32, 0.36), Vector3(0.29, 0.34, 0), Color("447a76")],
+			[Vector3(0.24, 0.08, 0.2), Vector3(0, 0.4, 0.28), Color("447a76")],
+			[Vector3(0.46, 0.46, 0.46), Vector3(0, 0.77, 0), Color("e8dcc0"), "birch_bark"],
+			[Vector3(0.07, 0.3, 0.07), Vector3(0, 1.15, 0), Color("4f8a86")],
+			[Vector3(0.06, 0.24, 0.06), Vector3(-0.1, 1.11, 0), Color("4f8a86")],
+			[Vector3(0.06, 0.24, 0.06), Vector3(0.1, 1.11, 0), Color("4f8a86")],
+		],
+		"face": [0.46, Vector3(0, 0.77, -0.23)]},
 	"lavabo": {"name": "Lavabo Kafa", "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD,
 		"primary": Color("f4f4f4"), "secondary": Color("e7b99a"), "height": 1.4, "width": 0.9, "speed": 3.5},
 	"mercek": {"name": "Mercek", "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD,
