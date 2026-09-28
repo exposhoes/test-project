@@ -33,6 +33,8 @@ var _highlight_mat := StandardMaterial3D.new()
 ## Basılı tutarak kırma: hangi blok, ne kadar ilerledi (0..1).
 var _break_cell := Vector3i.MAX
 var _break_progress := 0.0
+## Kayıttan yüklenen konum; boşsa dünyanın başlangıç noktasında doğar.
+var saved_position := Vector3.INF
 
 
 func _ready() -> void:
@@ -240,6 +242,7 @@ func hurt(amount: int, from: Vector3) -> void:
 
 
 func respawn() -> void:
+	saved_position = Vector3.INF
 	survival.reset()
 	_knockback = Vector3.ZERO
 	_spawned = false
@@ -306,11 +309,15 @@ func _overlaps_body(cell: Vector3i) -> bool:
 
 
 func _try_spawn() -> void:
-	var spawn := Vector3(8.5, 0, 8.5)
+	var spawn := Vector3(8.5, 0, 8.5) if saved_position == Vector3.INF else saved_position
 	world.update_center(spawn)
 	if not world.is_meshed_at(spawn):
 		return
-	global_position = Vector3(spawn.x, world.surface_y(floori(spawn.x), floori(spawn.z)) + 0.5, spawn.z)
+	if saved_position == Vector3.INF:
+		global_position = Vector3(spawn.x, world.surface_y(floori(spawn.x), floori(spawn.z)) + 0.5, spawn.z)
+	else:
+		global_position = saved_position
+		saved_position = Vector3.INF
 	velocity = Vector3.ZERO
 	_fall_peak = global_position.y
 	_spawned = true

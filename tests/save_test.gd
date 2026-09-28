@@ -1,0 +1,57 @@
+extends SceneTree
+## Kayıt testi: dünyayı değiştirip kaydeder, oyunu yeniden açıp her şeyin geri geldiğini dener.
+##   godot --headless --path . --script res://tests/save_test.gd
+
+const PATH := "user://test_world.save"
+
+var _failures := 0
+
+
+func _initialize() -> void:
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
+	var main := await _start()
+	var player: Player = main.player
+	var cell := Vector3i(player.global_position.floor()) + Vector3i(3, 2, 0)
+	main.world.set_block(cell, Blocks.BRICKS)
+	var dug := Vector3i(player.global_position.floor()) + Vector3i(-2, -1, 0)
+	main.world.set_block(dug, Blocks.AIR)
+	player.inventory.add(Items.IRON_PICKAXE)
+	player.inventory.add(Blocks.PLANKS, 17)
+	player.survival.hunger = 11
+	player.global_position += Vector3(0.3, 0, 0.2)
+	var pos := player.global_position
+	main.time_of_day = 0.8
+	_check(main.save_game(), "kayıt yazılmalı")
+	main.free()
+
+	main = await _start()
+	player = main.player
+	_check(main.world.get_block(cell) == Blocks.BRICKS, "konan blok geri gelmeli")
+	_check(main.world.get_block(dug) == Blocks.AIR, "kazılan blok boş kalmalı")
+	_check(player.inventory.count_of(Items.IRON_PICKAXE) == 1 and player.inventory.count_of(Blocks.PLANKS) == 17, "envanter geri gelmeli")
+	_check(player.survival.hunger == 11, "açlık geri gelmeli")
+	_check(player.global_position.distance_to(pos) < 0.2, "oyuncu kaldığı yerde doğmalı (%s / %s)" % [player.global_position, pos])
+	_check(is_equal_approx(main.time_of_day, 0.8) or main.time_of_day > 0.8, "gün saati geri gelmeli")
+	main.free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
+	print("SAVE TEST: ", "BAŞARILI" if _failures == 0 else "%d HATA" % _failures)
+	quit(1 if _failures > 0 else 0)
+
+
+func _start() -> Node:
+	var main: Node = load("res://scenes/main.tscn").instantiate()
+	main.save_path = PATH
+	root.add_child(main)
+	var frames := 0
+	while not main.player.is_spawned() and frames < 600:
+		await process_frame
+		frames += 1
+	return main
+
+
+func _check(ok: bool, message: String) -> void:
+	if ok:
+		print("  ok  ", message)
+	else:
+		_failures += 1
+		printerr("  FAIL ", message)

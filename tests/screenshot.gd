@@ -8,6 +8,7 @@ func _initialize() -> void:
 	if not args.is_empty():
 		out = args[0]
 	var main: Node = load("res://scenes/main.tscn").instantiate()
+	main.save_path = ""
 	root.add_child(main)
 	var player: Player = main.player
 	while not player.is_spawned():

@@ -1,0 +1,75 @@
+class_name SaveGame
+extends RefCounted
+## Oyunun cihaza kaydı: dünya tohumu ve değişiklikleri, gün saati, oyuncunun konumu,
+## can/açlık ve envanteri. Tek dosya, Godot'un store_var biçimiyle.
+
+## Biçim değişirse artır; eski kayıtlar yüklenmez, yeni dünya başlar.
+const VERSION := 1
+
+
+static func save(path: String, main: Node) -> bool:
+	var player: Player = main.player
+	var world: World = main.world
+	var dead := player.survival.dead
+	var pos := player.global_position if player.is_spawned() else player.saved_position
+	var data := {
+		"version": VERSION,
+		"seed": world.world_seed,
+		"time_of_day": main.time_of_day,
+		"edits": world.edits,
+		"player": {
+			# Ölüyken kaydedilirse bir sonraki açılışta başlangıç noktasında dolu canla doğar.
+			"position": Vector3.INF if dead else pos,
+			"yaw": player.rotation.y,
+			"pitch": player._pitch,
+			"health": Survival.MAX_HEALTH if dead else player.survival.health,
+			"hunger": Survival.MAX_HUNGER if dead else player.survival.hunger,
+			"inventory": player.inventory.slots,
+		},
+	}
+	# Önce geçici dosyaya yazılır; yazarken uygulama kapanırsa eski kayıt bozulmaz.
+	var tmp := path + ".tmp"
+	var f := FileAccess.open(tmp, FileAccess.WRITE)
+	if f == null:
+		push_warning("Kayıt yazılamadı: %s" % error_string(FileAccess.get_open_error()))
+		return false
+	f.store_var(data)
+	f.close()
+	return DirAccess.rename_absolute(tmp, path) == OK
+
+
+## Kaydı okur; yoksa ya da uyumsuzsa boş sözlük döner.
+static func read(path: String) -> Dictionary:
+	if not FileAccess.file_exists(path):
+		return {}
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		return {}
+	var data = f.get_var()
+	if not data is Dictionary or data.get("version", 0) != VERSION:
+		return {}
+	return data
+
+
+## Dünya sahneye eklenmeden önce çağrılır (tohum ve değişiklikler üretimden önce gerekli).
+static func apply_world(data: Dictionary, main: Node) -> void:
+	main.world.world_seed = data["seed"]
+	main.world.edits = data["edits"]
+	main.time_of_day = data["time_of_day"]
+
+
+## Oyuncu sahneye eklendikten sonra çağrılır.
+static func apply_player(data: Dictionary, player: Player) -> void:
+	var p: Dictionary = data["player"]
+	if p["position"] != Vector3.INF:
+		player.saved_position = p["position"]
+	player.rotation.y = p["yaw"]
+	player._pitch = p["pitch"]
+	player.camera.rotation.x = p["pitch"]
+	player.survival.health = p["health"]
+	player.survival.hunger = p["hunger"]
+	var slots: Array = p["inventory"]
+	for i in mini(slots.size(), Inventory.SIZE):
+		player.inventory.slots[i] = slots[i]
+	player.inventory.changed.emit()
+	player.survival.changed.emit()

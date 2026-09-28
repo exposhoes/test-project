@@ -42,7 +42,8 @@ tests/                      başsız duman testi, ekran görüntüsü
 3. **Üretim (yapıldı):** 36 yuvalı çanta, Çanta ekranında 16 tarif, çalışma masası, tahta/taş/demir/kristal kazma,
    balta ve kılıçlar (Yakut Kılıç dahil). Kır basılı tutularak kırılır; taş ve madenler kazma ister,
    madenler kömür/demir/altın/yakut/kristal bırakır. Sırada: alet dayanıklılığı, fırın.
-4. **Kayıt:** dünyada yapılan değişiklikleri cihaza kaydetme (şu an uzaklaşınca değişiklikler sıfırlanıyor).
+4. **Kayıt (yapıldı):** dünya değişiklikleri, gün saati, oyuncunun konumu, can/açlık ve envanter `user://world.save`
+   dosyasına 20 saniyede bir ve uygulama arka plana atılınca yazılıyor. Yeni dünya açma ana menüyle gelecek.
 5. **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.
 6. **Boyutlar:** "Sarı Koridorlar" (Backrooms esinli) ve "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli) portallarla.
 7. **Performans:** chunk üretimini arka plan iş parçacığına taşıma, greedy meshing.
@@ -51,4 +52,4 @@ tests/                      başsız duman testi, ekran görüntüsü
 ## Çalıştırma
 - Godot 4.3'ü indir, bu klasörü **Import** ile aç, F5.
 - Bilgisayarda: WASD/yön tuşları, fare ile bak (tıklayınca imleç kilitlenir, Esc bırakır), sol tık kır, sağ tık koy, 1-9 / tekerlek blok seç.
-- Test: `godot --headless --path . --script res://tests/smoke_test.gd`
+- Test: `godot --headless --path . --script res://tests/smoke_test.gd` ve `res://tests/save_test.gd`

@@ -17,6 +17,9 @@ var _chunks := {}  # Vector2i -> Chunk (verisi üretilmiş)
 var _meshed := {}  # Vector2i -> true
 var _pending: Array[Vector2i] = []
 var _center := Vector2i(2147483647, 0)
+## Oyuncunun yaptığı değişiklikler: chunk -> {yerel indeks: blok}. Chunk yeniden üretilince uygulanır
+## ve kayıt dosyasına yazılır, böylece uzaklaşınca ya da oyunu kapatınca kaybolmaz.
+var edits := {}
 
 
 func _ready() -> void:
@@ -53,6 +56,9 @@ func set_block(pos: Vector3i, id: int) -> void:
 	var lx := pos.x - c.x * Chunk.SIZE
 	var lz := pos.z - c.y * Chunk.SIZE
 	chunk.set_local(lx, pos.y, lz, id)
+	if not edits.has(c):
+		edits[c] = {}
+	edits[c][Chunk.index(lx, pos.y, lz)] = id
 	_remesh(c)
 	if lx == 0:
 		_remesh(c + Vector2i(-1, 0))
@@ -109,6 +115,8 @@ func _ensure_chunk(c: Vector2i) -> Chunk:
 	if not _chunks.has(c):
 		var chunk := Chunk.new(c, self)
 		generator.generate(chunk)
+		for i: int in edits.get(c, {}):
+			chunk.blocks[i] = edits[c][i]
 		_chunks[c] = chunk
 		add_child(chunk)
 	return _chunks[c]

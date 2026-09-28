@@ -1,10 +1,14 @@
 extends Node3D
-## Oyunun giriş noktası: dünya, oyuncu, arayüz, gece-gündüz döngüsü ve yaratık doğurma.
+## Oyunun giriş noktası: dünya, oyuncu, arayüz, gece-gündüz döngüsü, yaratık doğurma ve kayıt.
 
 const DAY_LENGTH := 600.0  # saniye
 const MAX_MOBS := 8
 const SPAWN_INTERVAL := 5.0
 const DESPAWN_DISTANCE := 56.0
+const AUTOSAVE_INTERVAL := 20.0
+
+## Kayıt dosyası; boş bırakılırsa (testlerde) kaydetmez ve yüklemez.
+var save_path := "user://world.save"
 
 var world := World.new()
 var player := Player.new()
@@ -18,10 +22,14 @@ var _environment := Environment.new()
 var _sky_material := ProceduralSkyMaterial.new()
 var _mobs: Array[Mob] = []
 var _spawn_timer := 0.0
+var _autosave_timer := 0.0
 
 
 func _ready() -> void:
 	_setup_input()
+	var save := SaveGame.read(save_path) if save_path != "" else {}
+	if not save.is_empty():
+		SaveGame.apply_world(save, self)
 	_setup_environment()
 
 	world.name = "World"
@@ -35,6 +43,22 @@ func _ready() -> void:
 	hud.atlas = world.atlas
 	hud.player = player
 	add_child(hud)
+	if not save.is_empty():
+		SaveGame.apply_player(save, player)
+		hud.toast("Kaldığın yerden devam")
+
+
+func save_game() -> bool:
+	if save_path == "":
+		return false
+	return SaveGame.save(save_path, self)
+
+
+func _notification(what: int) -> void:
+	# Android'de uygulama arka plana atılınca ya da kapatılınca kaydet.
+	if what in [NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_WM_GO_BACK_REQUEST, NOTIFICATION_APPLICATION_FOCUS_OUT]:
+		if is_node_ready():
+			save_game()
 
 
 func is_night() -> bool:
@@ -44,6 +68,10 @@ func is_night() -> bool:
 func _process(delta: float) -> void:
 	time_of_day = fposmod(time_of_day + delta / DAY_LENGTH, 1.0)
 	_update_sun()
+	_autosave_timer += delta
+	if _autosave_timer >= AUTOSAVE_INTERVAL:
+		_autosave_timer = 0.0
+		save_game()
 	if player.is_spawned():
 		_spawn_timer -= delta
 		if _spawn_timer <= 0.0:

@@ -17,3 +17,5 @@ Telefonda: sol yarıda joystick, sağ yarıda sürükleyerek bak, sağ alttaki Z
 
 Oyun boş envanterle başlar: kırdığın bloklar yere düşer, üstünden geçince toplanır. Koy düğmesi seçili bloğu koyar, seçili eşya elmaysa yer.
 Çanta ekranında tariflere dokunarak üretirsin: kütük → tahta → çubuk → çalışma masası → kazma. Aletler için masanın yanında olmalısın.
+
+Oyun kendini 20 saniyede bir ve arka plana atılınca kaydeder; açınca kaldığın yerden devam edersin.

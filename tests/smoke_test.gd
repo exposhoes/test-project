@@ -10,6 +10,7 @@ var _failures := 0
 
 func _initialize() -> void:
 	var main: Node = load("res://scenes/main.tscn").instantiate()
+	main.save_path = ""
 	root.add_child(main)
 	var player: Player = main.player
 	var world: World = main.world
