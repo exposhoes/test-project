@@ -143,6 +143,17 @@ func _initialize() -> void:
 		frames2 += 1
 	_check(player.is_spawned() and survival.health == Survival.MAX_HEALTH and not survival.dead, "yeniden doğunca can dolu olmalı")
 
+	# Duraklatma ve ana menü.
+	player.hud.open_pause()
+	_check(paused and player.hud.is_menu_open(), "duraklatınca oyun durmalı")
+	player.hud.close_pause()
+	_check(not paused, "devam edince oyun sürmeli")
+	var menu: Node = load("res://scenes/menu.tscn").instantiate()
+	root.add_child(menu)
+	await process_frame
+	_check(menu._panel._buttons.size() >= 1, "ana menüde düğme olmalı")
+	menu.free()
+
 	print("SMOKE TEST: ", "BAŞARILI" if _failures == 0 else "%d HATA" % _failures)
 	quit(1 if _failures > 0 else 0)
 

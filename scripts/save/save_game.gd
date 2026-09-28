@@ -5,6 +5,7 @@ extends RefCounted
 
 ## Biçim değişirse artır; eski kayıtlar yüklenmez, yeni dünya başlar.
 const VERSION := 1
+const DEFAULT_PATH := "user://world.save"
 
 
 static func save(path: String, main: Node) -> bool:
@@ -36,6 +37,11 @@ static func save(path: String, main: Node) -> bool:
 	f.store_var(data)
 	f.close()
 	return DirAccess.rename_absolute(tmp, path) == OK
+
+
+static func delete(path: String) -> void:
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
 ## Kaydı okur; yoksa ya da uyumsuzsa boş sözlük döner.

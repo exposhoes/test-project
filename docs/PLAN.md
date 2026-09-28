@@ -15,7 +15,8 @@ Karakterler popüler internet yaratıklarından **esinlenen ama özgün** tasar�
 
 ## Klasör yapısı
 ```
-scenes/main.tscn            giriş sahnesi
+scenes/menu.tscn            ana menü (giriş sahnesi)
+scenes/main.tscn            oyun
 scripts/main.gd             dünya + oyuncu + arayüz + gece/gündüz + yaratık doğurma
 scripts/world/              blok kayıt defteri, doku atlası, chunk, arazi üretici, dünya
 scripts/player/             oyuncu (hareket, kır/koy), can/açlık, envanter
@@ -47,7 +48,9 @@ tests/                      başsız duman testi, ekran görüntüsü
 5. **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.
 6. **Boyutlar:** "Sarı Koridorlar" (Backrooms esinli) ve "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli) portallarla.
 7. **Performans:** chunk üretimini arka plan iş parçacığına taşıma, greedy meshing.
-8. **Yayın:** Android (APK/AAB) ve iOS dışa aktarım ayarları, uygulama ikonu, mağaza görselleri.
+8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
+   ve "Kaydet ve Ana Menü". Sırada ayarlar (bakış hassasiyeti, görüş mesafesi).
+9. **Yayın:** Android (APK/AAB) ve iOS dışa aktarım ayarları, uygulama ikonu, mağaza görselleri.
 
 ## Çalıştırma
 - Godot 4.3'ü indir, bu klasörü **Import** ile aç, F5.

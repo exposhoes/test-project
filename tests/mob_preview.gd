@@ -22,8 +22,8 @@ func _initialize() -> void:
 	var spacing := 1.6
 	for i in ids.size():
 		var mob := Mob.create(ids[i])
-		mob.set_physics_process(false)
 		scene.add_child(mob)
+		mob.set_physics_process(false)
 		mob.position = Vector3((i - (ids.size() - 1) / 2.0) * spacing, 0, 0)
 		mob.rotation.y = PI + deg_to_rad(20)
 	var cam := Camera3D.new()

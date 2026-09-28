@@ -22,6 +22,7 @@ var _damage_flash := ColorRect.new()
 var _death_screen := ColorRect.new()
 var _death_time := 0.0
 var _inventory_screen := InventoryScreen.new()
+var _pause_menu := MenuPanel.new()
 
 
 func _ready() -> void:
@@ -113,6 +114,16 @@ func _ready() -> void:
 	root.move_child(_toast, -1)
 	player.inventory.changed.connect(_inventory_screen.queue_redraw)
 
+	_pause_menu.title = "Duraklatıldı"
+	_pause_menu.visible = false
+	_pause_menu.set_buttons([
+		{"label": "Oyuna Dön", "action": close_pause},
+		{"label": "Kaydet ve Ana Menü", "action": func() -> void: get_parent().quit_to_menu()},
+	])
+	root.add_child(_pause_menu)
+	# Oyun duraklatılınca arayüz çalışmaya devam etsin.
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
 	touch.hud = self
 	root.add_child(touch)
 	_select(0)
@@ -141,7 +152,22 @@ func select_slot(i: int) -> void:
 
 
 func is_menu_open() -> bool:
-	return _inventory_screen.visible or _death_screen.visible
+	return _inventory_screen.visible or _death_screen.visible or _pause_menu.visible
+
+
+func open_pause() -> void:
+	close_inventory()
+	touch.release_all()
+	touch.visible = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_pause_menu.visible = true
+	get_tree().paused = true
+
+
+func close_pause() -> void:
+	_pause_menu.visible = false
+	get_tree().paused = false
+	touch.visible = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
 
 
 func open_inventory() -> void:
@@ -175,7 +201,12 @@ func _process(delta: float) -> void:
 	_toast_timer = maxf(_toast_timer - delta, 0.0)
 	_toast.modulate.a = clampf(_toast_timer, 0.0, 1.0)
 	_damage_flash.color.a = move_toward(_damage_flash.color.a, 0.0, delta)
-	if Input.is_action_just_pressed("inventory") and not _death_screen.visible:
+	if Input.is_action_just_pressed("pause") and not _death_screen.visible:
+		if _pause_menu.visible:
+			close_pause()
+		else:
+			open_pause()
+	elif Input.is_action_just_pressed("inventory") and not _death_screen.visible and not _pause_menu.visible:
 		if _inventory_screen.visible:
 			close_inventory()
 		else:

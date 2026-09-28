@@ -1,7 +1,7 @@
 class_name TouchControls
 extends Control
 ## Çoklu dokunuş kontrolleri: sol tarafta sanal joystick, sağ tarafta sürükleyerek bakma,
-## sağ altta Zıpla / Kır / Koy, sağ üstte Çanta düğmesi. Düğmeler normal giriş eylemlerini tetikler.
+## sağ altta Zıpla / Kır / Koy, sağ üstte Çanta ve duraklatma (II) düğmeleri. Düğmeler normal giriş eylemlerini tetikler.
 
 const JOYSTICK_RADIUS := 80.0
 ## Joystick boştayken sol alt köşede durduğu yer (sol ve alt kenardan uzaklık).
@@ -11,6 +11,7 @@ const BUTTONS := [
 	{"action": "break_block", "label": "Kır", "offset": Vector2(-250, -110), "radius": 48.0},
 	{"action": "place_block", "label": "Koy", "offset": Vector2(-120, -270), "radius": 48.0},
 	{"action": "inventory", "label": "Çanta", "offset": Vector2(-70, 70), "radius": 42.0, "top": true},
+	{"action": "pause", "label": "II", "offset": Vector2(-170, 60), "radius": 32.0, "top": true},
 ]
 
 var move_vector := Vector2.ZERO

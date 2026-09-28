@@ -8,7 +8,7 @@ const DESPAWN_DISTANCE := 56.0
 const AUTOSAVE_INTERVAL := 20.0
 
 ## Kayıt dosyası; boş bırakılırsa (testlerde) kaydetmez ve yüklemez.
-var save_path := "user://world.save"
+var save_path := SaveGame.DEFAULT_PATH
 
 var world := World.new()
 var player := Player.new()
@@ -30,6 +30,9 @@ func _ready() -> void:
 	var save := SaveGame.read(save_path) if save_path != "" else {}
 	if not save.is_empty():
 		SaveGame.apply_world(save, self)
+	elif save_path != "":
+		# Yeni dünya: her seferinde farklı arazi. Testler sabit tohumla çalışır.
+		world.world_seed = randi()
 	_setup_environment()
 
 	world.name = "World"
@@ -46,6 +49,13 @@ func _ready() -> void:
 	if not save.is_empty():
 		SaveGame.apply_player(save, player)
 		hud.toast("Kaldığın yerden devam")
+
+
+## Kaydedip ana menüye döner.
+func quit_to_menu() -> void:
+	save_game()
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/menu.tscn")
 
 
 func save_game() -> bool:
@@ -149,6 +159,7 @@ func _setup_input() -> void:
 		"move_right": [KEY_D, KEY_RIGHT],
 		"jump": [KEY_SPACE],
 		"inventory": [KEY_E],
+		"pause": [KEY_ESCAPE, KEY_P],
 	}
 	for action in keys:
 		_ensure_action(action)
