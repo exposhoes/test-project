@@ -14,3 +14,5 @@ Blok tabanlı, mobil (Android/iOS) hayatta kalma ve inşa oyunu. Godot 4.3 ile y
 
 Bilgisayar kontrolleri: WASD hareket, Space zıpla, fare bak, sol tık kır/vur, sağ tık koy, 1-9 blok seç.
 Telefonda: sol yarıda joystick, sağ yarıda sürükleyerek bak, sağ alttaki Zıpla / Kır / Koy düğmeleri. Kır düğmesi önündeki yaratığa vurur.
+
+Oyun boş envanterle başlar: kırdığın bloklar yere düşer, üstünden geçince toplanır. Koy düğmesi seçili bloğu koyar, seçili eşya elmaysa yer.

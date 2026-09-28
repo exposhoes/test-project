@@ -93,9 +93,6 @@ const PLACEHOLDER_COLORS := {
 	"toy_brick_yellow": Color("f2c230"),
 }
 
-## Hızlı erişim çubuğundaki bloklar (şimdilik sınırsız yaratıcı envanter).
-const HOTBAR := [GRASS, DIRT, STONE, COBBLESTONE, PLANKS, LOG, GLASS, BRICKS, SAND]
-
 
 static func is_solid(id: int) -> bool:
 	return id != AIR

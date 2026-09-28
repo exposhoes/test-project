@@ -18,11 +18,13 @@ Karakterler popüler internet yaratıklarından **esinlenen ama özgün** tasar�
 scenes/main.tscn            giriş sahnesi
 scripts/main.gd             dünya + oyuncu + arayüz + gece/gündüz + yaratık doğurma
 scripts/world/              blok kayıt defteri, doku atlası, chunk, arazi üretici, dünya
-scripts/player/player.gd    hareket, bakış, voxel ışın izleme, kır/koy
+scripts/player/             oyuncu (hareket, kır/koy), can/açlık, envanter
+scripts/items/              eşya listesi ve yere düşen eşya
 scripts/ui/                 HUD (hızlı erişim çubuğu) ve dokunmatik kontroller
 scripts/mobs/               20 yaratığın tanımı ve temel yapay zekâ
 assets/textures/blocks/     <doku_adı>.png  (ör. grass_top.png)
 assets/textures/mobs/       mob_<kod>_face.png
+assets/textures/items/      item_<ad>.png (ör. item_apple.png)
 tests/                      başsız duman testi, ekran görüntüsü
 ```
 
@@ -35,7 +37,8 @@ tests/                      başsız duman testi, ekran görüntüsü
 1. **İskelet (bu PR):** sonsuz arazi, chunk yükleme, yürüme/zıplama, blok kırma/koyma, hızlı erişim çubuğu,
    dokunmatik kontroller, gece-gündüz, 20 yaratığın tanımı ve dünyada dolaşan ilk yaratıklar.
 2. **Hayatta kalma (yapıldı):** can ve açlık, düşman hasarı, düşme hasarı, yaratıklara vurma, ölüm/yeniden doğma.
-   Yapraktan elma çıkıyor ve hemen yeniyor. Envanter ve blok düşürme sonraki adım.
+   Kırılan bloklar yere düşüyor ve toplanıyor; 9 yuvalı envanter, 64'lük yığınlar, koyunca harcanıyor.
+   Yapraktan elma düşüyor, seçip Koy'a basınca yeniyor. Tam envanter ekranı üretimle gelecek.
 3. **Üretim:** çalışma masası, tarifler, aletler (kazma/balta/kılıç), kazma hızı.
 4. **Kayıt:** dünyada yapılan değişiklikleri cihaza kaydetme (şu an uzaklaşınca değişiklikler sıfırlanıyor).
 5. **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.

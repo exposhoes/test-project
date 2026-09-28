@@ -36,6 +36,34 @@ func _initialize() -> void:
 	var hit := player.raycast_block()
 	_check(not hit.is_empty() and hit["hit"] == below, "aşağı bakınca ayak altındaki blok seçilmeli: %s" % [hit])
 
+	# Envanter: kırılan blok yere düşer, oyuncu toplar, koyunca bir tane harcanır.
+	var inv := player.inventory
+	_check(inv.item_at(0) == Blocks.AIR, "oyun boş envanterle başlamalı")
+	var broken_id := world.get_block(below)
+	var expected := Items.drop_for_block(broken_id)
+	player._target = hit
+	player.break_target()
+	_check(world.get_block(below) == Blocks.AIR, "kırılan blok yok olmalı")
+	_check(get_nodes_in_group("item_drops").size() == 1, "kırılan bloktan eşya düşmeli")
+	for i in 90:
+		await physics_frame
+	_check(inv.count_of(expected) == 1 and get_nodes_in_group("item_drops").is_empty(),
+		"düşen eşya toplanmalı (%s: %d)" % [Items.display_name(expected), inv.count_of(expected)])
+	for i in 30:
+		await physics_frame
+	var place_pos := Vector3i(player.global_position.floor()) + Vector3i(2, 3, 0)
+	player._target = {"hit": place_pos + Vector3i.DOWN, "place": place_pos}
+	player.use_selected()
+	_check(world.get_block(place_pos) == expected and inv.count_of(expected) == 0, "koyunca envanterden bir blok harcanmalı")
+	world.set_block(place_pos, Blocks.AIR)
+	inv.add(Blocks.STONE, 70)
+	_check(inv.count_at(0) == 64 and inv.count_at(1) == 6, "yığınlar 64'te dolup sonraki yuvaya geçmeli")
+	inv.add(Items.APPLE, 1)
+	player.survival.hunger = 10
+	player.hud._select(2)
+	player.use_selected()
+	_check(player.survival.hunger == 14 and inv.count_of(Items.APPLE) == 0, "elma yenince açlık dolmalı")
+
 	var mob := Mob.create("tokmak")
 	root.add_child(mob)
 	_check(mob.get_child_count() > 0, "yaratık modeli kurulmalı")

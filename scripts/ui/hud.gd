@@ -42,18 +42,29 @@ func _ready() -> void:
 	_hotbar.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_hotbar.position.y -= SLOT_SIZE + 12
 	root.add_child(_hotbar)
-	for id in Blocks.HOTBAR:
+	for i in Inventory.SIZE:
 		var slot := Panel.new()
 		slot.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var icon := TextureRect.new()
-		icon.texture = atlas.icon(id)
+		icon.name = "Icon"
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 8)
 		slot.add_child(icon)
+		var count := Label.new()
+		count.name = "Count"
+		count.add_theme_font_size_override("font_size", 18)
+		count.add_theme_color_override("font_outline_color", Color.BLACK)
+		count.add_theme_constant_override("outline_size", 5)
+		count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		count.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+		count.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 3)
+		slot.add_child(count)
 		_hotbar.add_child(slot)
 		_slots.append(slot)
+	player.inventory.changed.connect(_refresh_hotbar)
+	_refresh_hotbar()
 
 	_name_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_name_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -101,8 +112,24 @@ func _ready() -> void:
 	_select(0)
 
 
-func selected_block() -> int:
-	return Blocks.HOTBAR[_selected]
+func selected_slot() -> int:
+	return _selected
+
+
+func _refresh_hotbar() -> void:
+	var inv := player.inventory
+	for i in _slots.size():
+		var id := inv.item_at(i)
+		var icon := _slots[i].get_node("Icon") as TextureRect
+		if id == Blocks.AIR:
+			icon.texture = null
+		elif Items.is_block(id):
+			icon.texture = atlas.icon(id)
+		else:
+			icon.texture = Items.item_icon(id)
+		var n := inv.count_at(i)
+		(_slots[i].get_node("Count") as Label).text = str(n) if n > 1 else ""
+	_name_label.text = Items.display_name(inv.item_at(_selected))
 
 
 ## Dokunulan nokta bir yuvanın üstündeyse onu seçer.
@@ -159,4 +186,4 @@ func _select(i: int) -> void:
 	_selected = i
 	for j in _slots.size():
 		_slots[j].self_modulate = Color(1.6, 1.6, 1.6) if j == i else Color(1, 1, 1, 0.7)
-	_name_label.text = Blocks.display_name(selected_block())
+	_name_label.text = Items.display_name(player.inventory.item_at(i))

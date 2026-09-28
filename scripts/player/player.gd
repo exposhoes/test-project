@@ -16,12 +16,12 @@ const SAFE_FALL := 3.0
 const ATTACK_REACH := 3.5
 const ATTACK_DAMAGE := 4
 const APPLE_CHANCE := 0.2
-const APPLE_FOOD := 4
 
 var world: World
 var hud: Hud
 var camera := Camera3D.new()
 var survival := Survival.new()
+var inventory := Inventory.new()
 
 var _pitch := 0.0
 var _target := {}
@@ -32,6 +32,7 @@ var _knockback := Vector3.ZERO
 
 
 func _ready() -> void:
+	add_to_group("player")
 	var shape := BoxShape3D.new()
 	shape.size = Vector3(HALF_WIDTH * 2.0, BODY_HEIGHT, HALF_WIDTH * 2.0)
 	var col := CollisionShape3D.new()
@@ -118,7 +119,7 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("break_block") and not attack():
 		break_target()
 	if Input.is_action_just_pressed("place_block"):
-		place_at_target(hud.selected_block() if hud else Blocks.DIRT)
+		use_selected()
 
 
 func break_target() -> void:
@@ -128,11 +129,36 @@ func break_target() -> void:
 	var id := world.get_block(pos)
 	if Blocks.is_breakable(id):
 		world.set_block(pos, Blocks.AIR)
-		# Envanter gelene kadar yapraktan çıkan elma hemen yenir.
+		var center := Vector3(pos) + Vector3.ONE * 0.5
+		var drop := Items.drop_for_block(id)
+		if drop != -1:
+			ItemDrop.spawn(get_parent(), center, drop)
 		if id == Blocks.LEAVES and randf() < APPLE_CHANCE:
-			survival.eat(APPLE_FOOD)
-			if hud:
-				hud.toast("Elma buldun!")
+			ItemDrop.spawn(get_parent(), center, Items.APPLE)
+
+
+## Koy düğmesi: seçili eşya yiyecekse yenir, blok ise baktığın yere konur.
+func use_selected() -> void:
+	var slot := hud.selected_slot() if hud else 0
+	var id := inventory.item_at(slot)
+	if id == Blocks.AIR:
+		return
+	var food := Items.food_value(id)
+	if food > 0:
+		if survival.hunger < Survival.MAX_HUNGER and inventory.take_one(slot):
+			survival.eat(food)
+		return
+	if Items.is_block(id) and place_at_target(id):
+		inventory.take_one(slot)
+
+
+func can_pick_up(_id: int) -> bool:
+	return _spawned and not survival.dead
+
+
+## Yerdeki eşyayı envantere alır; sığmayan miktarı döner.
+func pick_up(id: int, count: int) -> int:
+	return inventory.add(id, count)
 
 
 ## Önündeki en yakın yaratığa vurur. Vurduysa true döner (o zaman blok kırılmaz).
@@ -185,13 +211,15 @@ func _check_fall(was_on_floor: bool) -> void:
 			survival.take_damage(int(dist - SAFE_FALL))
 
 
-func place_at_target(id: int) -> void:
+## Bakılan bloğun önüne blok koyar. Konduysa true döner.
+func place_at_target(id: int) -> bool:
 	if _target.is_empty():
-		return
+		return false
 	var pos: Vector3i = _target["place"]
 	if Blocks.is_solid(world.get_block(pos)) or _overlaps_body(pos):
-		return
+		return false
 	world.set_block(pos, id)
+	return true
 
 
 ## Voxel DDA ışın izleme. {"hit": bakılan blok, "place": önündeki boş hücre} ya da {}.
