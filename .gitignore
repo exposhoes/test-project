@@ -5,3 +5,13 @@
 *.apk
 *.aab
 *.ipa
+
+# Claude Code Game Studios (yerel ve oturum dosyaları)
+.claude/settings.local.json
+.claude/agent-memory/
+CLAUDE.local.md
+project.local.yaml
+production/session-logs/
+production/session-state/*
+!production/session-state/.gitkeep
+.scratch/
