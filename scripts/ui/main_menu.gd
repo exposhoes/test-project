@@ -8,6 +8,7 @@ var _panel := MenuPanel.new()
 var _camera := Camera3D.new()
 var _angle := 0.0
 var _confirm_new := false
+var _settings := false
 
 
 func _ready() -> void:
@@ -25,7 +26,12 @@ func _ready() -> void:
 func _refresh() -> void:
 	var has_save := FileAccess.file_exists(SaveGame.DEFAULT_PATH)
 	var buttons := []
-	if _confirm_new:
+	if _settings:
+		_panel.subtitle = "Ayarlar"
+		buttons = Settings.menu_buttons(_refresh, func() -> void:
+			_settings = false
+			_refresh())
+	elif _confirm_new:
 		_panel.subtitle = "Eski dünya silinecek. Emin misin?"
 		buttons.append({"label": "Evet, yeni dünya", "action": _new_world, "style": "danger"})
 		buttons.append({"label": "Vazgeç", "action": func() -> void:
@@ -36,6 +42,9 @@ func _refresh() -> void:
 		if has_save:
 			buttons.append({"label": "Devam Et", "action": _continue})
 		buttons.append({"label": "Yeni Dünya", "action": _ask_new_world if has_save else _new_world})
+		buttons.append({"label": "Ayarlar", "action": func() -> void:
+			_settings = true
+			_refresh()})
 	_panel.set_buttons(buttons)
 
 

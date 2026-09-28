@@ -52,7 +52,8 @@ tests/                      başsız duman testi, ekran görüntüsü
 6. **Boyutlar:** "Sarı Koridorlar" (Backrooms esinli) ve "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli) portallarla.
 7. **Performans:** chunk üretimini arka plan iş parçacığına taşıma, greedy meshing.
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
-   ve "Kaydet ve Ana Menü". Sırada ayarlar (bakış hassasiyeti, görüş mesafesi).
+   ve "Kaydet ve Ana Menü". Ayarlar (ana menüde ve duraklatmada): bakış hızı 0,5x-2x,
+   görüş mesafesi Çok yakın-Çok uzak (2-8 chunk); `user://settings.cfg` dosyasında saklanır.
 9. **Yayın:** Android (APK/AAB) ve iOS dışa aktarım ayarları, uygulama ikonu, mağaza görselleri.
 
 ## Çalıştırma

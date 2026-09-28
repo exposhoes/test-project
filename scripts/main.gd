@@ -33,6 +33,8 @@ func _ready() -> void:
 	elif save_path != "":
 		# Yeni dünya: her seferinde farklı arazi. Testler sabit tohumla çalışır.
 		world.world_seed = randi()
+	Settings.ensure_loaded()
+	world.render_distance = Settings.view_distance
 	_setup_environment()
 
 	world.name = "World"
@@ -49,6 +51,13 @@ func _ready() -> void:
 	if not save.is_empty():
 		SaveGame.apply_player(save, player)
 		hud.toast("Kaldığın yerden devam")
+
+
+## Ayarlar menüsünde değişen görüş mesafesini ve sisi uygular.
+func apply_settings() -> void:
+	if world.render_distance != Settings.view_distance:
+		world.set_render_distance(Settings.view_distance)
+	_environment.fog_density = Settings.fog_density()
 
 
 ## Kaydedip ana menüye döner.
@@ -140,7 +149,7 @@ func _setup_environment() -> void:
 	_environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	_environment.ambient_light_color = Color.WHITE
 	_environment.fog_enabled = true
-	_environment.fog_density = 0.012
+	_environment.fog_density = Settings.fog_density()
 	_environment.fog_sky_affect = 0.0
 	var we := WorldEnvironment.new()
 	we.environment = _environment

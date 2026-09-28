@@ -69,7 +69,7 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		_look(event.relative * MOUSE_SENSITIVITY)
+		_look(event.relative * MOUSE_SENSITIVITY * Settings.look_speed)
 	elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 		if not DisplayServer.is_touchscreen_available():
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -88,7 +88,7 @@ func _physics_process(delta: float) -> void:
 
 	var menu := hud != null and hud.is_menu_open()
 	if hud and not menu:
-		_look(hud.touch.consume_look_delta() * TOUCH_SENSITIVITY)
+		_look(hud.touch.consume_look_delta() * TOUCH_SENSITIVITY * Settings.look_speed)
 
 	var input := Vector2.ZERO
 	if not menu:

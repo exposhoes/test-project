@@ -84,6 +84,12 @@ func surface_y(x: int, z: int) -> int:
 
 
 ## Oyuncu konumunu bildirir; chunk yükleme sırasını yeniler.
+## Görüş mesafesini değiştirir; chunk'lar bir sonraki update_center'da yeniden seçilir.
+func set_render_distance(d: int) -> void:
+	render_distance = d
+	_center = Vector2i(2147483647, 0)
+
+
 func update_center(pos: Vector3) -> void:
 	var c := chunk_coord(Vector3i(pos.floor()))
 	if c == _center:

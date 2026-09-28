@@ -120,12 +120,8 @@ func _ready() -> void:
 	root.move_child(_toast, -1)
 	player.inventory.changed.connect(_inventory_screen.queue_redraw)
 
-	_pause_menu.title = "Duraklatıldı"
 	_pause_menu.visible = false
-	_pause_menu.set_buttons([
-		{"label": "Oyuna Dön", "action": close_pause},
-		{"label": "Kaydet ve Ana Menü", "action": func() -> void: get_parent().quit_to_menu()},
-	])
+	_show_pause_buttons()
 	root.add_child(_pause_menu)
 	# Oyun duraklatılınca arayüz çalışmaya devam etsin.
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -177,6 +173,22 @@ func is_menu_open() -> bool:
 	return _inventory_screen.visible or _death_screen.visible or _pause_menu.visible
 
 
+func _show_pause_buttons() -> void:
+	_pause_menu.title = "Duraklatıldı"
+	_pause_menu.set_buttons([
+		{"label": "Oyuna Dön", "action": close_pause},
+		{"label": "Ayarlar", "action": _show_settings},
+		{"label": "Kaydet ve Ana Menü", "action": func() -> void: get_parent().quit_to_menu()},
+	])
+
+
+func _show_settings() -> void:
+	_pause_menu.title = "Ayarlar"
+	_pause_menu.set_buttons(Settings.menu_buttons(func() -> void:
+		get_parent().apply_settings()
+		_show_settings(), _show_pause_buttons))
+
+
 func open_pause() -> void:
 	close_inventory()
 	touch.release_all()
@@ -188,6 +200,7 @@ func open_pause() -> void:
 
 func close_pause() -> void:
 	_pause_menu.visible = false
+	_show_pause_buttons()
 	get_tree().paused = false
 	touch.visible = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
 

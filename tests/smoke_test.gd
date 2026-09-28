@@ -10,6 +10,7 @@ var _failures := 0
 
 func _initialize() -> void:
 	var main: Node = load("res://scenes/main.tscn").instantiate()
+	Settings.path = ""
 	main.save_path = ""
 	root.add_child(main)
 	var player: Player = main.player
@@ -183,6 +184,19 @@ func _initialize() -> void:
 	# Duraklatma ve ana menü.
 	player.hud.open_pause()
 	_check(paused and player.hud.is_menu_open(), "duraklatınca oyun durmalı")
+	player.hud._show_settings()
+	var settings_buttons := player.hud._pause_menu._buttons
+	_check(settings_buttons.size() == 3, "ayarlar menüsünde 3 düğme olmalı")
+	var speed := Settings.look_speed
+	settings_buttons[0]["action"].call()
+	_check(Settings.look_speed != speed, "bakış hızı değişmeli")
+	settings_buttons = player.hud._pause_menu._buttons
+	settings_buttons[1]["action"].call()
+	_check(world.render_distance == Settings.view_distance and Settings.view_distance == 6, "görüş mesafesi dünyaya uygulanmalı (%d)" % world.render_distance)
+	Settings.view_distance = Settings.BASE_VIEW
+	main.apply_settings()
+	player.hud._pause_menu._buttons[2]["action"].call()
+	_check(player.hud._pause_menu.title == "Duraklatıldı", "Geri ile duraklatma menüsüne dönülmeli")
 	player.hud.close_pause()
 	_check(not paused, "devam edince oyun sürmeli")
 	var menu: Node = load("res://scenes/menu.tscn").instantiate()
