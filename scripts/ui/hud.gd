@@ -21,6 +21,7 @@ var _toast_timer := 0.0
 var _damage_flash := ColorRect.new()
 var _death_screen := ColorRect.new()
 var _death_time := 0.0
+var _inventory_screen := InventoryScreen.new()
 
 
 func _ready() -> void:
@@ -42,7 +43,7 @@ func _ready() -> void:
 	_hotbar.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_hotbar.position.y -= SLOT_SIZE + 12
 	root.add_child(_hotbar)
-	for i in Inventory.SIZE:
+	for i in Inventory.HOTBAR:
 		var slot := Panel.new()
 		slot.custom_minimum_size = Vector2(SLOT_SIZE, SLOT_SIZE)
 		slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -107,6 +108,11 @@ func _ready() -> void:
 	root.add_child(_death_screen)
 	player.survival.died.connect(_on_died)
 
+	_inventory_screen.hud = self
+	root.add_child(_inventory_screen)
+	root.move_child(_toast, -1)
+	player.inventory.changed.connect(_inventory_screen.queue_redraw)
+
 	touch.hud = self
 	root.add_child(touch)
 	_select(0)
@@ -120,16 +126,34 @@ func _refresh_hotbar() -> void:
 	var inv := player.inventory
 	for i in _slots.size():
 		var id := inv.item_at(i)
-		var icon := _slots[i].get_node("Icon") as TextureRect
-		if id == Blocks.AIR:
-			icon.texture = null
-		elif Items.is_block(id):
-			icon.texture = atlas.icon(id)
-		else:
-			icon.texture = Items.item_icon(id)
+		(_slots[i].get_node("Icon") as TextureRect).texture = item_texture(id) if id != Blocks.AIR else null
 		var n := inv.count_at(i)
 		(_slots[i].get_node("Count") as Label).text = str(n) if n > 1 else ""
 	_name_label.text = Items.display_name(inv.item_at(_selected))
+
+
+func item_texture(id: int) -> Texture2D:
+	return atlas.icon(id) if Items.is_block(id) else Items.item_icon(id)
+
+
+func select_slot(i: int) -> void:
+	_select(i)
+
+
+func is_menu_open() -> bool:
+	return _inventory_screen.visible or _death_screen.visible
+
+
+func open_inventory() -> void:
+	touch.release_all()
+	touch.visible = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_inventory_screen.open()
+
+
+func close_inventory() -> void:
+	_inventory_screen.close()
+	touch.visible = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
 
 
 ## Dokunulan nokta bir yuvanın üstündeyse onu seçer.
@@ -151,9 +175,16 @@ func _process(delta: float) -> void:
 	_toast_timer = maxf(_toast_timer - delta, 0.0)
 	_toast.modulate.a = clampf(_toast_timer, 0.0, 1.0)
 	_damage_flash.color.a = move_toward(_damage_flash.color.a, 0.0, delta)
+	if Input.is_action_just_pressed("inventory") and not _death_screen.visible:
+		if _inventory_screen.visible:
+			close_inventory()
+		else:
+			open_inventory()
 
 
 func _on_died() -> void:
+	close_inventory()
+	touch.release_all()
 	_death_screen.visible = true
 	_death_time = Time.get_ticks_msec() / 1000.0
 	touch.visible = false

@@ -1,7 +1,7 @@
 class_name TouchControls
 extends Control
 ## Çoklu dokunuş kontrolleri: sol tarafta sanal joystick, sağ tarafta sürükleyerek bakma,
-## sağ altta Zıpla / Kır / Koy düğmeleri. Düğmeler normal giriş eylemlerini tetikler.
+## sağ altta Zıpla / Kır / Koy, sağ üstte Çanta düğmesi. Düğmeler normal giriş eylemlerini tetikler.
 
 const JOYSTICK_RADIUS := 80.0
 ## Joystick boştayken sol alt köşede durduğu yer (sol ve alt kenardan uzaklık).
@@ -10,6 +10,7 @@ const BUTTONS := [
 	{"action": "jump", "label": "Zıpla", "offset": Vector2(-110, -120), "radius": 58.0},
 	{"action": "break_block", "label": "Kır", "offset": Vector2(-250, -110), "radius": 48.0},
 	{"action": "place_block", "label": "Koy", "offset": Vector2(-120, -270), "radius": 48.0},
+	{"action": "inventory", "label": "Çanta", "offset": Vector2(-70, 70), "radius": 42.0, "top": true},
 ]
 
 var move_vector := Vector2.ZERO
@@ -83,7 +84,21 @@ func _on_release(finger: int) -> void:
 		_look_finger = -1
 
 
+## Basılı kalan tüm düğmeleri ve joystick'i bırakır (menü açılınca, ölünce).
+func release_all() -> void:
+	for finger in _finger_actions:
+		Input.action_release(_finger_actions[finger])
+	_finger_actions.clear()
+	_joy_finger = -1
+	_look_finger = -1
+	move_vector = Vector2.ZERO
+	queue_redraw()
+
+
+## "top" olan düğmeler sağ üst köşeye, diğerleri sağ alt köşeye göre konumlanır.
 func _button_center(b: Dictionary) -> Vector2:
+	if b.get("top", false):
+		return Vector2(size.x + b["offset"].x, b["offset"].y)
 	return size + b["offset"]
 
 

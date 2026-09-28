@@ -120,6 +120,7 @@ func _setup_input() -> void:
 		"move_left": [KEY_A, KEY_LEFT],
 		"move_right": [KEY_D, KEY_RIGHT],
 		"jump": [KEY_SPACE],
+		"inventory": [KEY_E],
 	}
 	for action in keys:
 		_ensure_action(action)

@@ -64,6 +64,43 @@ func _initialize() -> void:
 	player.use_selected()
 	_check(player.survival.hunger == 14 and inv.count_of(Items.APPLE) == 0, "elma yenince açlık dolmalı")
 
+	# Üretim ve aletler: taş kazmasız bir şey bırakmaz, kütükten tahta, masada kazma.
+	for i in Inventory.SIZE:
+		inv.slots[i] = {}
+	player.hud.select_slot(0)
+	_check(not Items.harvests(Blocks.STONE, Blocks.AIR) and Items.harvests(Blocks.STONE, Items.WOOD_PICKAXE), "taş için kazma gerekmeli")
+	_check(Items.break_time(Blocks.STONE, Items.STONE_PICKAXE) < Items.break_time(Blocks.STONE, Blocks.AIR), "kazma taşı daha hızlı kırmalı")
+	_check(not Items.harvests(Blocks.IRON_ORE, Items.WOOD_PICKAXE) and Items.harvests(Blocks.IRON_ORE, Items.STONE_PICKAXE), "demir madeni taş kazma istemeli")
+	inv.add(Blocks.LOG, 3)
+	var recipes := {}
+	for r in Items.RECIPES:
+		recipes[r["out"]] = r
+	_check(inv.craft(recipes[Blocks.PLANKS]) and inv.count_of(Blocks.PLANKS) == 4, "1 kütükten 4 tahta çıkmalı")
+	inv.craft(recipes[Blocks.PLANKS])
+	inv.craft(recipes[Blocks.PLANKS])
+	_check(inv.craft(recipes[Items.STICK]) and inv.count_of(Items.STICK) == 4, "2 tahtadan 4 çubuk çıkmalı")
+	_check(inv.craft(recipes[Blocks.CRAFTING_TABLE]), "4 tahtadan çalışma masası çıkmalı")
+	_check(inv.craft(recipes[Items.WOOD_PICKAXE]) and inv.count_of(Items.WOOD_PICKAXE) == 1 and inv.count_of(Blocks.PLANKS) == 3,
+		"kazma üretilmeli ve malzemeler harcanmalı (tahta=%d)" % inv.count_of(Blocks.PLANKS))
+	inv.remove(Blocks.PLANKS, 1)
+	_check(not inv.craft(recipes[Items.WOOD_PICKAXE]) and inv.count_of(Blocks.PLANKS) == 2, "malzeme yetmeyince üretilmemeli")
+	_check(not player.near_crafting_table(), "başta yakında masa olmamalı")
+	var table_pos := Vector3i(player.global_position.floor()) + Vector3i(2, 0, 0)
+	world.set_block(table_pos, Blocks.CRAFTING_TABLE)
+	_check(player.near_crafting_table(), "masa koyunca yakında algılanmalı")
+	world.set_block(table_pos, Blocks.AIR)
+	var pick_slot := -1
+	for i in Inventory.SIZE:
+		if inv.item_at(i) == Items.WOOD_PICKAXE:
+			pick_slot = i
+	inv.swap(pick_slot, 0)
+	_check(player.held_item() == Items.WOOD_PICKAXE, "seçili yuvadaki kazma elde olmalı")
+	player.hud.open_inventory()
+	_check(player.hud.is_menu_open(), "çanta açılmalı")
+	player.hud.close_inventory()
+	for i in Inventory.SIZE:
+		inv.slots[i] = {}
+
 	var mob := Mob.create("tokmak")
 	root.add_child(mob)
 	_check(mob.get_child_count() > 0, "yaratık modeli kurulmalı")

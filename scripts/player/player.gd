@@ -29,6 +29,10 @@ var _highlight := MeshInstance3D.new()
 var _spawned := false
 var _fall_peak := 0.0
 var _knockback := Vector3.ZERO
+var _highlight_mat := StandardMaterial3D.new()
+## Basılı tutarak kırma: hangi blok, ne kadar ilerledi (0..1).
+var _break_cell := Vector3i.MAX
+var _break_progress := 0.0
 
 
 func _ready() -> void:
@@ -47,7 +51,7 @@ func _ready() -> void:
 
 	var box := BoxMesh.new()
 	box.size = Vector3.ONE * 1.02
-	var mat := StandardMaterial3D.new()
+	var mat := _highlight_mat
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mat.albedo_color = Color(1, 1, 1, 0.18)
@@ -80,12 +84,15 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector3.ZERO
 		return
 
-	if hud:
+	var menu := hud != null and hud.is_menu_open()
+	if hud and not menu:
 		_look(hud.touch.consume_look_delta() * TOUCH_SENSITIVITY)
 
-	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	if hud:
-		input += hud.touch.move_vector
+	var input := Vector2.ZERO
+	if not menu:
+		input = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+		if hud:
+			input += hud.touch.move_vector
 	input = input.limit_length(1.0)
 	var dir := (transform.basis * Vector3(input.x, 0, input.y))
 	velocity.x = dir.x * WALK_SPEED + _knockback.x
@@ -94,7 +101,7 @@ func _physics_process(delta: float) -> void:
 
 	var was_on_floor := is_on_floor()
 	if is_on_floor():
-		if Input.is_action_pressed("jump"):
+		if Input.is_action_pressed("jump") and not menu:
 			velocity.y = JUMP_VELOCITY
 	else:
 		velocity.y -= GRAVITY * delta
@@ -107,19 +114,57 @@ func _physics_process(delta: float) -> void:
 		survival.take_damage(Survival.MAX_HEALTH)
 
 
-func _process(_delta: float) -> void:
-	if not _spawned or survival.dead:
+func _process(delta: float) -> void:
+	if not _spawned or survival.dead or (hud and hud.is_menu_open()):
 		_highlight.visible = false
+		_break_progress = 0.0
 		return
 	_target = raycast_block()
 	_highlight.visible = not _target.is_empty()
 	if _highlight.visible:
 		_highlight.global_position = Vector3(_target["hit"]) + Vector3.ONE * 0.5
 
-	if Input.is_action_just_pressed("break_block") and not attack():
-		break_target()
+	# Kır'a basınca önce yaratığa vurmayı dener; basılı tutunca blok kırılır.
+	if Input.is_action_just_pressed("break_block") and attack():
+		_break_progress = 0.0
+	elif Input.is_action_pressed("break_block") and not _target.is_empty():
+		mine(delta)
+	else:
+		_break_progress = 0.0
+	_highlight_mat.albedo_color = Color(1, 1, 1, 0.18).lerp(Color(0, 0, 0, 0.6), _break_progress)
 	if Input.is_action_just_pressed("place_block"):
 		use_selected()
+
+
+func held_item() -> int:
+	return inventory.item_at(hud.selected_slot() if hud else 0)
+
+
+## Bakılan bloğu kırmaya delta kadar devam eder; süre dolunca kırar.
+func mine(delta: float) -> void:
+	var cell: Vector3i = _target["hit"]
+	var id := world.get_block(cell)
+	if not Blocks.is_breakable(id):
+		_break_progress = 0.0
+		return
+	if cell != _break_cell:
+		_break_cell = cell
+		_break_progress = 0.0
+	_break_progress += delta / Items.break_time(id, held_item())
+	if _break_progress >= 1.0:
+		_break_progress = 0.0
+		break_target()
+
+
+## Yakında (dist blok içinde) çalışma masası var mı.
+func near_crafting_table(dist := 4) -> bool:
+	var c := Vector3i(global_position.floor())
+	for x in range(-dist, dist + 1):
+		for y in range(-dist, dist + 2):
+			for z in range(-dist, dist + 1):
+				if world.get_block(c + Vector3i(x, y, z)) == Blocks.CRAFTING_TABLE:
+					return true
+	return false
 
 
 func break_target() -> void:
@@ -131,7 +176,7 @@ func break_target() -> void:
 		world.set_block(pos, Blocks.AIR)
 		var center := Vector3(pos) + Vector3.ONE * 0.5
 		var drop := Items.drop_for_block(id)
-		if drop != -1:
+		if drop != -1 and Items.harvests(id, held_item()):
 			ItemDrop.spawn(get_parent(), center, drop)
 		if id == Blocks.LEAVES and randf() < APPLE_CHANCE:
 			ItemDrop.spawn(get_parent(), center, Items.APPLE)
@@ -179,7 +224,7 @@ func attack() -> bool:
 			best_dist = dist
 	if best == null:
 		return false
-	best.take_damage(ATTACK_DAMAGE, global_position)
+	best.take_damage(ATTACK_DAMAGE + Items.attack_bonus(held_item()), global_position)
 	return true
 
 

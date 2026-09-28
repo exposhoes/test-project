@@ -39,7 +39,9 @@ tests/                      başsız duman testi, ekran görüntüsü
 2. **Hayatta kalma (yapıldı):** can ve açlık, düşman hasarı, düşme hasarı, yaratıklara vurma, ölüm/yeniden doğma.
    Kırılan bloklar yere düşüyor ve toplanıyor; 9 yuvalı envanter, 64'lük yığınlar, koyunca harcanıyor.
    Yapraktan elma düşüyor, seçip Koy'a basınca yeniyor. Tam envanter ekranı üretimle gelecek.
-3. **Üretim:** çalışma masası, tarifler, aletler (kazma/balta/kılıç), kazma hızı.
+3. **Üretim (yapıldı):** 36 yuvalı çanta, Çanta ekranında 16 tarif, çalışma masası, tahta/taş/demir/kristal kazma,
+   balta ve kılıçlar (Yakut Kılıç dahil). Kır basılı tutularak kırılır; taş ve madenler kazma ister,
+   madenler kömür/demir/altın/yakut/kristal bırakır. Sırada: alet dayanıklılığı, fırın.
 4. **Kayıt:** dünyada yapılan değişiklikleri cihaza kaydetme (şu an uzaklaşınca değişiklikler sıfırlanıyor).
 5. **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.
 6. **Boyutlar:** "Sarı Koridorlar" (Backrooms esinli) ve "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli) portallarla.

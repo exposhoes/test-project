@@ -12,7 +12,8 @@ Blok tabanlı, mobil (Android/iOS) hayatta kalma ve inşa oyunu. Godot 4.3 ile y
 2. Godot'ta **Import** → bu klasördeki `project.godot`.
 3. **F5** ile çalıştır.
 
-Bilgisayar kontrolleri: WASD hareket, Space zıpla, fare bak, sol tık kır/vur, sağ tık koy, 1-9 blok seç.
-Telefonda: sol yarıda joystick, sağ yarıda sürükleyerek bak, sağ alttaki Zıpla / Kır / Koy düğmeleri. Kır düğmesi önündeki yaratığa vurur.
+Bilgisayar kontrolleri: WASD hareket, Space zıpla, fare bak, sol tık basılı tut kır / tıkla vur, sağ tık koy veya ye, 1-9 yuva seç, E çanta.
+Telefonda: sol yarıda joystick, sağ yarıda sürükleyerek bak, sağ alttaki Zıpla / Kır / Koy düğmeleri, sağ üstte Çanta. Kır'ı basılı tutunca blok kırılır, önünde yaratık varsa vurur.
 
 Oyun boş envanterle başlar: kırdığın bloklar yere düşer, üstünden geçince toplanır. Koy düğmesi seçili bloğu koyar, seçili eşya elmaysa yer.
+Çanta ekranında tariflere dokunarak üretirsin: kütük → tahta → çubuk → çalışma masası → kazma. Aletler için masanın yanında olmalısın.
