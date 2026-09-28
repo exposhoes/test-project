@@ -24,11 +24,16 @@ func _initialize() -> void:
 		var mob := Mob.create(ids[i])
 		scene.add_child(mob)
 		mob.set_physics_process(false)
+		mob.set_process(false)
 		mob.position = Vector3((i - (ids.size() - 1) / 2.0) * spacing, 0, 0)
 		mob.rotation.y = PI + deg_to_rad(20)
 	var cam := Camera3D.new()
 	scene.add_child(cam)
 	await process_frame
+	# _ready yönü sıfırlar; herkes kameraya baksın.
+	for m in scene.get_children():
+		if m is Mob:
+			m.rotation.y = PI + deg_to_rad(20)
 	cam.look_at_from_position(Vector3(0, 1.4, 2.4 + ids.size() * 0.6), Vector3(0, 1.0, 0))
 	for i in 5:
 		await process_frame
