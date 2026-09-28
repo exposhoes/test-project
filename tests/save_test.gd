@@ -19,6 +19,7 @@ func _initialize() -> void:
 	player.inventory.add(Blocks.PLANKS, 17)
 	player.inventory.wear(0, 5)
 	player.inventory.fuel = 3
+	main.spawn_ally("basbekci", 7)
 	player.survival.hunger = 11
 	player.global_position += Vector3(0.3, 0, 0.2)
 	var pos := player.global_position
@@ -35,6 +36,10 @@ func _initialize() -> void:
 	_check(player.survival.hunger == 11, "açlık geri gelmeli")
 	_check(player.global_position.distance_to(pos) < 0.2, "oyuncu kaldığı yerde doğmalı (%s / %s)" % [player.global_position, pos])
 	_check(is_equal_approx(main.time_of_day, 0.8) or main.time_of_day > 0.8, "gün saati geri gelmeli")
+	for i in 3:
+		await process_frame
+	var allies := get_nodes_in_group("allies")
+	_check(allies.size() == 1 and allies[0].mob_id == "basbekci" and allies[0].health == 7 and allies[0].tamed, "evcil dost geri gelmeli")
 	main.free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
 	print("SAVE TEST: ", "BAŞARILI" if _failures == 0 else "%d HATA" % _failures)

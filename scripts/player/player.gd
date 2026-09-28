@@ -16,6 +16,10 @@ const SAFE_FALL := 3.0
 const ATTACK_REACH := 3.5
 const ATTACK_DAMAGE := 4
 const APPLE_CHANCE := 0.2
+## Dost yaratıkları evcilleştiren eşya.
+const TAME_ITEM := Items.IRON
+
+signal tamed_mob(mob: Mob)
 
 var world: World
 var hud: Hud
@@ -204,6 +208,8 @@ func use_selected() -> void:
 	var id := inventory.item_at(slot)
 	if id == Blocks.AIR:
 		return
+	if try_tame():
+		return
 	var food := Items.food_value(id)
 	if food > 0:
 		if survival.hunger < Survival.MAX_HUNGER and inventory.take_one(slot):
@@ -223,13 +229,26 @@ func pick_up(id: int, count: int) -> int:
 
 
 ## Önündeki en yakın yaratığa vurur. Vurduysa true döner (o zaman blok kırılmaz).
+## Evcil dostlara vurulmaz.
 func attack() -> bool:
+	var best := aimed_mob(false)
+	if best == null:
+		return false
+	best.take_damage(ATTACK_DAMAGE + Items.attack_bonus(held_item()), global_position)
+	wear_held()
+	return true
+
+
+## Önünde, erişim mesafesindeki en yakın yaratık; include_tamed false ise evcil dostlar atlanır.
+func aimed_mob(include_tamed := true) -> Mob:
 	var eye := camera.global_position
 	var forward := -camera.global_transform.basis.z
 	var best: Mob = null
 	var best_dist := ATTACK_REACH
 	for node in get_tree().get_nodes_in_group("mobs"):
 		var mob := node as Mob
+		if mob.tamed and not include_tamed:
+			continue
 		var to_mob := mob.global_position + Vector3.UP * mob.center_height() - eye
 		var dist := to_mob.length()
 		# Uzaktakiler için dar bir koni; burnumuzun dibindekiler için yatayda geniş açı yeterli.
@@ -238,10 +257,22 @@ func attack() -> bool:
 		if dist < best_dist and aimed:
 			best = mob
 			best_dist = dist
-	if best == null:
+	return best
+
+
+## Önündeki dost yaratığa elindeki demiri verip onu evcilleştirir. Olduysa true.
+func try_tame() -> bool:
+	var slot := hud.selected_slot() if hud else 0
+	if inventory.item_at(slot) != TAME_ITEM:
 		return false
-	best.take_damage(ATTACK_DAMAGE + Items.attack_bonus(held_item()), global_position)
-	wear_held()
+	var mob := aimed_mob()
+	if mob == null or not mob.is_ally() or mob.tamed:
+		return false
+	inventory.take_one(slot)
+	mob.tame(self)
+	tamed_mob.emit(mob)
+	if hud:
+		hud.toast("%s artık dostun!" % mob.data["name"])
 	return true
 
 

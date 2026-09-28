@@ -1,7 +1,10 @@
 class_name Mob
 extends CharacterBody3D
 ## Kutulardan kurulan basit yaratık: dolaşır, düşmanca olanlar oyuncuyu kovalayıp vurur.
-## Nötr olanlar vurulunca kızar, barışçıllar kaçar. Özel yetenekler sonraki adımlarda eklenecek.
+## Nötr olanlar vurulunca kızar, barışçıllar kaçar. Dost (ALLY) olanlara demir verilince evcilleşir:
+## oyuncuyu takip eder, yakındaki düşmanlarla savaşır. Özel yetenekler sonraki adımlarda eklenecek.
+
+signal died
 
 const GRAVITY := 24.0
 const JUMP_VELOCITY := 7.5
@@ -12,11 +15,25 @@ const FLEE_TIME := 4.0
 const DEFAULT_HEALTH := 10
 const DEFAULT_DAMAGE := 2
 const FACE_DIR := "res://assets/textures/mobs/"
+## Evcil dost: bu mesafeden uzaksa sahibine yürür, çok uzaksa yanına ışınlanır.
+const FOLLOW_DISTANCE := 3.5
+const TELEPORT_DISTANCE := 24.0
+## Evcil dostun sahibinin çevresinde düşman aradığı mesafe.
+const GUARD_RANGE := 12.0
+## Evcil dost bu kadar saniyede bir 1 can yeniler.
+const REGEN_INTERVAL := 4.0
 
 var mob_id: String
 var data: Dictionary
 var target: Node3D
 var health := DEFAULT_HEALTH
+## Evcilleşmiş dost mu; sahibi owner.
+var tamed := false
+var owner_node: Node3D
+
+var _foe: Mob
+var _fallback_target: Node3D
+var _regen_timer := 0.0
 
 var _angry := false
 var _flee_timer := 0.0
@@ -123,6 +140,28 @@ func _face_texture() -> Texture2D:
 	return ImageTexture.create_from_image(img)
 
 
+func max_health() -> int:
+	return data.get("health", DEFAULT_HEALTH)
+
+
+func is_ally() -> bool:
+	return data["behavior"] == MobData.Behavior.ALLY
+
+
+## Dost yaratığı oyuncuya bağlar.
+func tame(owner: Node3D) -> void:
+	tamed = true
+	owner_node = owner
+	_angry = false
+	_flee_timer = 0.0
+	add_to_group("allies")
+
+
+## Düşman yaratıklar evcil dostlara da vurabilsin diye (oyuncudaki hurt ile aynı imza).
+func hurt(amount: int, from: Vector3) -> void:
+	take_damage(amount, from)
+
+
 func center_height() -> float:
 	return data["height"] / 2.0
 
@@ -134,16 +173,71 @@ func take_damage(amount: int, from: Vector3) -> void:
 	_knockback = away.normalized() * 7.0
 	velocity.y = 4.0
 	_flash(true)
-	if data["behavior"] == MobData.Behavior.PASSIVE:
+	if tamed:
+		pass
+	elif data["behavior"] == MobData.Behavior.PASSIVE:
 		_flee_timer = FLEE_TIME
 	elif data["behavior"] == MobData.Behavior.NEUTRAL:
 		_angry = true
 	if health <= 0:
+		died.emit()
 		queue_free()
 
 
 func _is_aggressive() -> bool:
-	return data["behavior"] == MobData.Behavior.HOSTILE or _angry
+	return not tamed and (data["behavior"] == MobData.Behavior.HOSTILE or _angry)
+
+
+## Evcil dostun bu kare yürüyeceği yön: düşman varsa ona saldırır, yoksa sahibini izler.
+func _ally_direction(delta: float) -> Vector3:
+	_regen_timer += delta
+	if _regen_timer >= REGEN_INTERVAL:
+		_regen_timer = 0.0
+		health = mini(health + 1, max_health())
+	if not is_instance_valid(owner_node):
+		return Vector3.ZERO
+	if not _is_valid_foe(_foe):
+		_foe = _find_foe()
+	if _foe:
+		var to_foe := _foe.global_position - global_position
+		to_foe.y = 0
+		if to_foe.length() < ATTACK_RANGE + (data["width"] + _foe.data["width"]) / 2.0:
+			if _attack_timer <= 0.0:
+				_attack_timer = ATTACK_COOLDOWN
+				# Vurulan düşman artık dosta döner; dost ölünce yine oyuncuya.
+				if _foe.target != self:
+					_foe._fallback_target = _foe.target
+					_foe.target = self
+				_foe.take_damage(data.get("damage", DEFAULT_DAMAGE), global_position)
+			return Vector3.ZERO
+		return to_foe.normalized()
+	var to_owner := owner_node.global_position - global_position
+	var flat := Vector3(to_owner.x, 0, to_owner.z)
+	if to_owner.length() > TELEPORT_DISTANCE:
+		global_position = owner_node.global_position + owner_node.global_transform.basis.z * 1.5 + Vector3.UP * 0.2
+		velocity = Vector3.ZERO
+		return Vector3.ZERO
+	return flat.normalized() if flat.length() > FOLLOW_DISTANCE else Vector3.ZERO
+
+
+func _is_valid_foe(m) -> bool:
+	return is_instance_valid(m) and m is Mob and m.health > 0 and m._is_aggressive() \
+		and m.global_position.distance_to(owner_node.global_position) < GUARD_RANGE
+
+
+## Sahibinin çevresindeki en yakın düşman yaratık.
+func _find_foe() -> Mob:
+	var best: Mob = null
+	var best_dist := GUARD_RANGE
+	for node in get_tree().get_nodes_in_group("mobs"):
+		var m := node as Mob
+		if m == self or not _is_valid_foe(m):
+			continue
+		var d := m.global_position.distance_to(global_position)
+		if d < best_dist:
+			best = m
+			best_dist = d
+	return best
 
 
 func _physics_process(delta: float) -> void:
@@ -155,7 +249,13 @@ func _physics_process(delta: float) -> void:
 		if _flash_timer <= 0.0:
 			_flash(false)
 
-	if target and is_instance_valid(target):
+	if not is_instance_valid(target) and is_instance_valid(_fallback_target):
+		target = _fallback_target
+		_fallback_target = null
+
+	if tamed:
+		dir = _ally_direction(delta)
+	elif is_instance_valid(target):
 		var to_target := target.global_position - global_position
 		to_target.y = 0
 		var dist := to_target.length()

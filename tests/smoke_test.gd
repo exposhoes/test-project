@@ -181,6 +181,38 @@ func _initialize() -> void:
 		frames2 += 1
 	_check(player.is_spawned() and survival.health == Survival.MAX_HEALTH and not survival.dead, "yeniden doğunca can dolu olmalı")
 
+	# Dostlar: demir verilen Mercek evcilleşir, oyuncuya vurulmaz, düşmana saldırır.
+	for m in get_nodes_in_group("mobs"):
+		m.free()
+	var ally := Mob.create("mercek")
+	main.add_child(ally)
+	player.camera.rotation.x = 0.0
+	ally.global_position = player.global_position - player.global_transform.basis.z * 1.5
+	ally.set_physics_process(false)
+	player.hud.select_slot(0)
+	inv.add(Items.IRON, 1)
+	player.look_at(Vector3(ally.global_position.x, player.global_position.y, ally.global_position.z))
+	_check(player.try_tame(), "dosta demir verilebilmeli")
+	_check(ally.tamed and ally.is_in_group("allies") and inv.count_of(Items.IRON) == 0, "demir verilen Mercek evcilleşmeli")
+	_check(not player.attack(), "evcil dosta vurulmamalı")
+	var enemy := Mob.create("lavabo")
+	main.add_child(enemy)
+	enemy.global_position = ally.global_position + Vector3(0.8, 0, 0)
+	enemy.set_physics_process(false)
+	ally.set_physics_process(true)
+	var enemy_health := enemy.health
+	for i in 30:
+		await physics_frame
+	_check(not is_instance_valid(enemy) or enemy.health < enemy_health, "evcil dost yakındaki düşmana saldırmalı")
+	if is_instance_valid(enemy):
+		_check(enemy.target == ally, "vurulan düşman dosta dönmeli")
+		enemy.free()
+	ally.global_position = player.global_position + Vector3(40, 0, 0)
+	await physics_frame
+	await physics_frame
+	_check(ally.global_position.distance_to(player.global_position) < 5.0, "çok uzaklaşan dost oyuncunun yanına gelmeli")
+	ally.free()
+
 	# Duraklatma ve ana menü.
 	player.hud.open_pause()
 	_check(paused and player.hud.is_menu_open(), "duraklatınca oyun durmalı")

@@ -48,7 +48,10 @@ tests/                      başsız duman testi, ekran görüntüsü
    her eritme bir yakıt harcar (kömür 8, kütük 3, tahta 1 eritmeye yeter).
 4. **Kayıt (yapıldı):** dünya değişiklikleri, gün saati, oyuncunun konumu, can/açlık ve envanter `user://world.save`
    dosyasına 20 saniyede bir ve uygulama arka plana atılınca yazılıyor. Yeni dünya açma ana menüyle gelecek.
-5. **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.
+5. **Dostlar (yapıldı):** Mercek, Bas Bekçi ve Ekran Adam'a elinde demirle Koy'a basınca evcilleşir;
+   seni takip eder, çok uzaklaşırsa yanına ışınlanır, 12 blok içindeki düşmanlara saldırır, yavaşça can yeniler
+   ve kayıtla birlikte saklanır. Sana vurulmaz.
+   **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.
 6. **Boyutlar:** "Sarı Koridorlar" (Backrooms esinli) ve "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli) portallarla.
 7. **Performans:** chunk üretimini arka plan iş parçacığına taşıma, greedy meshing.
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma

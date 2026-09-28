@@ -64,7 +64,7 @@ const MOBS := {
 			[Vector3(0.44, 0.34, 0.06), Vector3(0, 1.27, 0.26), Color("6b3f1f")],
 		],
 		"face": [0.4, Vector3(0, 1.21, -0.15)]},
-	"mercek": {"name": "Mercek", "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD,
+	"mercek": {"name": "Mercek", "health": 20, "damage": 3, "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD,
 		"primary": Color("1f2a44"), "secondary": Color("555a60"), "height": 2.0, "width": 0.7, "speed": 3.0,
 		# Konsept: docs/konseptler/mob_mercek_concept.png — lacivert takım elbise, kamera kafa, kırmızı kayıt ışığı.
 		"parts": [
@@ -86,7 +86,7 @@ const MOBS := {
 			[Vector3(0.06, 0.04, 0.06), Vector3(0.07, 2.02, -0.1), Color("e02020")],
 		],
 		"face": [Vector2(0.46, 0.44), Vector3(0, 1.72, -0.25)]},
-	"basbekci": {"name": "Bas Bekçi", "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
+	"basbekci": {"name": "Bas Bekçi", "health": 26, "damage": 4, "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
 		"primary": Color("333333"), "secondary": Color("111111"), "height": 2.05, "width": 0.8, "speed": 2.8,
 		# Konsept: docs/konseptler/mob_basbekci_concept.png — siyah takım, çift hoparlörlü kafa, sırtında kablo.
 		"parts": [
@@ -103,7 +103,7 @@ const MOBS := {
 			[Vector3(0.05, 0.8, 0.05), Vector3(0, 1.1, 0.2), Color("555555")],
 		],
 		"face": [Vector2(0.48, 0.58), Vector3(0, 1.7, -0.22)]},
-	"ekran": {"name": "Ekran Adam", "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
+	"ekran": {"name": "Ekran Adam", "health": 20, "damage": 3, "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
 		"primary": Color("6b1f2c"), "secondary": Color("7a5530"), "height": 2.1, "width": 0.7, "speed": 3.0,
 		# Konsept: docs/konseptler/mob_ekran_concept.png — bordo takım, ahşap kasalı tüplü TV kafa, iki anten.
 		"parts": [

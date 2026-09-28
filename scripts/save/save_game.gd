@@ -28,6 +28,7 @@ static func save(path: String, main: Node) -> bool:
 			"inventory": player.inventory.slots,
 			"fuel": player.inventory.fuel,
 		},
+		"allies": _allies(main),
 	}
 	# Önce geçici dosyaya yazılır; yazarken uygulama kapanırsa eski kayıt bozulmaz.
 	var tmp := path + ".tmp"
@@ -38,6 +39,15 @@ static func save(path: String, main: Node) -> bool:
 	f.store_var(data)
 	f.close()
 	return DirAccess.rename_absolute(tmp, path) == OK
+
+
+static func _allies(main: Node) -> Array:
+	var list: Array = main.pending_allies.duplicate()
+	for node in main.get_tree().get_nodes_in_group("allies"):
+		var mob := node as Mob
+		if mob.health > 0 and not mob.is_queued_for_deletion():
+			list.append({"id": mob.mob_id, "health": mob.health})
+	return list
 
 
 static func delete(path: String) -> void:
@@ -79,5 +89,6 @@ static func apply_player(data: Dictionary, player: Player) -> void:
 	for i in mini(slots.size(), Inventory.SIZE):
 		player.inventory.slots[i] = slots[i]
 	player.inventory.fuel = p.get("fuel", 0)
+	player.get_parent().pending_allies = data.get("allies", [])
 	player.inventory.changed.emit()
 	player.survival.changed.emit()

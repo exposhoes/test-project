@@ -23,6 +23,8 @@ var _sky_material := ProceduralSkyMaterial.new()
 var _mobs: Array[Mob] = []
 var _spawn_timer := 0.0
 var _autosave_timer := 0.0
+## Kayıttan gelen evcil dostlar: oyuncu doğunca yanına çıkarılır. [{"id", "health"}]
+var pending_allies: Array = []
 
 
 func _ready() -> void:
@@ -44,6 +46,7 @@ func _ready() -> void:
 	player.world = world
 	player.hud = hud
 	add_child(player)
+	player.tamed_mob.connect(_on_tamed)
 
 	hud.atlas = world.atlas
 	hud.player = player
@@ -92,6 +95,9 @@ func _process(delta: float) -> void:
 		_autosave_timer = 0.0
 		save_game()
 	if player.is_spawned():
+		for ally in pending_allies:
+			spawn_ally(ally["id"], ally["health"])
+		pending_allies.clear()
 		_spawn_timer -= delta
 		if _spawn_timer <= 0.0:
 			_spawn_timer = SPAWN_INTERVAL
@@ -129,6 +135,25 @@ func _try_spawn_mob() -> void:
 	add_child(mob)
 	mob.global_position = Vector3(x + 0.5, world.surface_y(x, z) + 0.1, z + 0.5)
 	_mobs.append(mob)
+
+
+## Evcil bir dostu oyuncunun yanında doğurur.
+func spawn_ally(id: String, health := -1) -> Mob:
+	var mob := Mob.create(id)
+	add_child(mob)
+	var p := player.global_position + player.global_transform.basis.z * 1.5
+	mob.global_position = Vector3(p.x, world.surface_y(floori(p.x), floori(p.z)) + 0.1, p.z)
+	if health > 0:
+		mob.health = health
+	mob.tame(player)
+	_on_tamed(mob)
+	return mob
+
+
+## Evcil dostlar uzaklaşınca silinmez ve yaratık sınırına sayılmaz.
+func _on_tamed(mob: Mob) -> void:
+	_mobs.erase(mob)
+	mob.died.connect(func() -> void: hud.toast("%s öldü" % mob.data["name"]))
 
 
 func _despawn_far_mobs() -> void:
