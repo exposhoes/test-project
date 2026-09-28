@@ -56,6 +56,10 @@ func is_wall(x: int, z: int) -> bool:
 	return false
 
 
+func start_position() -> Vector3:
+	return SPAWN
+
+
 ## Canlıların doğabileceği yükseklik; duvar içindeyse -1.
 func spawn_y(x: int, z: int) -> int:
 	return -1 if is_wall(x, z) else FLOOR

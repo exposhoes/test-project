@@ -91,6 +91,13 @@ func _placeholder(texture_name: String) -> Image:
 				# Ahşap çerçeveli, içi parlayan sarı kapı.
 				var frame := x < 4 or x >= TILE - 4 or y < 3
 				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.2) if frame else base.lightened(0.15 + 0.25 * sin(y * 0.4 + x * 0.2))
+			elif texture_name == "factory_portal":
+				# Ahşap çerçeve, içinde dönen renkli şeritler.
+				var frame := x < 4 or x >= TILE - 4 or y < 3
+				var band := int((x + y + 2 * sin(x * 0.5)) / 5.0) % 3
+				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.2) if frame else [base, Color("f2c230"), Color("2f6fd9")][band]
+			elif texture_name == "playroom_wall" and (Vector2(x % 16, y % 16).distance_to(Vector2(5, 6)) < 2.5 or (x + y * 3) % 23 == 0):
+				c = Color("fdf6c8")
 			elif texture_name == "ceiling_tile" and (x % 16 == 0 or y % 16 == 0):
 				c = base.darkened(0.3)
 			elif texture_name == "ceiling_light":

@@ -55,7 +55,9 @@ tests/                      başsız duman testi, ekran görüntüsü
 6. **Boyutlar:** "Sarı Koridorlar" (yapıldı, Backrooms esinli): masada 4 tahta + 2 altınla Koridor Kapısı yapılır,
    kapıya bakıp Koy'a basınca sonsuz sarı labirente geçilir (nemli halı, floresan tavan, duvarlarda altın/kristal).
    Orada Sırıtkan, Balon Kafa ve Pençe dolaşır; başlangıç odasındaki kapıdan yeryüzüne dönülür. Dostlar da gelir.
-   Sırada "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli).
+   "Oyuncak Fabrikası" (yapıldı, Poppy/Banban/Rainbow esinli): masada 4 tahta + 2 yakutla Fabrika Kapısı;
+   yüksek tavanlı renkli salonlar, kapı boşluklu duvarlar, oyuncak blok yığınları, duvarlarda yakut/kristal.
+   Orada Çivit, Yosun, Kıvılcım, Bando, Pembe Leylek, Fermuar, Mışıl, Kutucuk ve dost Düğme dolaşır.
 7. **Performans:** chunk üretimini arka plan iş parçacığına taşıma, greedy meshing.
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
    ve "Kaydet ve Ana Menü". Ayarlar (ana menüde ve duraklatmada): bakış hızı 0,5x-2x,

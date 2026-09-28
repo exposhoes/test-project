@@ -112,7 +112,7 @@ func _process(delta: float) -> void:
 
 
 func _update_sun() -> void:
-	if dimension == Dimension.HALLS:
+	if dimension != Dimension.OVERWORLD:
 		return
 	var angle := (time_of_day - 0.25) * TAU
 	_sun.rotation = Vector3(-angle, deg_to_rad(30), 0)
@@ -129,8 +129,8 @@ func _update_sun() -> void:
 func _try_spawn_mob() -> void:
 	if _mobs.size() >= MAX_MOBS:
 		return
-	var in_halls := dimension == Dimension.HALLS
-	var ids := MobData.ids_for(MobData.Habitat.YELLOW_HALLS if in_halls else MobData.Habitat.OVERWORLD, in_halls or is_night())
+	var indoor := dimension != Dimension.OVERWORLD
+	var ids := MobData.ids_for(Dimension.DEFS[dimension]["habitat"], indoor or is_night())
 	if ids.is_empty():
 		return
 	var a := randf() * TAU
@@ -149,10 +149,12 @@ func _try_spawn_mob() -> void:
 	_mobs.append(mob)
 
 
-## Koridor Kapısı: Yeryüzü ile Sarı Koridorlar arasında geçiş. Dünya yeniden kurulur,
+## Kapıdan geçiş: yeryüzünden kapının boyutuna, diğer boyutlardan yeryüzüne. Dünya yeniden kurulur,
 ## oyuncu o boyutta en son ayrıldığı yere (ilk seferde başlangıç odasına) döner.
-func travel() -> void:
-	var target_dim := Dimension.HALLS if dimension == Dimension.OVERWORLD else Dimension.OVERWORLD
+func travel(portal_block := Blocks.HALLS_PORTAL) -> void:
+	var target_dim := Dimension.destination(dimension, portal_block)
+	if target_dim == -1:
+		return
 	dim_edits[dimension] = world.edits
 	return_positions[dimension] = player.global_position
 	for node in get_tree().get_nodes_in_group("item_drops"):
@@ -178,7 +180,7 @@ func travel() -> void:
 	hud.atlas = world.atlas
 	player.teleport(return_positions.get(dimension, Vector3.INF))
 	_apply_dimension_look()
-	hud.toast(Dimension.NAMES[dimension])
+	hud.toast(Dimension.display_name(dimension))
 
 
 func _make_world(p_seed: int) -> World:
@@ -244,17 +246,17 @@ func _setup_environment() -> void:
 	_apply_dimension_look()
 
 
-## Yeryüzünde gökyüzü ve güneş; Sarı Koridorlar'da gökyüzü yok, her yer loş sarı floresan ışığı.
+## Yeryüzünde gökyüzü ve güneş; kapalı boyutlarda gökyüzü yok, ışık ve sis boyutun renginde.
 func _apply_dimension_look() -> void:
-	var halls := dimension == Dimension.HALLS
-	_sun.visible = not halls
-	if halls:
+	var indoor: Dictionary = Dimension.DEFS[dimension].get("indoor", {})
+	_sun.visible = indoor.is_empty()
+	if not indoor.is_empty():
 		_environment.background_mode = Environment.BG_COLOR
-		_environment.background_color = Color("4a4326")
-		_environment.ambient_light_color = Color("fff0b0")
-		_environment.ambient_light_energy = 0.95
-		_environment.fog_light_color = Color("b9a64e")
-		_environment.fog_density = 0.045
+		_environment.background_color = indoor["background"]
+		_environment.ambient_light_color = indoor["ambient"]
+		_environment.ambient_light_energy = indoor["energy"]
+		_environment.fog_light_color = indoor["fog"]
+		_environment.fog_density = indoor["fog_density"]
 	else:
 		_environment.background_mode = Environment.BG_SKY
 		_environment.ambient_light_color = Color.WHITE

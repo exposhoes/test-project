@@ -28,6 +28,8 @@ func _ready() -> void:
 	atlas = BlockAtlas.new()
 	if dimension == Dimension.HALLS:
 		generator = HallsGenerator.new(world_seed)
+	elif dimension == Dimension.FACTORY:
+		generator = FactoryGenerator.new(world_seed)
 	else:
 		generator = TerrainGenerator.new(world_seed)
 	material = StandardMaterial3D.new()
@@ -78,6 +80,11 @@ func set_block(pos: Vector3i, id: int) -> void:
 
 func is_meshed_at(pos: Vector3) -> bool:
 	return _meshed.has(chunk_coord(Vector3i(pos.floor())))
+
+
+## Oyuncunun bu boyuta ilk girişte belirdiği nokta (y, spawn_y ile bulunur).
+func start_position() -> Vector3:
+	return generator.start_position() if generator.has_method("start_position") else Vector3(8.5, 0, 8.5)
 
 
 ## Canlıların (oyuncu, yaratık) bu sütunda duracağı yükseklik; uygun yer yoksa -1.

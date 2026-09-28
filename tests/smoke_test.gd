@@ -224,7 +224,7 @@ func _initialize() -> void:
 	await process_frame
 	player._target = player.raycast_block()
 	var went := [false]
-	player.used_portal.connect(func() -> void: went[0] = true, CONNECT_ONE_SHOT)
+	player.used_portal.connect(func(_b: int) -> void: went[0] = true, CONNECT_ONE_SHOT)
 	player.used_portal.disconnect(main.travel)
 	player.use_selected()
 	player.used_portal.connect(main.travel)
@@ -248,6 +248,26 @@ func _initialize() -> void:
 	world = main.world
 	_check(main.dimension == Dimension.OVERWORLD and player.global_position.distance_to(before_pos) < 1.0, "yeryüzünde kapının önüne dönülmeli")
 	_check(world.get_block(portal_pos) == Blocks.HALLS_PORTAL, "yeryüzündeki kapı yerinde kalmalı")
+
+	# Oyuncak Fabrikası: kendi kapısıyla girilir, oradaki kapı yeryüzüne döndürür.
+	_check(Dimension.destination(Dimension.OVERWORLD, Blocks.FACTORY_PORTAL) == Dimension.FACTORY, "fabrika kapısı fabrikaya götürmeli")
+	_check(Dimension.destination(Dimension.FACTORY, Blocks.FACTORY_PORTAL) == Dimension.OVERWORLD, "fabrikadaki kapı yeryüzüne döndürmeli")
+	main.travel(Blocks.FACTORY_PORTAL)
+	frames3 = 0
+	while not player.is_spawned() and frames3 < MAX_FRAMES:
+		await process_frame
+		frames3 += 1
+	world = main.world
+	_check(main.dimension == Dimension.FACTORY and absf(player.global_position.y - FactoryGenerator.FLOOR) < 1.0, "Oyuncak Fabrikası'na geçilmeli (y=%.1f)" % player.global_position.y)
+	_check(world.get_block(FactoryGenerator.EXIT_PORTAL) == Blocks.FACTORY_PORTAL, "fabrikada dönüş kapısı olmalı")
+	_check(MobData.ids_for(MobData.Habitat.TOY_FACTORY, true).size() >= 8, "fabrikada yaratık olmalı")
+	main.travel(Blocks.FACTORY_PORTAL)
+	frames3 = 0
+	while not player.is_spawned() and frames3 < MAX_FRAMES:
+		await process_frame
+		frames3 += 1
+	world = main.world
+	_check(main.dimension == Dimension.OVERWORLD and player.global_position.distance_to(before_pos) < 1.0, "fabrikadan yeryüzüne dönülmeli")
 
 	# Duraklatma ve ana menü.
 	player.hud.open_pause()

@@ -21,7 +21,7 @@ const TAME_ITEM := Items.IRON
 
 signal tamed_mob(mob: Mob)
 ## Koridor Kapısı kullanıldı (boyut değiştirme main.gd'de).
-signal used_portal
+signal used_portal(portal_block: int)
 
 var world: World
 var hud: Hud
@@ -206,8 +206,8 @@ func break_target() -> void:
 
 ## Koy düğmesi: kapıya bakıyorsan geçer; seçili eşya yiyecekse yenir, blok ise baktığın yere konur.
 func use_selected() -> void:
-	if not _target.is_empty() and world.get_block(_target["hit"]) == Blocks.HALLS_PORTAL:
-		used_portal.emit()
+	if not _target.is_empty() and Dimension.is_portal(world.get_block(_target["hit"])):
+		used_portal.emit(world.get_block(_target["hit"]))
 		return
 	var slot := hud.selected_slot() if hud else 0
 	var id := inventory.item_at(slot)
@@ -370,7 +370,7 @@ func _overlaps_body(cell: Vector3i) -> bool:
 
 
 func _try_spawn() -> void:
-	var start := HallsGenerator.SPAWN if world.dimension == Dimension.HALLS else Vector3(8.5, 0, 8.5)
+	var start := world.start_position()
 	var spawn := start if saved_position == Vector3.INF else saved_position
 	world.update_center(spawn)
 	if not world.is_meshed_at(spawn):

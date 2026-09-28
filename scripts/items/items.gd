@@ -98,6 +98,7 @@ const MINING := {
 	Blocks.FURNACE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
 	Blocks.HALLS_PORTAL: {"time": 2.0, "tool": "axe"},
 	Blocks.CEILING_LIGHT: {"time": 0.4},
+	Blocks.FACTORY_PORTAL: {"time": 2.0, "tool": "axe"},
 	Blocks.STONE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
 	Blocks.COBBLESTONE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
 	Blocks.BRICKS: {"time": 4.0, "tool": "pickaxe", "tier": 1},
@@ -126,6 +127,7 @@ const RECIPES := [
 	{"out": RUBY_SWORD, "count": 1, "in": {RUBY: 2, GOLD: 1, STICK: 1}, "table": true},
 	{"out": Blocks.FURNACE, "count": 1, "in": {Blocks.COBBLESTONE: 8}, "table": true},
 	{"out": Blocks.HALLS_PORTAL, "count": 1, "in": {Blocks.PLANKS: 4, GOLD: 2}, "table": true},
+	{"out": Blocks.FACTORY_PORTAL, "count": 1, "in": {Blocks.PLANKS: 4, RUBY: 2}, "table": true},
 	{"out": Blocks.BRICKS, "count": 2, "in": {Blocks.COBBLESTONE: 2, Blocks.DIRT: 2}, "table": true},
 ]
 

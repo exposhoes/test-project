@@ -33,6 +33,8 @@ enum {
 	HALLS_PORTAL,
 	CEILING_TILE,
 	CEILING_LIGHT,
+	FACTORY_PORTAL,
+	PLAYROOM_WALL,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -68,6 +70,8 @@ const DEFS := {
 	HALLS_PORTAL: {"name": "Koridor Kapısı", "top": "planks", "side": "halls_portal", "bottom": "planks"},
 	CEILING_TILE: {"name": "Tavan Karosu", "all": "ceiling_tile"},
 	CEILING_LIGHT: {"name": "Floresan Lamba", "all": "ceiling_light"},
+	FACTORY_PORTAL: {"name": "Fabrika Kapısı", "top": "planks", "side": "factory_portal", "bottom": "planks"},
+	PLAYROOM_WALL: {"name": "Oyun Odası Duvarı", "all": "playroom_wall"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -104,6 +108,8 @@ const PLACEHOLDER_COLORS := {
 	"halls_portal": Color("e8d56a"),
 	"ceiling_tile": Color("d9d3b8"),
 	"ceiling_light": Color("fffbe6"),
+	"factory_portal": Color("e85a8a"),
+	"playroom_wall": Color("a9d6f0"),
 }
 
 

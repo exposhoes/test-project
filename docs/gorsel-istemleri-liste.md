@@ -393,3 +393,10 @@ Konsept görselleri 1536×1024, diğer her şeyi 1024×1024 üret. Kaydettiğin 
    ```
    rectangular fluorescent ceiling light panel seen from below, bright warm white glowing diffuser with a thin grey metal frame, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
    ```
+
+## Oyuncak Fabrikası kapısı
+
+95. **factory_portal.png**
+   ```
+   front of a magical toy doorway block: wooden door frame around a swirling rainbow of candy pink, sunny yellow and toy blue stripes like a spinning toy top, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```
