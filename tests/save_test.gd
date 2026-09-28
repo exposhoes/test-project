@@ -41,6 +41,19 @@ func _initialize() -> void:
 	var allies := get_nodes_in_group("allies")
 	_check(allies.size() == 1 and allies[0].mob_id == "basbekci" and allies[0].health == 7 and allies[0].tamed, "evcil dost geri gelmeli")
 	main.free()
+	# Koridordayken kaydedilirse orada açılmalı.
+	main = await _start()
+	main.travel()
+	while not main.player.is_spawned():
+		await process_frame
+	var hall_cell := HallsGenerator.EXIT_PORTAL + Vector3i(0, 1, 0)
+	main.world.set_block(hall_cell, Blocks.BRICKS)
+	_check(main.save_game(), "koridorda kayıt yazılmalı")
+	main.free()
+	main = await _start()
+	_check(main.dimension == Dimension.HALLS and main.world.get_block(hall_cell) == Blocks.BRICKS, "koridorda açılmalı ve değişiklik kalmalı")
+	_check(main.dim_edits.has(Dimension.OVERWORLD) and not main.dim_edits[Dimension.OVERWORLD].is_empty(), "yeryüzü değişiklikleri de saklanmalı")
+	main.free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(PATH))
 	print("SAVE TEST: ", "BAŞARILI" if _failures == 0 else "%d HATA" % _failures)
 	quit(1 if _failures > 0 else 0)

@@ -30,6 +30,9 @@ enum {
 	TOY_BRICK_BLUE,
 	TOY_BRICK_YELLOW,
 	FURNACE,
+	HALLS_PORTAL,
+	CEILING_TILE,
+	CEILING_LIGHT,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -62,6 +65,9 @@ const DEFS := {
 	TOY_BRICK_BLUE: {"name": "Mavi Oyuncak Blok", "all": "toy_brick_blue"},
 	TOY_BRICK_YELLOW: {"name": "Sarı Oyuncak Blok", "all": "toy_brick_yellow"},
 	FURNACE: {"name": "Fırın", "top": "furnace_top", "side": "furnace_side", "bottom": "cobblestone"},
+	HALLS_PORTAL: {"name": "Koridor Kapısı", "top": "planks", "side": "halls_portal", "bottom": "planks"},
+	CEILING_TILE: {"name": "Tavan Karosu", "all": "ceiling_tile"},
+	CEILING_LIGHT: {"name": "Floresan Lamba", "all": "ceiling_light"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -95,6 +101,9 @@ const PLACEHOLDER_COLORS := {
 	"toy_brick_yellow": Color("f2c230"),
 	"furnace_top": Color("7a7a7a"),
 	"furnace_side": Color("6e6e6e"),
+	"halls_portal": Color("e8d56a"),
+	"ceiling_tile": Color("d9d3b8"),
+	"ceiling_light": Color("fffbe6"),
 }
 
 

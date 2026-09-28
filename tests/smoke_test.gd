@@ -213,6 +213,42 @@ func _initialize() -> void:
 	_check(ally.global_position.distance_to(player.global_position) < 5.0, "çok uzaklaşan dost oyuncunun yanına gelmeli")
 	ally.free()
 
+	# Sarı Koridorlar: kapıya Koy ile geçilir, dönüşte kapının önüne gelinir.
+	var portal_pos := Vector3i(player.global_position.floor()) + Vector3i(0, 0, -2)
+	player.rotation = Vector3.ZERO
+	player.camera.rotation.x = deg_to_rad(-15)
+	world.set_block(portal_pos, Blocks.HALLS_PORTAL)
+	world.set_block(portal_pos + Vector3i(0, 1, 0), Blocks.HALLS_PORTAL)
+	await physics_frame
+	await process_frame
+	await process_frame
+	player._target = player.raycast_block()
+	var went := [false]
+	player.used_portal.connect(func() -> void: went[0] = true, CONNECT_ONE_SHOT)
+	player.used_portal.disconnect(main.travel)
+	player.use_selected()
+	player.used_portal.connect(main.travel)
+	_check(went[0], "kapıya bakıp Koy'a basınca geçiş olmalı")
+	var before_pos := player.global_position
+	main.travel()
+	var frames3 := 0
+	while not player.is_spawned() and frames3 < MAX_FRAMES:
+		await process_frame
+		frames3 += 1
+	world = main.world
+	_check(main.dimension == Dimension.HALLS and world.dimension == Dimension.HALLS, "Sarı Koridorlar'a geçilmeli")
+	_check(player.is_spawned() and absf(player.global_position.y - HallsGenerator.FLOOR) < 1.0, "koridor zemininde doğmalı (y=%.1f)" % player.global_position.y)
+	_check(world.get_block(HallsGenerator.EXIT_PORTAL) == Blocks.HALLS_PORTAL, "başlangıç odasında dönüş kapısı olmalı")
+	_check(MobData.ids_for(MobData.Habitat.YELLOW_HALLS, true).size() >= 3, "koridorlarda yaratık olmalı")
+	main.travel()
+	frames3 = 0
+	while not player.is_spawned() and frames3 < MAX_FRAMES:
+		await process_frame
+		frames3 += 1
+	world = main.world
+	_check(main.dimension == Dimension.OVERWORLD and player.global_position.distance_to(before_pos) < 1.0, "yeryüzünde kapının önüne dönülmeli")
+	_check(world.get_block(portal_pos) == Blocks.HALLS_PORTAL, "yeryüzündeki kapı yerinde kalmalı")
+
 	# Duraklatma ve ana menü.
 	player.hud.open_pause()
 	_check(paused and player.hud.is_menu_open(), "duraklatınca oyun durmalı")

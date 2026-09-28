@@ -8,10 +8,12 @@ signal block_changed(pos: Vector3i, id: int)
 @export var render_distance := 4
 @export var meshes_per_frame := 1
 @export var world_seed := 1337
+## 0: Yeryüzü, 1: Sarı Koridorlar.
+@export var dimension := 0
 
 var atlas: BlockAtlas
 var material: StandardMaterial3D
-var generator: TerrainGenerator
+var generator: RefCounted
 
 var _chunks := {}  # Vector2i -> Chunk (verisi üretilmiş)
 var _meshed := {}  # Vector2i -> true
@@ -24,7 +26,10 @@ var edits := {}
 
 func _ready() -> void:
 	atlas = BlockAtlas.new()
-	generator = TerrainGenerator.new(world_seed)
+	if dimension == Dimension.HALLS:
+		generator = HallsGenerator.new(world_seed)
+	else:
+		generator = TerrainGenerator.new(world_seed)
 	material = StandardMaterial3D.new()
 	material.albedo_texture = atlas.texture
 	material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
@@ -73,6 +78,14 @@ func set_block(pos: Vector3i, id: int) -> void:
 
 func is_meshed_at(pos: Vector3) -> bool:
 	return _meshed.has(chunk_coord(Vector3i(pos.floor())))
+
+
+## Canlıların (oyuncu, yaratık) bu sütunda duracağı yükseklik; uygun yer yoksa -1.
+## Tavanlı boyutlarda en üst katı blok değil zemin kullanılır.
+func spawn_y(x: int, z: int) -> int:
+	if generator.has_method("spawn_y"):
+		return generator.spawn_y(x, z)
+	return surface_y(x, z)
 
 
 ## Bir sütundaki en üstteki katı bloğun üstü.

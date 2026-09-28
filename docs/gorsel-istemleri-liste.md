@@ -378,3 +378,18 @@ Konsept görselleri 1536×1024, diğer her şeyi 1024×1024 üret. Kaydettiğin 
    ```
    lumpy chunk of raw gold ore, bright yellow nuggets with darker ochre shadows, single pixel art game item icon, 32x32 pixel grid, hard pixel edges, centered, transparent background, slight dark outline, no text, 1:1 aspect ratio
    ```
+
+## Sarı Koridorlar kapısı ve tavanı
+
+92. **halls_portal.png**
+   ```
+   front of a magical doorway block: old wooden door frame around a glowing pale yellow light filled with faint wavy lines like humming fluorescent haze, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```
+93. **ceiling_tile.png**
+   ```
+   old office drop ceiling tile, off-white yellowish panel with tiny holes and a thin grey grid edge, a faint water stain, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```
+94. **ceiling_light.png**
+   ```
+   rectangular fluorescent ceiling light panel seen from below, bright warm white glowing diffuser with a thin grey metal frame, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```

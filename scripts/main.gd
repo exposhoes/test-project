@@ -25,6 +25,10 @@ var _spawn_timer := 0.0
 var _autosave_timer := 0.0
 ## Kayıttan gelen evcil dostlar: oyuncu doğunca yanına çıkarılır. [{"id", "health"}]
 var pending_allies: Array = []
+## Şu anki boyut, her boyutun blok değişiklikleri ve oyuncunun her boyuttan ayrıldığı yer.
+var dimension := Dimension.OVERWORLD
+var dim_edits := {}
+var return_positions := {}
 
 
 func _ready() -> void:
@@ -47,6 +51,7 @@ func _ready() -> void:
 	player.hud = hud
 	add_child(player)
 	player.tamed_mob.connect(_on_tamed)
+	player.used_portal.connect(travel)
 
 	hud.atlas = world.atlas
 	hud.player = player
@@ -60,7 +65,8 @@ func _ready() -> void:
 func apply_settings() -> void:
 	if world.render_distance != Settings.view_distance:
 		world.set_render_distance(Settings.view_distance)
-	_environment.fog_density = Settings.fog_density()
+	if dimension == Dimension.OVERWORLD:
+		_environment.fog_density = Settings.fog_density()
 
 
 ## Kaydedip ana menüye döner.
@@ -106,6 +112,8 @@ func _process(delta: float) -> void:
 
 
 func _update_sun() -> void:
+	if dimension == Dimension.HALLS:
+		return
 	var angle := (time_of_day - 0.25) * TAU
 	_sun.rotation = Vector3(-angle, deg_to_rad(30), 0)
 	var daylight := clampf(sin(angle) * 2.0 + 0.2, 0.0, 1.0)
@@ -121,7 +129,8 @@ func _update_sun() -> void:
 func _try_spawn_mob() -> void:
 	if _mobs.size() >= MAX_MOBS:
 		return
-	var ids := MobData.ids_for(MobData.Habitat.OVERWORLD, is_night())
+	var in_halls := dimension == Dimension.HALLS
+	var ids := MobData.ids_for(MobData.Habitat.YELLOW_HALLS if in_halls else MobData.Habitat.OVERWORLD, in_halls or is_night())
 	if ids.is_empty():
 		return
 	var a := randf() * TAU
@@ -130,11 +139,58 @@ func _try_spawn_mob() -> void:
 	var z := floori(player.global_position.z + sin(a) * dist)
 	if not world.is_meshed_at(Vector3(x, 0, z)):
 		return
+	var y := world.spawn_y(x, z)
+	if y < 0:
+		return
 	var mob := Mob.create(ids[randi() % ids.size()])
 	mob.target = player
 	add_child(mob)
-	mob.global_position = Vector3(x + 0.5, world.surface_y(x, z) + 0.1, z + 0.5)
+	mob.global_position = Vector3(x + 0.5, y + 0.1, z + 0.5)
 	_mobs.append(mob)
+
+
+## Koridor Kapısı: Yeryüzü ile Sarı Koridorlar arasında geçiş. Dünya yeniden kurulur,
+## oyuncu o boyutta en son ayrıldığı yere (ilk seferde başlangıç odasına) döner.
+func travel() -> void:
+	var target_dim := Dimension.HALLS if dimension == Dimension.OVERWORLD else Dimension.OVERWORLD
+	dim_edits[dimension] = world.edits
+	return_positions[dimension] = player.global_position
+	for node in get_tree().get_nodes_in_group("item_drops"):
+		node.queue_free()
+	for mob in _mobs:
+		if is_instance_valid(mob):
+			mob.queue_free()
+	_mobs.clear()
+	# Dostlar da gelir: oyuncu yeni dünyada belirince yanında doğarlar.
+	for node in get_tree().get_nodes_in_group("allies"):
+		var ally := node as Mob
+		if ally.health > 0 and not ally.is_queued_for_deletion():
+			pending_allies.append({"id": ally.mob_id, "health": ally.health})
+		ally.remove_from_group("allies")
+		ally.queue_free()
+	var old := world
+	remove_child(old)
+	old.queue_free()
+	dimension = target_dim
+	world = _make_world(old.world_seed)
+	add_child(world)
+	player.world = world
+	hud.atlas = world.atlas
+	player.teleport(return_positions.get(dimension, Vector3.INF))
+	_apply_dimension_look()
+	hud.toast(Dimension.NAMES[dimension])
+
+
+func _make_world(p_seed: int) -> World:
+	var w := World.new()
+	w.name = "World"
+	w.world_seed = p_seed
+	w.dimension = dimension
+	if not dim_edits.has(dimension):
+		dim_edits[dimension] = {}
+	w.edits = dim_edits[dimension]
+	w.render_distance = Settings.view_distance
+	return w
 
 
 ## Evcil bir dostu oyuncunun yanında doğurur.
@@ -142,7 +198,11 @@ func spawn_ally(id: String, health := -1) -> Mob:
 	var mob := Mob.create(id)
 	add_child(mob)
 	var p := player.global_position + player.global_transform.basis.z * 1.5
-	mob.global_position = Vector3(p.x, world.surface_y(floori(p.x), floori(p.z)) + 0.1, p.z)
+	var y := world.spawn_y(floori(p.x), floori(p.z))
+	if y < 0:
+		p = player.global_position
+		y = int(p.y)
+	mob.global_position = Vector3(p.x, y + 0.1, p.z)
 	if health > 0:
 		mob.health = health
 	mob.tame(player)
@@ -181,7 +241,25 @@ func _setup_environment() -> void:
 	add_child(we)
 	_sun.shadow_enabled = false
 	add_child(_sun)
-	_update_sun()
+	_apply_dimension_look()
+
+
+## Yeryüzünde gökyüzü ve güneş; Sarı Koridorlar'da gökyüzü yok, her yer loş sarı floresan ışığı.
+func _apply_dimension_look() -> void:
+	var halls := dimension == Dimension.HALLS
+	_sun.visible = not halls
+	if halls:
+		_environment.background_mode = Environment.BG_COLOR
+		_environment.background_color = Color("4a4326")
+		_environment.ambient_light_color = Color("fff0b0")
+		_environment.ambient_light_energy = 0.95
+		_environment.fog_light_color = Color("b9a64e")
+		_environment.fog_density = 0.045
+	else:
+		_environment.background_mode = Environment.BG_SKY
+		_environment.ambient_light_color = Color.WHITE
+		_environment.fog_density = Settings.fog_density()
+		_update_sun()
 
 
 ## Klavye/fare eşlemeleri. Dokunmatik düğmeler aynı eylemleri tetikler.

@@ -12,12 +12,15 @@ static func save(path: String, main: Node) -> bool:
 	var player: Player = main.player
 	var world: World = main.world
 	var dead := player.survival.dead
+	main.dim_edits[main.dimension] = world.edits
 	var pos := player.global_position if player.is_spawned() else player.saved_position
 	var data := {
 		"version": VERSION,
 		"seed": world.world_seed,
 		"time_of_day": main.time_of_day,
-		"edits": world.edits,
+		"dimension": main.dimension,
+		"dim_edits": main.dim_edits,
+		"return_positions": main.return_positions,
 		"player": {
 			# Ölüyken kaydedilirse bir sonraki açılışta başlangıç noktasında dolu canla doğar.
 			"position": Vector3.INF if dead else pos,
@@ -71,7 +74,14 @@ static func read(path: String) -> Dictionary:
 ## Dünya sahneye eklenmeden önce çağrılır (tohum ve değişiklikler üretimden önce gerekli).
 static func apply_world(data: Dictionary, main: Node) -> void:
 	main.world.world_seed = data["seed"]
-	main.world.edits = data["edits"]
+	# İlk sürüm kayıtlarında yalnızca yeryüzü değişiklikleri "edits" altındaydı.
+	main.dim_edits = data.get("dim_edits", {Dimension.OVERWORLD: data.get("edits", {})})
+	main.dimension = data.get("dimension", Dimension.OVERWORLD)
+	main.return_positions = data.get("return_positions", {})
+	if not main.dim_edits.has(main.dimension):
+		main.dim_edits[main.dimension] = {}
+	main.world.dimension = main.dimension
+	main.world.edits = main.dim_edits[main.dimension]
 	main.time_of_day = data["time_of_day"]
 
 

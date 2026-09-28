@@ -20,6 +20,8 @@ const APPLE_CHANCE := 0.2
 const TAME_ITEM := Items.IRON
 
 signal tamed_mob(mob: Mob)
+## Koridor Kapısı kullanıldı (boyut değiştirme main.gd'de).
+signal used_portal
 
 var world: World
 var hud: Hud
@@ -202,8 +204,11 @@ func break_target() -> void:
 		wear_held()
 
 
-## Koy düğmesi: seçili eşya yiyecekse yenir, blok ise baktığın yere konur.
+## Koy düğmesi: kapıya bakıyorsan geçer; seçili eşya yiyecekse yenir, blok ise baktığın yere konur.
 func use_selected() -> void:
+	if not _target.is_empty() and world.get_block(_target["hit"]) == Blocks.HALLS_PORTAL:
+		used_portal.emit()
+		return
 	var slot := hud.selected_slot() if hud else 0
 	var id := inventory.item_at(slot)
 	if id == Blocks.AIR:
@@ -287,6 +292,16 @@ func hurt(amount: int, from: Vector3) -> void:
 	velocity.y = 4.0
 
 
+## Başka bir boyuta/konuma geçer: dünya hazır olunca pos'ta (INF ise başlangıç noktasında) belirir.
+func teleport(pos: Vector3) -> void:
+	saved_position = pos
+	_knockback = Vector3.ZERO
+	velocity = Vector3.ZERO
+	_break_progress = 0.0
+	_target = {}
+	_spawned = false
+
+
 func respawn() -> void:
 	saved_position = Vector3.INF
 	survival.reset()
@@ -355,12 +370,13 @@ func _overlaps_body(cell: Vector3i) -> bool:
 
 
 func _try_spawn() -> void:
-	var spawn := Vector3(8.5, 0, 8.5) if saved_position == Vector3.INF else saved_position
+	var start := HallsGenerator.SPAWN if world.dimension == Dimension.HALLS else Vector3(8.5, 0, 8.5)
+	var spawn := start if saved_position == Vector3.INF else saved_position
 	world.update_center(spawn)
 	if not world.is_meshed_at(spawn):
 		return
 	if saved_position == Vector3.INF:
-		global_position = Vector3(spawn.x, world.surface_y(floori(spawn.x), floori(spawn.z)) + 0.5, spawn.z)
+		global_position = Vector3(spawn.x, world.spawn_y(floori(spawn.x), floori(spawn.z)) + 0.5, spawn.z)
 	else:
 		global_position = saved_position
 		saved_position = Vector3.INF

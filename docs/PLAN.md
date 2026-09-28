@@ -52,7 +52,10 @@ tests/                      başsız duman testi, ekran görüntüsü
    seni takip eder, çok uzaklaşırsa yanına ışınlanır, 12 blok içindeki düşmanlara saldırır, yavaşça can yeniler
    ve kayıtla birlikte saklanır. Sana vurulmaz.
    **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.
-6. **Boyutlar:** "Sarı Koridorlar" (Backrooms esinli) ve "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli) portallarla.
+6. **Boyutlar:** "Sarı Koridorlar" (yapıldı, Backrooms esinli): masada 4 tahta + 2 altınla Koridor Kapısı yapılır,
+   kapıya bakıp Koy'a basınca sonsuz sarı labirente geçilir (nemli halı, floresan tavan, duvarlarda altın/kristal).
+   Orada Sırıtkan, Balon Kafa ve Pençe dolaşır; başlangıç odasındaki kapıdan yeryüzüne dönülür. Dostlar da gelir.
+   Sırada "Oyuncak Fabrikası" (Poppy/Banban/Rainbow esinli).
 7. **Performans:** chunk üretimini arka plan iş parçacığına taşıma, greedy meshing.
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
    ve "Kaydet ve Ana Menü". Ayarlar (ana menüde ve duraklatmada): bakış hızı 0,5x-2x,

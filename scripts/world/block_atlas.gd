@@ -87,6 +87,16 @@ func _placeholder(texture_name: String) -> Image:
 				c = Color("1a1a1a") if y < 21 else Color("e8741c").lerp(Color("f7c948"), rng.randf())
 			elif texture_name.begins_with("furnace") and (x == 0 or y == 0 or x == TILE - 1 or y == TILE - 1):
 				c = base.darkened(0.4)
+			elif texture_name == "halls_portal":
+				# Ahşap çerçeveli, içi parlayan sarı kapı.
+				var frame := x < 4 or x >= TILE - 4 or y < 3
+				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.2) if frame else base.lightened(0.15 + 0.25 * sin(y * 0.4 + x * 0.2))
+			elif texture_name == "ceiling_tile" and (x % 16 == 0 or y % 16 == 0):
+				c = base.darkened(0.3)
+			elif texture_name == "ceiling_light":
+				c = base if (x > 2 and x < TILE - 3 and y > 2 and y < TILE - 3) else Color("b8b29a")
+			elif texture_name == "yellow_wallpaper" and x % 6 == 0:
+				c = base.darkened(0.12)
 			elif texture_name.begins_with("toy_brick") and Vector2(x % 16, y % 16).distance_to(Vector2(8, 8)) < 4.5:
 				c = base.lightened(0.2)
 			img.set_pixel(x, y, c)
