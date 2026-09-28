@@ -26,6 +26,7 @@ static func save(path: String, main: Node) -> bool:
 			"health": Survival.MAX_HEALTH if dead else player.survival.health,
 			"hunger": Survival.MAX_HUNGER if dead else player.survival.hunger,
 			"inventory": player.inventory.slots,
+			"fuel": player.inventory.fuel,
 		},
 	}
 	# Önce geçici dosyaya yazılır; yazarken uygulama kapanırsa eski kayıt bozulmaz.
@@ -77,5 +78,6 @@ static func apply_player(data: Dictionary, player: Player) -> void:
 	var slots: Array = p["inventory"]
 	for i in mini(slots.size(), Inventory.SIZE):
 		player.inventory.slots[i] = slots[i]
+	player.inventory.fuel = p.get("fuel", 0)
 	player.inventory.changed.emit()
 	player.survival.changed.emit()

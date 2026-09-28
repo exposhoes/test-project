@@ -17,6 +17,8 @@ func _initialize() -> void:
 	main.world.set_block(dug, Blocks.AIR)
 	player.inventory.add(Items.IRON_PICKAXE)
 	player.inventory.add(Blocks.PLANKS, 17)
+	player.inventory.wear(0, 5)
+	player.inventory.fuel = 3
 	player.survival.hunger = 11
 	player.global_position += Vector3(0.3, 0, 0.2)
 	var pos := player.global_position
@@ -29,6 +31,7 @@ func _initialize() -> void:
 	_check(main.world.get_block(cell) == Blocks.BRICKS, "konan blok geri gelmeli")
 	_check(main.world.get_block(dug) == Blocks.AIR, "kazılan blok boş kalmalı")
 	_check(player.inventory.count_of(Items.IRON_PICKAXE) == 1 and player.inventory.count_of(Blocks.PLANKS) == 17, "envanter geri gelmeli")
+	_check(player.inventory.uses_at(0) == Items.max_uses(Items.IRON_PICKAXE) - 5 and player.inventory.fuel == 3, "alet hakkı ve yakıt geri gelmeli")
 	_check(player.survival.hunger == 11, "açlık geri gelmeli")
 	_check(player.global_position.distance_to(pos) < 0.2, "oyuncu kaldığı yerde doğmalı (%s / %s)" % [player.global_position, pos])
 	_check(is_equal_approx(main.time_of_day, 0.8) or main.time_of_day > 0.8, "gün saati geri gelmeli")

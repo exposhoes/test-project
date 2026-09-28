@@ -82,6 +82,11 @@ func _placeholder(texture_name: String) -> Image:
 				c = base.darkened(0.35)
 			elif texture_name == "bricks" and (y % 8 == 0 or (x + (y / 8) * 8) % 16 == 0):
 				c = Color("c8c2b8")
+			elif texture_name == "furnace_side" and x >= 8 and x < 24 and y >= 14 and y < 28:
+				# Ağız: üstte karanlık, altta kor.
+				c = Color("1a1a1a") if y < 21 else Color("e8741c").lerp(Color("f7c948"), rng.randf())
+			elif texture_name.begins_with("furnace") and (x == 0 or y == 0 or x == TILE - 1 or y == TILE - 1):
+				c = base.darkened(0.4)
 			elif texture_name.begins_with("toy_brick") and Vector2(x % 16, y % 16).distance_to(Vector2(8, 8)) < 4.5:
 				c = base.lightened(0.2)
 			img.set_pixel(x, y, c)

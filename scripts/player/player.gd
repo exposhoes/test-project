@@ -160,13 +160,26 @@ func mine(delta: float) -> void:
 
 ## Yakında (dist blok içinde) çalışma masası var mı.
 func near_crafting_table(dist := 4) -> bool:
+	return near_block(Blocks.CRAFTING_TABLE, dist)
+
+
+## Yakında (dist blok içinde) verilen blok var mı.
+func near_block(block_id: int, dist := 4) -> bool:
 	var c := Vector3i(global_position.floor())
 	for x in range(-dist, dist + 1):
 		for y in range(-dist, dist + 2):
 			for z in range(-dist, dist + 1):
-				if world.get_block(c + Vector3i(x, y, z)) == Blocks.CRAFTING_TABLE:
+				if world.get_block(c + Vector3i(x, y, z)) == block_id:
 					return true
 	return false
+
+
+## Elde tutulan aleti bir kez kullanır; kırılırsa haber verir.
+func wear_held() -> void:
+	var slot := hud.selected_slot() if hud else 0
+	var id := inventory.item_at(slot)
+	if inventory.wear(slot) and hud:
+		hud.toast("%s kırıldı!" % Items.display_name(id))
 
 
 func break_target() -> void:
@@ -182,6 +195,7 @@ func break_target() -> void:
 			ItemDrop.spawn(get_parent(), center, drop)
 		if id == Blocks.LEAVES and randf() < APPLE_CHANCE:
 			ItemDrop.spawn(get_parent(), center, Items.APPLE)
+		wear_held()
 
 
 ## Koy düğmesi: seçili eşya yiyecekse yenir, blok ise baktığın yere konur.
@@ -227,6 +241,7 @@ func attack() -> bool:
 	if best == null:
 		return false
 	best.take_damage(ATTACK_DAMAGE + Items.attack_bonus(held_item()), global_position)
+	wear_held()
 	return true
 
 

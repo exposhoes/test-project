@@ -1,6 +1,6 @@
 class_name InventoryScreen
 extends Control
-## Çanta ve üretim ekranı. Solda çanta ve hızlı erişim çubuğu, sağda tarifler.
+## Çanta ve üretim ekranı. Solda çanta ve hızlı erişim çubuğu, sağda Üretim ya da Fırın tarifleri.
 ## Dokunmatik ve fare aynı şekilde çalışır: her şey dokunulan noktaya göre seçilir.
 
 const SLOT := 56.0
@@ -13,7 +13,11 @@ var hud: Hud
 var _slot_rects: Array[Rect2] = []  # yuva indeksine göre
 var _recipe_rects: Array[Rect2] = []
 var _close_rect := Rect2()
+var _tab_rects: Array[Rect2] = []
 var _near_table := false
+var _near_furnace := false
+## 0: Üretim (masa tarifleri), 1: Fırın.
+var tab := 0
 
 
 func _ready() -> void:
@@ -25,6 +29,9 @@ func _ready() -> void:
 
 func open() -> void:
 	_near_table = hud.player.near_crafting_table(TABLE_RANGE)
+	_near_furnace = hud.player.near_block(Blocks.FURNACE, TABLE_RANGE)
+	# Fırının yanında açılırsa doğrudan Fırın sekmesi gelir.
+	tab = 1 if _near_furnace and not _near_table else 0
 	visible = true
 	queue_redraw()
 
@@ -46,11 +53,17 @@ func _layout() -> void:
 	var x0 := origin.x + 9 * (SLOT + GAP) + 30
 	var col_w := (size.x - x0 - 30 - GAP) / 2.0
 	var rows := ceili(Items.RECIPES.size() / 2.0)
-	for r in Items.RECIPES.size():
+	for r in recipes().size():
 		var col := r / rows
 		var row := r % rows
 		_recipe_rects.append(Rect2(Vector2(x0 + col * (col_w + GAP), origin.y + row * (ROW_H + GAP)), Vector2(col_w, ROW_H)))
 	_close_rect = Rect2(Vector2(size.x - 84, 16), Vector2(64, 56))
+	_tab_rects = [Rect2(Vector2(x0, 24), Vector2(150, 52)), Rect2(Vector2(x0 + 160, 24), Vector2(150, 52))]
+
+
+## Açık sekmenin tarifleri.
+func recipes() -> Array:
+	return Items.SMELTING if tab == 1 else Items.RECIPES
 
 
 func _draw() -> void:
@@ -59,8 +72,9 @@ func _draw() -> void:
 	var inv := hud.player.inventory
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.05, 0.05, 0.08, 0.85))
 	draw_string(font, Vector2(40, 60), "Çanta", HORIZONTAL_ALIGNMENT_LEFT, -1, 30)
-	draw_string(font, _recipe_rects[0].position + Vector2(0, -30), "Üretim", HORIZONTAL_ALIGNMENT_LEFT, -1, 30)
 	_button(_close_rect, "X", font)
+	for t in 2:
+		_button(_tab_rects[t], ["Üretim", "Fırın"][t], font, t == tab)
 
 	for i in Inventory.SIZE:
 		var r := _slot_rects[i]
@@ -68,13 +82,23 @@ func _draw() -> void:
 		draw_rect(r, Color(1, 1, 1, 0.28 if selected else 0.1))
 		draw_rect(r, Color(1, 1, 1, 0.9 if selected else 0.3), false, 3.0 if selected else 1.0)
 		_draw_item(r, inv.item_at(i), inv.count_at(i), font)
+		var frac := Hud.wear_fraction(inv, i)
+		if frac < 1.0:
+			draw_rect(Rect2(r.position + Vector2(6, r.size.y - 8), Vector2((r.size.x - 12) * frac, 4)), Hud.wear_color(frac))
 	var hint_y := _slot_rects[0].end.y + 36
 	draw_string(font, Vector2(40, hint_y), "Çantadaki eşyaya dokun: seçili yuvayla yer değiştirir.", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 1, 1, 0.7))
-	var table_text := "Yakında çalışma masası var." if _near_table else "Aletler için çalışma masasının yanında olmalısın."
-	draw_string(font, Vector2(40, hint_y + 26), table_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.6, 1, 0.6) if _near_table else Color(1, 0.8, 0.5))
+	if tab == 0:
+		var table_text := "Yakında çalışma masası var." if _near_table else "Aletler için çalışma masasının yanında olmalısın."
+		draw_string(font, Vector2(40, hint_y + 26), table_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.6, 1, 0.6) if _near_table else Color(1, 0.8, 0.5))
+	else:
+		var furnace_text := "Yakında fırın var." if _near_furnace else "Eritmek için fırının yanında olmalısın."
+		draw_string(font, Vector2(40, hint_y + 26), furnace_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0.6, 1, 0.6) if _near_furnace else Color(1, 0.8, 0.5))
+		var fuel_text := "Yakıt: %d eritme. Kömür 8, kütük 3, tahta 1 eritmeye yeter." % inv.fuel
+		draw_string(font, Vector2(40, hint_y + 52), fuel_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(1, 1, 1, 0.7))
 
-	for r in Items.RECIPES.size():
-		var recipe: Dictionary = Items.RECIPES[r]
+	var list := recipes()
+	for r in list.size():
+		var recipe: Dictionary = list[r]
 		var rect := _recipe_rects[r]
 		var ok := _can_craft(recipe)
 		draw_rect(rect, Color(0.3, 0.55, 0.3, 0.45) if ok else Color(1, 1, 1, 0.07))
@@ -88,6 +112,8 @@ func _draw() -> void:
 		var needs := " + ".join(parts)
 		if recipe.get("table", false):
 			needs += "  (masa)"
+		elif tab == 1:
+			needs += " + yakıt"
 		draw_string(font, rect.position + Vector2(58, 46), needs, HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 13, Color(1, 1, 1, alpha * 0.8))
 
 
@@ -103,8 +129,8 @@ func _draw_item(r: Rect2, id: int, count: int, font: Font) -> void:
 		draw_string(font, p, text, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
 
 
-func _button(r: Rect2, text: String, font: Font) -> void:
-	draw_rect(r, Color(1, 1, 1, 0.15))
+func _button(r: Rect2, text: String, font: Font, active := false) -> void:
+	draw_rect(r, Color(1, 1, 1, 0.4 if active else 0.15))
 	draw_rect(r, Color(1, 1, 1, 0.6), false, 2.0)
 	var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, 26).x
 	draw_string(font, r.get_center() + Vector2(-w / 2.0, 9), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 26)
@@ -112,6 +138,8 @@ func _button(r: Rect2, text: String, font: Font) -> void:
 
 func _can_craft(recipe: Dictionary) -> bool:
 	var inv := hud.player.inventory
+	if tab == 1:
+		return _near_furnace and inv.can_smelt(recipe)
 	return inv.has_ingredients(recipe) and (_near_table or not recipe.get("table", false)) and inv.can_fit(recipe["out"], recipe["count"])
 
 
@@ -133,6 +161,11 @@ func tap(pos: Vector2) -> void:
 	if _close_rect.has_point(pos):
 		hud.close_inventory()
 		return
+	for t in _tab_rects.size():
+		if _tab_rects[t].has_point(pos):
+			tab = t
+			queue_redraw()
+			return
 	var inv := hud.player.inventory
 	for i in Inventory.SIZE:
 		if _slot_rects[i].has_point(pos):
@@ -144,8 +177,12 @@ func tap(pos: Vector2) -> void:
 			return
 	for r in _recipe_rects.size():
 		if _recipe_rects[r].has_point(pos):
-			var recipe: Dictionary = Items.RECIPES[r]
-			if _can_craft(recipe) and inv.craft(recipe):
+			var recipe: Dictionary = recipes()[r]
+			if not _can_craft(recipe):
+				pass
+			elif tab == 1 and inv.smelt(recipe):
+				hud.toast("%s eritildi" % Items.display_name(recipe["out"]))
+			elif tab == 0 and inv.craft(recipe):
 				hud.toast("%s üretildi" % Items.display_name(recipe["out"]))
 			queue_redraw()
 			return

@@ -7,8 +7,10 @@ signal changed
 const HOTBAR := 9
 const SIZE := 36
 
-## Her yuva {"id": int, "count": int} ya da boşsa {}.
+## Her yuva {"id": int, "count": int} ya da boşsa {}. Aletlerde "uses": kalan kullanım hakkı.
 var slots: Array[Dictionary] = []
+## Fırında yanmış, henüz harcanmamış yakıt (kaç eritmeye yeteceği).
+var fuel := 0
 
 
 func _init() -> void:
@@ -27,6 +29,8 @@ func add(id: int, count := 1) -> int:
 			if pass_empty and slot.is_empty():
 				slot["id"] = id
 				slot["count"] = 0
+				if Items.max_uses(id) > 0:
+					slot["uses"] = Items.max_uses(id)
 			if not slot.is_empty() and slot["id"] == id and slot["count"] < limit:
 				var n := mini(count, limit - slot["count"])
 				slot["count"] += n
@@ -79,6 +83,25 @@ func count_at(i: int) -> int:
 	return slots[i]["count"] if not slots[i].is_empty() else 0
 
 
+## Aletin kalan kullanım hakkı; alet değilse 0.
+func uses_at(i: int) -> int:
+	if slots[i].is_empty():
+		return 0
+	return slots[i].get("uses", Items.max_uses(slots[i]["id"]))
+
+
+## Yuvadaki aleti bir kez kullanır. Alet bu kullanımla kırıldıysa true döner.
+func wear(i: int, amount := 1) -> bool:
+	if slots[i].is_empty() or Items.max_uses(slots[i]["id"]) == 0:
+		return false
+	slots[i]["uses"] = uses_at(i) - amount
+	var broke: bool = slots[i]["uses"] <= 0
+	if broke:
+		slots[i] = {}
+	changed.emit()
+	return broke
+
+
 func count_of(id: int) -> int:
 	var total := 0
 	for slot in slots:
@@ -120,3 +143,30 @@ func craft(recipe: Dictionary) -> bool:
 			add(id, recipe["in"][id])
 		return false
 	return true
+
+
+## Fırında eritilebilir mi: malzeme, yer ve yakıt (yanmış ya da yakılabilir eşya) var mı.
+func can_smelt(recipe: Dictionary) -> bool:
+	return has_ingredients(recipe) and can_fit(recipe["out"], recipe["count"]) and (fuel > 0 or _fuel_to_burn(recipe) != -1)
+
+
+## Gerekirse yakıt yakar, sonra eritir. Yapılamıyorsa hiçbir şey harcamaz.
+func smelt(recipe: Dictionary) -> bool:
+	if not can_smelt(recipe):
+		return false
+	if fuel == 0:
+		var id := _fuel_to_burn(recipe)
+		remove(id, 1)
+		fuel += Items.FUEL[id]
+	if not craft(recipe):
+		return false
+	fuel -= 1
+	return true
+
+
+## Yakılacak eşya: eritilecek malzemeyi tüketmeyen ilk yakıt; yoksa -1.
+func _fuel_to_burn(recipe: Dictionary) -> int:
+	for id in Items.FUEL:
+		if count_of(id) >= recipe["in"].get(id, 0) + 1:
+			return id
+	return -1

@@ -63,6 +63,12 @@ func _ready() -> void:
 		count.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 		count.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 3)
 		slot.add_child(count)
+		var wear := ColorRect.new()
+		wear.name = "Wear"
+		wear.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		wear.position = Vector2(6, SLOT_SIZE - 8)
+		wear.size = Vector2(SLOT_SIZE - 12, 4)
+		slot.add_child(wear)
 		_hotbar.add_child(slot)
 		_slots.append(slot)
 	player.inventory.changed.connect(_refresh_hotbar)
@@ -140,7 +146,23 @@ func _refresh_hotbar() -> void:
 		(_slots[i].get_node("Icon") as TextureRect).texture = item_texture(id) if id != Blocks.AIR else null
 		var n := inv.count_at(i)
 		(_slots[i].get_node("Count") as Label).text = str(n) if n > 1 else ""
+		var wear := _slots[i].get_node("Wear") as ColorRect
+		var frac := wear_fraction(inv, i)
+		wear.visible = frac < 1.0
+		wear.size.x = (SLOT_SIZE - 12) * frac
+		wear.color = wear_color(frac)
 	_name_label.text = Items.display_name(inv.item_at(_selected))
+
+
+## Aletin kalan hakkı 0..1; alet değilse ya da hiç kullanılmadıysa 1.
+static func wear_fraction(inv: Inventory, i: int) -> float:
+	var full := Items.max_uses(inv.item_at(i))
+	return 1.0 if full == 0 else float(inv.uses_at(i)) / full
+
+
+## Dayanıklılık çubuğu rengi: yeşilden kırmızıya.
+static func wear_color(frac: float) -> Color:
+	return Color.RED.lerp(Color.GREEN, frac)
 
 
 func item_texture(id: int) -> Texture2D:

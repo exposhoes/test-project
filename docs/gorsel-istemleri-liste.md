@@ -359,3 +359,22 @@ Konsept görselleri 1536×1024, diğer her şeyi 1024×1024 üret. Kaydettiğin 
    ```
    app icon for a voxel sandbox game named EmirCRAFT: a grass block with a pickaxe crossed over it, bright sky blue background, bold and readable, blocky pixel art style, centered, no small text, 1:1 aspect ratio
    ```
+
+## Fırın ve ham madenler
+
+88. **furnace_side.png**
+   ```
+   front of a stone furnace block: grey cobblestone frame with darker mortar, a square dark opening in the lower middle with glowing orange and yellow embers inside, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```
+89. **furnace_top.png**
+   ```
+   top of a stone furnace block: smooth grey cut stone slab with a darker square border and a small soot-stained vent in the center, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```
+90. **item_raw_iron.png**
+   ```
+   lumpy chunk of raw iron ore, pale beige and rusty brown rock with metallic grey spots, single pixel art game item icon, 32x32 pixel grid, hard pixel edges, centered, transparent background, slight dark outline, no text, 1:1 aspect ratio
+   ```
+91. **item_raw_gold.png**
+   ```
+   lumpy chunk of raw gold ore, bright yellow nuggets with darker ochre shadows, single pixel art game item icon, 32x32 pixel grid, hard pixel edges, centered, transparent background, slight dark outline, no text, 1:1 aspect ratio
+   ```

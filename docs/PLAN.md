@@ -42,7 +42,10 @@ tests/                      başsız duman testi, ekran görüntüsü
    Yapraktan elma düşüyor, seçip Koy'a basınca yeniyor. Tam envanter ekranı üretimle gelecek.
 3. **Üretim (yapıldı):** 36 yuvalı çanta, Çanta ekranında 16 tarif, çalışma masası, tahta/taş/demir/kristal kazma,
    balta ve kılıçlar (Yakut Kılıç dahil). Kır basılı tutularak kırılır; taş ve madenler kazma ister,
-   madenler kömür/demir/altın/yakut/kristal bırakır. Sırada: alet dayanıklılığı, fırın.
+   madenler kömür/ham demir/ham altın/yakut/kristal bırakır.
+   Aletler aşınır (tahta 60, taş 130, demir 250, yakut kılıç 800, kristal kazma 1500 kullanım; yuvada renkli çubuk).
+   Fırın (8 kırık taş, masada): Çanta'nın Fırın sekmesinde ham demir/altın, kum, kırık taş ve kütük eritilir;
+   her eritme bir yakıt harcar (kömür 8, kütük 3, tahta 1 eritmeye yeter).
 4. **Kayıt (yapıldı):** dünya değişiklikleri, gün saati, oyuncunun konumu, can/açlık ve envanter `user://world.save`
    dosyasına 20 saniyede bir ve uygulama arka plana atılınca yazılıyor. Yeni dünya açma ana menüyle gelecek.
 5. **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.

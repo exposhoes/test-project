@@ -99,6 +99,43 @@ func _initialize() -> void:
 	player.hud.open_inventory()
 	_check(player.hud.is_menu_open(), "çanta açılmalı")
 	player.hud.close_inventory()
+
+	# Dayanıklılık: her kullanım bir hak götürür, hak bitince alet kırılır.
+	var full := Items.max_uses(Items.WOOD_PICKAXE)
+	_check(inv.uses_at(0) == full, "yeni kazmanın hakkı dolu olmalı")
+	player.wear_held()
+	_check(inv.uses_at(0) == full - 1, "kullanınca hak azalmalı")
+	inv.slots[0]["uses"] = 1
+	player.wear_held()
+	_check(inv.item_at(0) == Blocks.AIR, "hakkı biten kazma kırılmalı")
+	_check(not inv.wear(1), "alet olmayan eşya aşınmamalı")
+
+	# Fırın: ham demir yakıtla demire dönüşür; kömür 8 eritmeye yeter.
+	for i in Inventory.SIZE:
+		inv.slots[i] = {}
+	_check(Items.drop_for_block(Blocks.IRON_ORE) == Items.RAW_IRON, "demir madeni ham demir bırakmalı")
+	var smelt := {}
+	for r in Items.SMELTING:
+		smelt[r["out"]] = r
+	inv.add(Items.RAW_IRON, 2)
+	_check(not inv.can_smelt(smelt[Items.IRON]), "yakıtsız eritilmemeli")
+	inv.add(Items.COAL, 1)
+	_check(inv.smelt(smelt[Items.IRON]) and inv.count_of(Items.IRON) == 1 and inv.count_of(Items.COAL) == 0 and inv.fuel == 7,
+		"kömür yakılıp demir çıkmalı (yakıt=%d)" % inv.fuel)
+	_check(inv.smelt(smelt[Items.IRON]) and inv.count_of(Items.IRON) == 2 and inv.fuel == 6, "kalan yakıtla eritmeli")
+	inv.fuel = 0
+	inv.add(Blocks.LOG, 1)
+	_check(not inv.can_smelt(smelt[Items.COAL]), "tek kütük hem yakıt hem malzeme olamamalı")
+	inv.add(Blocks.LOG, 1)
+	_check(inv.smelt(smelt[Items.COAL]) and inv.count_of(Blocks.LOG) == 0 and inv.fuel == 2, "kütükten kömür eritilmeli")
+	_check(not player.near_block(Blocks.FURNACE), "başta yakında fırın olmamalı")
+	world.set_block(table_pos, Blocks.FURNACE)
+	_check(player.near_block(Blocks.FURNACE), "fırın koyunca algılanmalı")
+	player.hud.open_inventory()
+	_check(player.hud._inventory_screen.tab == 1, "fırın yanında çanta Fırın sekmesiyle açılmalı")
+	player.hud.close_inventory()
+	world.set_block(table_pos, Blocks.AIR)
+	inv.fuel = 0
 	for i in Inventory.SIZE:
 		inv.slots[i] = {}
 

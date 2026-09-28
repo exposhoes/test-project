@@ -29,6 +29,7 @@ enum {
 	TOY_BRICK_RED,
 	TOY_BRICK_BLUE,
 	TOY_BRICK_YELLOW,
+	FURNACE,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -60,6 +61,7 @@ const DEFS := {
 	TOY_BRICK_RED: {"name": "Kırmızı Oyuncak Blok", "all": "toy_brick_red"},
 	TOY_BRICK_BLUE: {"name": "Mavi Oyuncak Blok", "all": "toy_brick_blue"},
 	TOY_BRICK_YELLOW: {"name": "Sarı Oyuncak Blok", "all": "toy_brick_yellow"},
+	FURNACE: {"name": "Fırın", "top": "furnace_top", "side": "furnace_side", "bottom": "cobblestone"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -91,6 +93,8 @@ const PLACEHOLDER_COLORS := {
 	"toy_brick_red": Color("d9343a"),
 	"toy_brick_blue": Color("2f6fd9"),
 	"toy_brick_yellow": Color("f2c230"),
+	"furnace_top": Color("7a7a7a"),
+	"furnace_side": Color("6e6e6e"),
 }
 
 

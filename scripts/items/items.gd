@@ -12,6 +12,8 @@ const IRON := 1003
 const GOLD := 1004
 const RUBY := 1005
 const CRYSTAL := 1006
+const RAW_IRON := 1007
+const RAW_GOLD := 1008
 const WOOD_PICKAXE := 1010
 const STONE_PICKAXE := 1011
 const IRON_PICKAXE := 1012
@@ -38,10 +40,12 @@ const PICK := ["_hhhhh__", "h__s__h_", "___s____", "___s____", "___s____", "___s
 const AXE := ["__shh___", "__shhh__", "__shh___", "__s_____", "__s_____", "__s_____", "__s_____", "________"]
 const SWORD := ["___h____", "___h____", "___h____", "___h____", "___h____", "_gggg___", "___s____", "___s____"]
 const INGOT := ["________", "________", "__hhhh__", "_hhhhhh_", "hhhhhhd_", "_dddddd_", "________", "________"]
+const NUGGET := ["________", "________", "__hh____", "_hhwhh__", "_hhhhhh_", "__hhhdd_", "___ddd__", "________"]
 const GEM := ["________", "__hhh___", "_hhhhh__", "hhwhhhh_", "_hhhhd__", "__hhd___", "___d____", "________"]
 
 ## name: ad. food: yenince doldurduğu açlık. tool/tier: alet türü ve kademesi.
 ## damage: kılıcın vuruşa eklediği hasar. stack: bir yuvaya sığan en fazla sayı.
+## uses: aletin kaç kullanımda kırılacağı (her blok ya da vuruş bir kullanım).
 const DEFS := {
 	APPLE: {"name": "Elma", "icon": "item_apple", "food": 4,
 		"colors": {"r": Color("d8263f"), "d": Color("8e1426"), "g": Color("3b8a2a"), "b": Color("5e4426"), "w": Color("f7a0a8")},
@@ -54,17 +58,19 @@ const DEFS := {
 	GOLD: {"name": "Altın", "icon": "item_gold", "colors": {"h": Color("f2cf3c"), "d": Color("b8911c")}, "pattern": INGOT},
 	RUBY: {"name": "Yakut", "icon": "item_ruby", "colors": {"h": Color("d8263f"), "d": Color("8e1426"), "w": Color("f7a0a8")}, "pattern": GEM},
 	CRYSTAL: {"name": "Kristal", "icon": "item_crystal", "colors": {"h": Color("45e0e6"), "d": Color("1f8a8f"), "w": Color("d8fbfc")}, "pattern": GEM},
-	WOOD_PICKAXE: {"name": "Tahta Kazma", "icon": "item_pickaxe_wood", "tool": "pickaxe", "tier": 1, "stack": 1, "colors": {"h": WOOD, "s": HANDLE}, "pattern": PICK},
-	STONE_PICKAXE: {"name": "Taş Kazma", "icon": "item_pickaxe_stone", "tool": "pickaxe", "tier": 2, "stack": 1, "colors": {"h": STONE, "s": HANDLE}, "pattern": PICK},
-	IRON_PICKAXE: {"name": "Demir Kazma", "icon": "item_pickaxe_iron", "tool": "pickaxe", "tier": 3, "stack": 1, "colors": {"h": IRONC, "s": HANDLE}, "pattern": PICK},
-	CRYSTAL_PICKAXE: {"name": "Kristal Kazma", "icon": "item_pickaxe_crystal", "tool": "pickaxe", "tier": 4, "stack": 1, "colors": {"h": Color("45e0e6"), "s": HANDLE}, "pattern": PICK},
-	WOOD_AXE: {"name": "Tahta Balta", "icon": "item_axe_wood", "tool": "axe", "tier": 1, "stack": 1, "colors": {"h": WOOD, "s": HANDLE}, "pattern": AXE},
-	STONE_AXE: {"name": "Taş Balta", "icon": "item_axe_stone", "tool": "axe", "tier": 2, "stack": 1, "colors": {"h": STONE, "s": HANDLE}, "pattern": AXE},
-	IRON_AXE: {"name": "Demir Balta", "icon": "item_axe_iron", "tool": "axe", "tier": 3, "stack": 1, "colors": {"h": IRONC, "s": HANDLE}, "pattern": AXE},
-	WOOD_SWORD: {"name": "Tahta Kılıç", "icon": "item_sword_wood", "damage": 2, "stack": 1, "colors": {"h": WOOD, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
-	STONE_SWORD: {"name": "Taş Kılıç", "icon": "item_sword_stone", "damage": 3, "stack": 1, "colors": {"h": STONE, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
-	IRON_SWORD: {"name": "Demir Kılıç", "icon": "item_sword_iron", "damage": 4, "stack": 1, "colors": {"h": IRONC, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
-	RUBY_SWORD: {"name": "Yakut Kılıç", "icon": "item_sword_ruby", "damage": 6, "stack": 1, "colors": {"h": Color("d8263f"), "g": Color("f2cf3c"), "s": HANDLE}, "pattern": SWORD},
+	RAW_IRON: {"name": "Ham Demir", "icon": "item_raw_iron", "colors": {"h": Color("c9a184"), "d": Color("8a6a55")}, "pattern": NUGGET},
+	RAW_GOLD: {"name": "Ham Altın", "icon": "item_raw_gold", "colors": {"h": Color("e8b93a"), "d": Color("a67c1c")}, "pattern": NUGGET},
+	WOOD_PICKAXE: {"uses": 60, "name": "Tahta Kazma", "icon": "item_pickaxe_wood", "tool": "pickaxe", "tier": 1, "stack": 1, "colors": {"h": WOOD, "s": HANDLE}, "pattern": PICK},
+	STONE_PICKAXE: {"uses": 130, "name": "Taş Kazma", "icon": "item_pickaxe_stone", "tool": "pickaxe", "tier": 2, "stack": 1, "colors": {"h": STONE, "s": HANDLE}, "pattern": PICK},
+	IRON_PICKAXE: {"uses": 250, "name": "Demir Kazma", "icon": "item_pickaxe_iron", "tool": "pickaxe", "tier": 3, "stack": 1, "colors": {"h": IRONC, "s": HANDLE}, "pattern": PICK},
+	CRYSTAL_PICKAXE: {"uses": 1500, "name": "Kristal Kazma", "icon": "item_pickaxe_crystal", "tool": "pickaxe", "tier": 4, "stack": 1, "colors": {"h": Color("45e0e6"), "s": HANDLE}, "pattern": PICK},
+	WOOD_AXE: {"uses": 60, "name": "Tahta Balta", "icon": "item_axe_wood", "tool": "axe", "tier": 1, "stack": 1, "colors": {"h": WOOD, "s": HANDLE}, "pattern": AXE},
+	STONE_AXE: {"uses": 130, "name": "Taş Balta", "icon": "item_axe_stone", "tool": "axe", "tier": 2, "stack": 1, "colors": {"h": STONE, "s": HANDLE}, "pattern": AXE},
+	IRON_AXE: {"uses": 250, "name": "Demir Balta", "icon": "item_axe_iron", "tool": "axe", "tier": 3, "stack": 1, "colors": {"h": IRONC, "s": HANDLE}, "pattern": AXE},
+	WOOD_SWORD: {"uses": 60, "name": "Tahta Kılıç", "icon": "item_sword_wood", "damage": 2, "stack": 1, "colors": {"h": WOOD, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
+	STONE_SWORD: {"uses": 130, "name": "Taş Kılıç", "icon": "item_sword_stone", "damage": 3, "stack": 1, "colors": {"h": STONE, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
+	IRON_SWORD: {"uses": 250, "name": "Demir Kılıç", "icon": "item_sword_iron", "damage": 4, "stack": 1, "colors": {"h": IRONC, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
+	RUBY_SWORD: {"uses": 800, "name": "Yakut Kılıç", "icon": "item_sword_ruby", "damage": 6, "stack": 1, "colors": {"h": Color("d8263f"), "g": Color("f2cf3c"), "s": HANDLE}, "pattern": SWORD},
 }
 
 ## Kırılınca bırakılan eşya; -1 hiçbir şey bırakmaz. Listede olmayan blok kendini bırakır.
@@ -74,8 +80,8 @@ const BLOCK_DROPS := {
 	Blocks.LEAVES: -1,
 	Blocks.GLASS: -1,
 	Blocks.COAL_ORE: COAL,
-	Blocks.IRON_ORE: IRON,
-	Blocks.GOLD_ORE: GOLD,
+	Blocks.IRON_ORE: RAW_IRON,
+	Blocks.GOLD_ORE: RAW_GOLD,
 	Blocks.RUBY_ORE: RUBY,
 	Blocks.CRYSTAL_ORE: CRYSTAL,
 }
@@ -89,6 +95,7 @@ const MINING := {
 	Blocks.LOG: {"time": 2.0, "tool": "axe"},
 	Blocks.PLANKS: {"time": 2.0, "tool": "axe"},
 	Blocks.CRAFTING_TABLE: {"time": 2.0, "tool": "axe"},
+	Blocks.FURNACE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
 	Blocks.STONE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
 	Blocks.COBBLESTONE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
 	Blocks.BRICKS: {"time": 4.0, "tool": "pickaxe", "tier": 1},
@@ -115,9 +122,21 @@ const RECIPES := [
 	{"out": IRON_SWORD, "count": 1, "in": {IRON: 2, STICK: 1}, "table": true},
 	{"out": CRYSTAL_PICKAXE, "count": 1, "in": {CRYSTAL: 3, STICK: 2}, "table": true},
 	{"out": RUBY_SWORD, "count": 1, "in": {RUBY: 2, GOLD: 1, STICK: 1}, "table": true},
-	{"out": Blocks.GLASS, "count": 1, "in": {Blocks.SAND: 1, COAL: 1}, "table": true},
+	{"out": Blocks.FURNACE, "count": 1, "in": {Blocks.COBBLESTONE: 8}, "table": true},
 	{"out": Blocks.BRICKS, "count": 2, "in": {Blocks.COBBLESTONE: 2, Blocks.DIRT: 2}, "table": true},
 ]
+
+## Fırın tarifleri: yakında fırın ve yakıt gerekir. Her eritme bir yakıt birimi harcar.
+const SMELTING := [
+	{"out": IRON, "count": 1, "in": {RAW_IRON: 1}},
+	{"out": GOLD, "count": 1, "in": {RAW_GOLD: 1}},
+	{"out": Blocks.GLASS, "count": 1, "in": {Blocks.SAND: 1}},
+	{"out": Blocks.STONE, "count": 1, "in": {Blocks.COBBLESTONE: 1}},
+	{"out": COAL, "count": 1, "in": {Blocks.LOG: 1}},
+]
+
+## Yakıtlar ve kaç eritmeye yettikleri; fırın bu sırayla yakar.
+const FUEL := {COAL: 8, Blocks.LOG: 3, Blocks.PLANKS: 1}
 
 static var _icons := {}
 
@@ -146,6 +165,11 @@ static func tool_type(id: int) -> String:
 
 static func tool_tier(id: int) -> int:
 	return DEFS[id].get("tier", 0) if DEFS.has(id) else 0
+
+
+## Aletin toplam kullanım hakkı; alet değilse 0.
+static func max_uses(id: int) -> int:
+	return DEFS[id].get("uses", 0) if DEFS.has(id) else 0
 
 
 static func attack_bonus(id: int) -> int:
