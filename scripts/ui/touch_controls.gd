@@ -22,9 +22,12 @@ var _finger_actions := {}  # parmak -> eylem
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	visible = DisplayServer.is_touchscreen_available()
+	# Bazı emülatörler dokunmatik ekran bildirmiyor; mobil sürümde düğmeler her zaman görünsün.
+	visible = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
+	# Düğmeler ekran boyutuna göre konumlanır; boyut ilk çizimden sonra oturduğunda yeniden çiz.
+	resized.connect(queue_redraw)
 
 
 func consume_look_delta() -> Vector2:
