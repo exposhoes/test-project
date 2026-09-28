@@ -1,6 +1,6 @@
 class_name Player
 extends CharacterBody3D
-## Birinci şahıs oyuncu: yürüme, zıplama, bakma, blok kırma ve koyma.
+## Birinci şahıs oyuncu: yürüme, zıplama, bakma, blok kırma/koyma, yaratıklara vurma.
 
 const WALK_SPEED := 4.5
 const JUMP_VELOCITY := 7.8
@@ -11,15 +11,24 @@ const HALF_WIDTH := 0.3
 const BODY_HEIGHT := 1.8
 const MOUSE_SENSITIVITY := 0.003
 const TOUCH_SENSITIVITY := 0.005
+## Bu kadar bloktan fazla düşünce her fazla blok için yarım kalp hasar.
+const SAFE_FALL := 3.0
+const ATTACK_REACH := 3.5
+const ATTACK_DAMAGE := 4
+const APPLE_CHANCE := 0.2
+const APPLE_FOOD := 4
 
 var world: World
 var hud: Hud
 var camera := Camera3D.new()
+var survival := Survival.new()
 
 var _pitch := 0.0
 var _target := {}
 var _highlight := MeshInstance3D.new()
 var _spawned := false
+var _fall_peak := 0.0
+var _knockback := Vector3.ZERO
 
 
 func _ready() -> void:
@@ -47,6 +56,9 @@ func _ready() -> void:
 	_highlight.visible = false
 	add_child(_highlight)
 
+	survival.name = "Survival"
+	add_child(survival)
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
@@ -63,6 +75,9 @@ func _physics_process(delta: float) -> void:
 	if not _spawned:
 		_try_spawn()
 		return
+	if survival.dead:
+		velocity = Vector3.ZERO
+		return
 
 	if hud:
 		_look(hud.touch.consume_look_delta() * TOUCH_SENSITIVITY)
@@ -72,9 +87,11 @@ func _physics_process(delta: float) -> void:
 		input += hud.touch.move_vector
 	input = input.limit_length(1.0)
 	var dir := (transform.basis * Vector3(input.x, 0, input.y))
-	velocity.x = dir.x * WALK_SPEED
-	velocity.z = dir.z * WALK_SPEED
+	velocity.x = dir.x * WALK_SPEED + _knockback.x
+	velocity.z = dir.z * WALK_SPEED + _knockback.z
+	_knockback = _knockback.move_toward(Vector3.ZERO, 20.0 * delta)
 
+	var was_on_floor := is_on_floor()
 	if is_on_floor():
 		if Input.is_action_pressed("jump"):
 			velocity.y = JUMP_VELOCITY
@@ -83,20 +100,22 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	world.update_center(global_position)
+	_check_fall(was_on_floor)
 
 	if global_position.y < -20.0:
-		_spawned = false
+		survival.take_damage(Survival.MAX_HEALTH)
 
 
 func _process(_delta: float) -> void:
-	if not _spawned:
+	if not _spawned or survival.dead:
+		_highlight.visible = false
 		return
 	_target = raycast_block()
 	_highlight.visible = not _target.is_empty()
 	if _highlight.visible:
 		_highlight.global_position = Vector3(_target["hit"]) + Vector3.ONE * 0.5
 
-	if Input.is_action_just_pressed("break_block"):
+	if Input.is_action_just_pressed("break_block") and not attack():
 		break_target()
 	if Input.is_action_just_pressed("place_block"):
 		place_at_target(hud.selected_block() if hud else Blocks.DIRT)
@@ -106,8 +125,64 @@ func break_target() -> void:
 	if _target.is_empty():
 		return
 	var pos: Vector3i = _target["hit"]
-	if Blocks.is_breakable(world.get_block(pos)):
+	var id := world.get_block(pos)
+	if Blocks.is_breakable(id):
 		world.set_block(pos, Blocks.AIR)
+		# Envanter gelene kadar yapraktan çıkan elma hemen yenir.
+		if id == Blocks.LEAVES and randf() < APPLE_CHANCE:
+			survival.eat(APPLE_FOOD)
+			if hud:
+				hud.toast("Elma buldun!")
+
+
+## Önündeki en yakın yaratığa vurur. Vurduysa true döner (o zaman blok kırılmaz).
+func attack() -> bool:
+	var eye := camera.global_position
+	var forward := -camera.global_transform.basis.z
+	var best: Mob = null
+	var best_dist := ATTACK_REACH
+	for node in get_tree().get_nodes_in_group("mobs"):
+		var mob := node as Mob
+		var to_mob := mob.global_position + Vector3.UP * mob.center_height() - eye
+		var dist := to_mob.length()
+		# Uzaktakiler için dar bir koni; burnumuzun dibindekiler için yatayda geniş açı yeterli.
+		var flat_angle := Vector2(forward.x, forward.z).angle_to(Vector2(to_mob.x, to_mob.z))
+		var aimed := forward.angle_to(to_mob) < deg_to_rad(25) or (dist < 2.0 and absf(flat_angle) < deg_to_rad(50))
+		if dist < best_dist and aimed:
+			best = mob
+			best_dist = dist
+	if best == null:
+		return false
+	best.take_damage(ATTACK_DAMAGE, global_position)
+	return true
+
+
+## Yaratık saldırısı gibi dış hasarlar: can düşer ve oyuncu geriye itilir.
+func hurt(amount: int, from: Vector3) -> void:
+	if survival.dead:
+		return
+	survival.take_damage(amount)
+	var away := global_position - from
+	away.y = 0
+	_knockback = away.normalized() * 8.0
+	velocity.y = 4.0
+
+
+func respawn() -> void:
+	survival.reset()
+	_knockback = Vector3.ZERO
+	_spawned = false
+
+
+func _check_fall(was_on_floor: bool) -> void:
+	if was_on_floor and not is_on_floor():
+		_fall_peak = global_position.y
+	elif not is_on_floor():
+		_fall_peak = maxf(_fall_peak, global_position.y)
+	elif not was_on_floor:
+		var dist := _fall_peak - global_position.y
+		if dist > SAFE_FALL:
+			survival.take_damage(int(dist - SAFE_FALL))
 
 
 func place_at_target(id: int) -> void:
@@ -164,6 +239,7 @@ func _try_spawn() -> void:
 		return
 	global_position = Vector3(spawn.x, world.surface_y(floori(spawn.x), floori(spawn.z)) + 0.5, spawn.z)
 	velocity = Vector3.ZERO
+	_fall_peak = global_position.y
 	_spawned = true
 
 

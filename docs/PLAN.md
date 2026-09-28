@@ -34,7 +34,8 @@ tests/                      başsız duman testi, ekran görüntüsü
 ## Yol haritası
 1. **İskelet (bu PR):** sonsuz arazi, chunk yükleme, yürüme/zıplama, blok kırma/koyma, hızlı erişim çubuğu,
    dokunmatik kontroller, gece-gündüz, 20 yaratığın tanımı ve dünyada dolaşan ilk yaratıklar.
-2. **Hayatta kalma:** can ve açlık, düşman hasarı, düşme hasarı, ölüm/yeniden doğma, envanter ve blok düşürme.
+2. **Hayatta kalma (yapıldı):** can ve açlık, düşman hasarı, düşme hasarı, yaratıklara vurma, ölüm/yeniden doğma.
+   Yapraktan elma çıkıyor ve hemen yeniyor. Envanter ve blok düşürme sonraki adım.
 3. **Üretim:** çalışma masası, tarifler, aletler (kazma/balta/kılıç), kazma hızı.
 4. **Kayıt:** dünyada yapılan değişiklikleri cihaza kaydetme (şu an uzaklaşınca değişiklikler sıfırlanıyor).
 5. **Yaratık yetenekleri:** Tokmakçı kapı çalma, Sırıtkan ışıktan kaçma, Yosun sese yönelme, Mışıl uyku gazı vb.

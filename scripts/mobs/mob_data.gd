@@ -8,10 +8,11 @@ enum Behavior { PASSIVE, NEUTRAL, HOSTILE, ALLY }
 enum Habitat { OVERWORLD, YELLOW_HALLS, TOY_FACTORY }
 
 ## height: toplam boy (blok), width: gövde genişliği, speed: blok/sn, night_only: sadece gece doğar.
+## health (varsayılan 10) ve damage (varsayılan 2) yarım kalp birimindedir.
 ## İsteğe bağlı "parts": [boyut, merkez, renk, (doku)] kutuları ve "face": [kenar, merkez] ile özel model;
 ## verilmezse boy/genişlikten genel bir model kurulur. Model -Z yönüne bakar.
 const MOBS := {
-	"tokmak": {"name": "Tokmakçı", "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true,
+	"tokmak": {"name": "Tokmakçı", "health": 16, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true,
 		"primary": Color("e8dcc0"), "secondary": Color("b8322f"), "height": 2.4, "width": 0.8, "speed": 3.0,
 		# Konsept: docs/konseptler/mob_tokmak_concept.png — uzun huş kütüğü gövde, kırmızı bere, tokmak ve fener.
 		"parts": [
@@ -28,7 +29,7 @@ const MOBS := {
 			[Vector3(0.14, 0.18, 0.14), Vector3(-0.3, 0.8, -0.2), Color("f2b33a")],
 		],
 		"face": [0.56, Vector3(0, 1.98, -0.25)]},
-	"tuylupasa": {"name": "Tüylüpaşa", "behavior": Behavior.PASSIVE, "habitat": Habitat.OVERWORLD,
+	"tuylupasa": {"name": "Tüylüpaşa", "health": 4, "behavior": Behavior.PASSIVE, "habitat": Habitat.OVERWORLD,
 		"primary": Color("4f8a86"), "secondary": Color("e3833a"), "height": 1.05, "width": 0.6, "speed": 2.0,
 		# Konsept: docs/konseptler/mob_tuylupasa_concept.png — teal gövde, huş renkli kafa, altın yelek, üç tüylü sorguç.
 		"parts": [
@@ -45,7 +46,7 @@ const MOBS := {
 			[Vector3(0.06, 0.24, 0.06), Vector3(0.1, 1.11, 0), Color("4f8a86")],
 		],
 		"face": [0.46, Vector3(0, 0.77, -0.23)]},
-	"lavabo": {"name": "Lavabo Kafa", "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD,
+	"lavabo": {"name": "Lavabo Kafa", "health": 8, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD,
 		"primary": Color("f4f4f4"), "secondary": Color("e7b99a"), "height": 1.4, "width": 0.9, "speed": 3.5},
 	"mercek": {"name": "Mercek", "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD,
 		"primary": Color("1f2a44"), "secondary": Color("555a60"), "height": 1.9, "width": 0.7, "speed": 3.0},
@@ -69,7 +70,7 @@ const MOBS := {
 		"primary": Color("f2801e"), "secondary": Color("e85a8a"), "height": 1.0, "width": 1.0, "speed": 6.0},
 	"bando": {"name": "Bando", "behavior": Behavior.NEUTRAL, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("c0202e"), "secondary": Color("2a4fb0"), "height": 2.2, "width": 1.2, "speed": 2.6},
-	"kocakurbaga": {"name": "Koca Kurbağa", "behavior": Behavior.NEUTRAL, "habitat": Habitat.OVERWORLD,
+	"kocakurbaga": {"name": "Koca Kurbağa", "health": 30, "damage": 4, "behavior": Behavior.NEUTRAL, "habitat": Habitat.OVERWORLD,
 		"primary": Color("8fd13f"), "secondary": Color("5c9a25"), "height": 3.0, "width": 1.8, "speed": 1.8},
 	"pembeleylek": {"name": "Pembe Leylek", "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("f07ab0"), "secondary": Color("f4c430"), "height": 2.6, "width": 0.9, "speed": 3.4},

@@ -33,6 +33,7 @@ func _ready() -> void:
 	add_child(player)
 
 	hud.atlas = world.atlas
+	hud.player = player
 	add_child(hud)
 
 
@@ -85,7 +86,9 @@ func _try_spawn_mob() -> void:
 
 func _despawn_far_mobs() -> void:
 	for mob in _mobs.duplicate():
-		if mob.global_position.distance_to(player.global_position) > DESPAWN_DISTANCE:
+		if not is_instance_valid(mob):
+			_mobs.erase(mob)
+		elif mob.global_position.distance_to(player.global_position) > DESPAWN_DISTANCE:
 			_mobs.erase(mob)
 			mob.queue_free()
 

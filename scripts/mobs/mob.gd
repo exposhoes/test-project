@@ -1,16 +1,29 @@
 class_name Mob
 extends CharacterBody3D
-## Kutulardan kurulan basit yaratık: dolaşır, düşmanca olanlar oyuncuyu kovalar.
-## Saldırı, can ve özel yetenekler sonraki adımlarda eklenecek.
+## Kutulardan kurulan basit yaratık: dolaşır, düşmanca olanlar oyuncuyu kovalayıp vurur.
+## Nötr olanlar vurulunca kızar, barışçıllar kaçar. Özel yetenekler sonraki adımlarda eklenecek.
 
 const GRAVITY := 24.0
 const JUMP_VELOCITY := 7.5
 const CHASE_RANGE := 14.0
+const ATTACK_RANGE := 1.4
+const ATTACK_COOLDOWN := 1.0
+const FLEE_TIME := 4.0
+const DEFAULT_HEALTH := 10
+const DEFAULT_DAMAGE := 2
 const FACE_DIR := "res://assets/textures/mobs/"
 
 var mob_id: String
 var data: Dictionary
 var target: Node3D
+var health := DEFAULT_HEALTH
+
+var _angry := false
+var _flee_timer := 0.0
+var _attack_timer := 0.0
+var _knockback := Vector3.ZERO
+var _flash_timer := 0.0
+var _materials: Array[StandardMaterial3D] = []
 
 var _wander_dir := Vector3.ZERO
 var _wander_timer := 0.0
@@ -25,6 +38,8 @@ static func create(id: String) -> Mob:
 
 
 func _ready() -> void:
+	add_to_group("mobs")
+	health = data.get("health", DEFAULT_HEALTH)
 	var h: float = data["height"]
 	var w: float = data["width"]
 	var shape := BoxShape3D.new()
@@ -84,6 +99,7 @@ func _box(size: Vector3, pos: Vector3, color: Color, texture_name := "") -> void
 		mat.uv1_triplanar = true
 		mat.uv1_scale = Vector3.ONE * 2.0
 	mesh.material = mat
+	_materials.append(mat)
 	mi.mesh = mesh
 	mi.position = pos
 	add_child(mi)
@@ -103,17 +119,56 @@ func _face_texture() -> Texture2D:
 	return ImageTexture.create_from_image(img)
 
 
+func center_height() -> float:
+	return data["height"] / 2.0
+
+
+func take_damage(amount: int, from: Vector3) -> void:
+	health -= amount
+	var away := global_position - from
+	away.y = 0
+	_knockback = away.normalized() * 7.0
+	velocity.y = 4.0
+	_flash(true)
+	if data["behavior"] == MobData.Behavior.PASSIVE:
+		_flee_timer = FLEE_TIME
+	elif data["behavior"] == MobData.Behavior.NEUTRAL:
+		_angry = true
+	if health <= 0:
+		queue_free()
+
+
+func _is_aggressive() -> bool:
+	return data["behavior"] == MobData.Behavior.HOSTILE or _angry
+
+
 func _physics_process(delta: float) -> void:
 	var dir := _wander(delta)
-	if data["behavior"] == MobData.Behavior.HOSTILE and target:
+	var speed: float = data["speed"]
+	_attack_timer = maxf(_attack_timer - delta, 0.0)
+	if _flash_timer > 0.0:
+		_flash_timer -= delta
+		if _flash_timer <= 0.0:
+			_flash(false)
+
+	if target and is_instance_valid(target):
 		var to_target := target.global_position - global_position
 		to_target.y = 0
-		if to_target.length() < CHASE_RANGE:
+		var dist := to_target.length()
+		if _flee_timer > 0.0:
+			_flee_timer -= delta
+			dir = -to_target.normalized()
+		elif _is_aggressive() and dist < CHASE_RANGE:
 			dir = to_target.normalized()
+			if dist < ATTACK_RANGE + data["width"] / 2.0 and _attack_timer <= 0.0 and target.has_method("hurt"):
+				_attack_timer = ATTACK_COOLDOWN
+				target.hurt(data.get("damage", DEFAULT_DAMAGE), global_position)
+		else:
+			speed *= 0.5
 
-	var speed: float = data["speed"]
-	velocity.x = dir.x * speed
-	velocity.z = dir.z * speed
+	velocity.x = dir.x * speed + _knockback.x
+	velocity.z = dir.z * speed + _knockback.z
+	_knockback = _knockback.move_toward(Vector3.ZERO, 20.0 * delta)
 	if is_on_floor():
 		if is_on_wall() and dir != Vector3.ZERO:
 			velocity.y = JUMP_VELOCITY
@@ -132,5 +187,13 @@ func _wander(delta: float) -> Vector3:
 			_wander_dir = Vector3.ZERO
 		else:
 			var a := randf() * TAU
-			_wander_dir = Vector3(sin(a), 0, cos(a)) * 0.5
+			_wander_dir = Vector3(sin(a), 0, cos(a))
 	return _wander_dir
+
+
+## Vurulunca kısa süre kırmızı yanıp söner.
+func _flash(on: bool) -> void:
+	_flash_timer = 0.15 if on else 0.0
+	for mat in _materials:
+		mat.emission_enabled = on
+		mat.emission = Color(0.8, 0.0, 0.0)
