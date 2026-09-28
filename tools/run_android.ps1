@@ -13,6 +13,10 @@ if (-not (& $adb devices | Select-String "\tdevice$")) {
 	exit 1
 }
 
+# Buluttaki son değişiklikleri al; yerel değişiklik varsa çekmeden devam eder.
+Write-Host "Güncelleniyor..."
+& git -C $root pull --ff-only 2>&1 | Out-String | Write-Host
+
 Write-Host "Derleniyor: $godot"
 New-Item -ItemType Directory -Force (Join-Path $root "export") | Out-Null
 & $godot --headless --path $root --export-debug "Android" $apk 2>&1 | Select-String "ERROR|SCRIPT ERROR|DONE.*export"

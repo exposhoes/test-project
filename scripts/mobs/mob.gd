@@ -55,7 +55,8 @@ func _build_model(h: float, w: float) -> void:
 	if data.has("parts"):
 		for part in data["parts"]:
 			_box(part[0], part[1], part[2], part[3] if part.size() > 3 else "")
-		_add_face(data["face"][0], data["face"][1])
+		var edge = data["face"][0]
+		_add_face(edge if edge is Vector2 else Vector2(edge, edge), data["face"][1])
 		return
 	var legs := h * 0.35
 	var torso := h * 0.4
@@ -64,15 +65,18 @@ func _build_model(h: float, w: float) -> void:
 	_box(Vector3(w * 0.4, legs, w * 0.45), Vector3(w * 0.22, legs / 2.0, 0), data["secondary"])
 	_box(Vector3(w, torso, w * 0.55), Vector3(0, legs + torso / 2.0, 0), data["primary"])
 	_box(Vector3(head, head, head), Vector3(0, legs + torso + head / 2.0, 0), data["primary"].lightened(0.1))
-	_add_face(head, Vector3(0, legs + torso + head / 2.0, -head / 2.0))
+	_add_face(Vector2(head, head), Vector3(0, legs + torso + head / 2.0, -head / 2.0))
 
 
-## Yüz dokusunu verilen noktadaki (ön yüzeyin merkezi) kareye giydirir.
-func _add_face(edge: float, center: Vector3) -> void:
+## Yüz dokusunu verilen noktadaki (ön yüzeyin merkezi) dikdörtgene giydirir.
+## "face_glow" olan yaratıkların yüzü (ekran, hoparlör, parlayan göz) karanlıkta da görünür.
+func _add_face(size: Vector2, center: Vector3) -> void:
 	var face := MeshInstance3D.new()
 	var quad := QuadMesh.new()
-	quad.size = Vector2(edge, edge) * 0.98
+	quad.size = size * 0.98
 	var mat := StandardMaterial3D.new()
+	if data.get("face_glow", false):
+		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 	mat.albedo_texture = _face_texture()
