@@ -4,6 +4,8 @@ extends Control
 ## sağ altta Zıpla / Kır / Koy düğmeleri. Düğmeler normal giriş eylemlerini tetikler.
 
 const JOYSTICK_RADIUS := 80.0
+## Joystick boştayken sol alt köşede durduğu yer (sol ve alt kenardan uzaklık).
+const JOYSTICK_HOME := Vector2(170, -170)
 const BUTTONS := [
 	{"action": "jump", "label": "Zıpla", "offset": Vector2(-110, -120), "radius": 58.0},
 	{"action": "break_block", "label": "Kır", "offset": Vector2(-250, -110), "radius": 48.0},
@@ -94,6 +96,8 @@ func _draw() -> void:
 		draw_arc(center, b["radius"], 0, TAU, 48, Color(1, 1, 1, 0.6), 2.0)
 		var text_size := font.get_string_size(b["label"], HORIZONTAL_ALIGNMENT_CENTER, -1, 22)
 		draw_string(font, center + Vector2(-text_size.x / 2.0, 8), b["label"], HORIZONTAL_ALIGNMENT_CENTER, -1, 22)
-	if _joy_finger != -1:
-		draw_circle(_joy_origin, JOYSTICK_RADIUS, Color(1, 1, 1, 0.15))
-		draw_circle(_joy_origin + move_vector * JOYSTICK_RADIUS, 32, Color(1, 1, 1, 0.4))
+	# Joystick her zaman görünür; dokununca parmağın değdiği yere taşınır.
+	var origin := _joy_origin if _joy_finger != -1 else Vector2(JOYSTICK_HOME.x, size.y + JOYSTICK_HOME.y)
+	draw_circle(origin, JOYSTICK_RADIUS, Color(1, 1, 1, 0.18 if _joy_finger != -1 else 0.1))
+	draw_arc(origin, JOYSTICK_RADIUS, 0, TAU, 48, Color(1, 1, 1, 0.5), 2.0)
+	draw_circle(origin + move_vector * JOYSTICK_RADIUS, 32, Color(1, 1, 1, 0.45))
