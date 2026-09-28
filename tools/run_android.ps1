@@ -20,7 +20,13 @@ if (-not (Test-Path $apk)) { Write-Host "APK üretilemedi."; exit 1 }
 
 Write-Host "Kuruluyor..."
 & $adb wait-for-device
-$out = & $adb install -r $apk 2>&1 | Out-String
+for ($try = 1; $try -le 3; $try++) {
+	& $adb wait-for-device
+	$out = cmd /c "`"$adb`" install -r `"$apk`" 2>&1" | Out-String
+	if ($out -match "Success|UPDATE_INCOMPATIBLE|signatures do not match") { break }
+	Write-Host "Kurulum denemesi $try başarısız, tekrar deneniyor..."
+	Start-Sleep 3
+}
 Write-Host $out
 if ($out -match "UPDATE_INCOMPATIBLE|signatures do not match") {
 	Write-Host "İmza uyuşmadı, eski sürüm kaldırılıp yeniden kuruluyor..."
