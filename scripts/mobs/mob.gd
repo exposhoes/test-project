@@ -22,6 +22,17 @@ const TELEPORT_DISTANCE := 24.0
 const GUARD_RANGE := 12.0
 ## Evcil dost bu kadar saniyede bir 1 can yeniler.
 const REGEN_INTERVAL := 4.0
+## Yetenek ayarları (mob_data.gd "ability").
+const HOP_VELOCITY := 5.5
+const HOP_INTERVAL := 0.7
+const STARE_SPEEDUP := 1.8
+const HEAR_MEMORY := 3.0        # duyduktan sonra bu kadar saniye kovalar
+const HEAR_CLOSE := 2.5         # bu kadar yakında sessiz yürüyüş de duyulur
+const AMBUSH_RANGE := 4.0
+const GAS_TIME := 4.0
+const TOSS_VELOCITY := 13.0
+const STUN_TIME := 2.0
+const SHOCKWAVE_RADIUS := 3.5
 
 var mob_id: String
 var data: Dictionary
@@ -34,6 +45,10 @@ var owner_node: Node3D
 var _foe: Mob
 var _fallback_target: Node3D
 var _regen_timer := 0.0
+var _stun_timer := 0.0
+var _hop_timer := 0.0
+var _heard_timer := 0.0
+var _awake := false
 
 var _angry := false
 var _flee_timer := 0.0
@@ -184,8 +199,65 @@ func take_damage(amount: int, from: Vector3) -> void:
 		queue_free()
 
 
+func ability() -> String:
+	return data.get("ability", "")
+
+
+## Kısa süre donar: yürümez, vurmaz (Ekran Adam'ın yeteneği).
+func stun(seconds: float) -> void:
+	_stun_timer = maxf(_stun_timer, seconds)
+
+
+func is_stunned() -> bool:
+	return _stun_timer > 0.0
+
+
 func _is_aggressive() -> bool:
-	return not tamed and (data["behavior"] == MobData.Behavior.HOSTILE or _angry)
+	if tamed:
+		return false
+	if ability() == "night_hostile" and _is_night():
+		return true
+	return data["behavior"] == MobData.Behavior.HOSTILE or _angry
+
+
+func _is_night() -> bool:
+	var main := get_parent()
+	return main != null and main.has_method("is_night") and main.is_night()
+
+
+## Kovalanacak hedefi algılıyor mu. "hears" koşanı duyar, "stare" bakılınca durur, "ambush" uyanınca kovalar.
+func _senses(dist: float) -> bool:
+	match ability():
+		"hears":
+			if dist < HEAR_CLOSE or (target.has_method("is_loud") and target.is_loud()):
+				_heard_timer = HEAR_MEMORY
+			return _heard_timer > 0.0
+		"stare":
+			return not _is_watched()
+		"ambush":
+			if not _awake and dist < AMBUSH_RANGE:
+				_awake = true
+				velocity.y = JUMP_VELOCITY
+			return _awake
+	return true
+
+
+func _is_watched() -> bool:
+	return target.has_method("is_looking_at") and target.is_looking_at(global_position + Vector3.UP * center_height())
+
+
+## Oyuncuya (ya da dosta) vurunca yeteneğe göre ek etki.
+func _on_hit(victim: Node3D) -> void:
+	match ability():
+		"teleport":
+			if victim.has_method("teleport_nearby") and victim.teleport_nearby():
+				if victim.get("hud"):
+					victim.hud.toast("Balon Kafa seni başka yere attı!")
+		"gas":
+			if victim.has_method("apply_sleep_gas"):
+				victim.apply_sleep_gas(GAS_TIME)
+		"toss":
+			victim.velocity.y = TOSS_VELOCITY
 
 
 ## Evcil dostun bu kare yürüyeceği yön: düşman varsa ona saldırır, yoksa sahibini izler.
@@ -209,6 +281,7 @@ func _ally_direction(delta: float) -> Vector3:
 					_foe._fallback_target = _foe.target
 					_foe.target = self
 				_foe.take_damage(data.get("damage", DEFAULT_DAMAGE), global_position)
+				_ally_power()
 			return Vector3.ZERO
 		return to_foe.normalized()
 	var to_owner := owner_node.global_position - global_position
@@ -218,6 +291,21 @@ func _ally_direction(delta: float) -> Vector3:
 		velocity = Vector3.ZERO
 		return Vector3.ZERO
 	return flat.normalized() if flat.length() > FOLLOW_DISTANCE else Vector3.ZERO
+
+
+## Dost yeteneği: Bas Bekçi'nin ses dalgası çevredeki tüm düşmanları iter, Ekran Adam vurduğunu dondurur.
+func _ally_power() -> void:
+	match ability():
+		"shockwave":
+			for node in get_tree().get_nodes_in_group("mobs"):
+				var m := node as Mob
+				if m != self and _is_valid_foe(m) and m.global_position.distance_to(global_position) < SHOCKWAVE_RADIUS:
+					if m != _foe:
+						m.take_damage(1, global_position)
+					m._knockback *= 2.0
+		"stun":
+			if is_instance_valid(_foe):
+				_foe.stun(STUN_TIME)
 
 
 func _is_valid_foe(m) -> bool:
@@ -253,7 +341,16 @@ func _physics_process(delta: float) -> void:
 		target = _fallback_target
 		_fallback_target = null
 
-	if tamed:
+	_hop_timer = maxf(_hop_timer - delta, 0.0)
+	_heard_timer = maxf(_heard_timer - delta, 0.0)
+	if _stun_timer > 0.0:
+		_stun_timer -= delta
+		dir = Vector3.ZERO
+	elif ability() == "ambush" and not _awake and not tamed:
+		dir = Vector3.ZERO
+		if is_instance_valid(target) and target.global_position.distance_to(global_position) < AMBUSH_RANGE:
+			_senses(0.0)
+	elif tamed:
 		dir = _ally_direction(delta)
 	elif is_instance_valid(target):
 		var to_target := target.global_position - global_position
@@ -262,11 +359,17 @@ func _physics_process(delta: float) -> void:
 		if _flee_timer > 0.0:
 			_flee_timer -= delta
 			dir = -to_target.normalized()
-		elif _is_aggressive() and dist < CHASE_RANGE:
+		elif ability() == "stare" and _is_aggressive() and dist < CHASE_RANGE and _is_watched():
+			# Bakılırken olduğu yerde donar.
+			dir = Vector3.ZERO
+		elif _is_aggressive() and dist < CHASE_RANGE and _senses(dist):
 			dir = to_target.normalized()
-			if dist < ATTACK_RANGE + data["width"] / 2.0 and _attack_timer <= 0.0 and target.has_method("hurt"):
+			if ability() == "stare":
+				speed *= STARE_SPEEDUP
+			if dist < ATTACK_RANGE + data["width"] / 2.0 + data.get("reach", 0.0) and _attack_timer <= 0.0 and target.has_method("hurt"):
 				_attack_timer = ATTACK_COOLDOWN
 				target.hurt(data.get("damage", DEFAULT_DAMAGE), global_position)
+				_on_hit(target)
 		else:
 			speed *= 0.5
 
@@ -276,6 +379,9 @@ func _physics_process(delta: float) -> void:
 	if is_on_floor():
 		if is_on_wall() and dir != Vector3.ZERO:
 			velocity.y = JUMP_VELOCITY
+		elif ability() == "hop" and dir != Vector3.ZERO and _hop_timer <= 0.0:
+			velocity.y = HOP_VELOCITY
+			_hop_timer = HOP_INTERVAL
 	else:
 		velocity.y -= GRAVITY * delta
 	if dir != Vector3.ZERO:

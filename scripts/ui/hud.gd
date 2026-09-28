@@ -19,6 +19,8 @@ var _status := StatusBar.new()
 var _toast := Label.new()
 var _toast_timer := 0.0
 var _damage_flash := ColorRect.new()
+var _gas_overlay := ColorRect.new()
+var _gas_time := 0.0
 var _death_screen := ColorRect.new()
 var _death_time := 0.0
 var _inventory_screen := InventoryScreen.new()
@@ -99,6 +101,10 @@ func _ready() -> void:
 	_damage_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_damage_flash.color = Color(0.8, 0, 0, 0)
 	root.add_child(_damage_flash)
+	_gas_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_gas_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_gas_overlay.color = Color(0.35, 0.2, 0.5, 0)
+	root.add_child(_gas_overlay)
 	player.survival.damaged.connect(func(_amount: int) -> void: _damage_flash.color.a = 0.35)
 
 	_death_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -159,6 +165,12 @@ static func wear_fraction(inv: Inventory, i: int) -> float:
 ## Dayanıklılık çubuğu rengi: yeşilden kırmızıya.
 static func wear_color(frac: float) -> Color:
 	return Color.RED.lerp(Color.GREEN, frac)
+
+
+## Uyku gazı: ekran mora çalıp kararır, süre bitince açılır.
+func show_gas(seconds: float) -> void:
+	_gas_time = maxf(_gas_time, seconds)
+	toast("Uyku gazı! Yavaşladın.")
 
 
 func item_texture(id: int) -> Texture2D:
@@ -236,6 +248,8 @@ func _process(delta: float) -> void:
 	_toast_timer = maxf(_toast_timer - delta, 0.0)
 	_toast.modulate.a = clampf(_toast_timer, 0.0, 1.0)
 	_damage_flash.color.a = move_toward(_damage_flash.color.a, 0.0, delta)
+	_gas_time = maxf(_gas_time - delta, 0.0)
+	_gas_overlay.color.a = minf(_gas_time, 1.0) * 0.55
 	if Input.is_action_just_pressed("pause") and not _death_screen.visible:
 		if _pause_menu.visible:
 			close_pause()

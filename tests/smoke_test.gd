@@ -213,6 +213,56 @@ func _initialize() -> void:
 	_check(ally.global_position.distance_to(player.global_position) < 5.0, "çok uzaklaşan dost oyuncunun yanına gelmeli")
 	ally.free()
 
+	# Yaratık yetenekleri.
+	for m in get_nodes_in_group("mobs"):
+		m.free()
+	player.rotation = Vector3.ZERO
+	player.camera.rotation.x = 0.0
+	var ahead := player.global_position - player.global_transform.basis.z * 6.0
+	var shadow := Mob.create("bosluk")
+	shadow.target = player
+	main.add_child(shadow)
+	shadow.global_position = Vector3(ahead.x, player.global_position.y + 0.1, ahead.z)
+	for i in 20:
+		await physics_frame
+	var watched_pos := shadow.global_position
+	for i in 20:
+		await physics_frame
+	_check(Vector2(shadow.global_position.x - watched_pos.x, shadow.global_position.z - watched_pos.z).length() < 0.05, "Boşluk Gölgesi bakılınca donmalı")
+	player.rotation.y = PI
+	for i in 20:
+		await physics_frame
+	_check(shadow.global_position.distance_to(player.global_position) < watched_pos.distance_to(player.global_position) - 0.5, "bakılmayınca yaklaşmalı")
+	shadow.free()
+	player.rotation = Vector3.ZERO
+	var hound := Mob.create("pence")
+	hound.target = player
+	main.add_child(hound)
+	hound.set_physics_process(false)
+	player.velocity = Vector3.ZERO
+	_check(not hound._senses(8.0), "Pençe sessiz oyuncuyu duymamalı")
+	player.velocity = Vector3(Player.WALK_SPEED, 0, 0)
+	_check(hound._senses(8.0), "Pençe koşan oyuncuyu duymalı")
+	player.velocity = Vector3.ZERO
+	hound.free()
+	var box := Mob.create("kutucuk")
+	box.target = player
+	main.add_child(box)
+	box.set_physics_process(false)
+	_check(not box._senses(10.0) and box._senses(2.0), "Kutucuk yaklaşana kadar pusuda beklemeli")
+	box.free()
+	var stunned := Mob.create("lavabo")
+	main.add_child(stunned)
+	stunned.stun(Mob.STUN_TIME)
+	_check(stunned.is_stunned(), "Ekran Adam'ın vurduğu donmalı")
+	stunned.free()
+	player.apply_sleep_gas(0.5)
+	_check(player.is_gassed(), "uyku gazı yavaşlatmalı")
+	var before_tp := player.global_position
+	_check(player.teleport_nearby(7) and player.global_position.distance_to(before_tp) > 7.0, "Balon Kafa oyuncuyu uzağa atmalı")
+	player.global_position = before_tp
+	await create_timer(0.6).timeout
+
 	# Sarı Koridorlar: kapıya Koy ile geçilir, dönüşte kapının önüne gelinir.
 	var portal_pos := Vector3i(player.global_position.floor()) + Vector3i(0, 0, -2)
 	player.rotation = Vector3.ZERO

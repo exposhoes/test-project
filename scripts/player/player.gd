@@ -18,6 +18,10 @@ const ATTACK_DAMAGE := 4
 const APPLE_CHANCE := 0.2
 ## Dost yaratıkları evcilleştiren eşya.
 const TAME_ITEM := Items.IRON
+## Uyku gazındayken yürüme hızı çarpanı.
+const GAS_SLOW := 0.45
+## Bu hızın üstünde yürümek sesle avlanan yaratıklara duyulur (joystick'i az itmek sessiz yürür).
+const LOUD_SPEED := 3.0
 
 signal tamed_mob(mob: Mob)
 ## Koridor Kapısı kullanıldı (boyut değiştirme main.gd'de).
@@ -30,6 +34,7 @@ var survival := Survival.new()
 var inventory := Inventory.new()
 
 var _pitch := 0.0
+var _gas_timer := 0.0
 var _target := {}
 var _highlight := MeshInstance3D.new()
 var _spawned := false
@@ -103,8 +108,12 @@ func _physics_process(delta: float) -> void:
 			input += hud.touch.move_vector
 	input = input.limit_length(1.0)
 	var dir := (transform.basis * Vector3(input.x, 0, input.y))
-	velocity.x = dir.x * WALK_SPEED + _knockback.x
-	velocity.z = dir.z * WALK_SPEED + _knockback.z
+	var speed := WALK_SPEED
+	if _gas_timer > 0.0:
+		_gas_timer -= delta
+		speed *= GAS_SLOW
+	velocity.x = dir.x * speed + _knockback.x
+	velocity.z = dir.z * speed + _knockback.z
 	_knockback = _knockback.move_toward(Vector3.ZERO, 20.0 * delta)
 
 	var was_on_floor := is_on_floor()
@@ -302,7 +311,53 @@ func teleport(pos: Vector3) -> void:
 	_spawned = false
 
 
+## Mışıl'ın uyku gazı: bir süre yavaşlar, ekran kararır.
+func apply_sleep_gas(seconds: float) -> void:
+	_gas_timer = maxf(_gas_timer, seconds)
+	if hud:
+		hud.show_gas(seconds)
+
+
+func is_gassed() -> bool:
+	return _gas_timer > 0.0
+
+
+## Sesle avlanan yaratıklar duyar mı: koşarken evet, yavaş yürürken ya da dururken hayır.
+func is_loud() -> bool:
+	return Vector2(velocity.x, velocity.z).length() > LOUD_SPEED
+
+
+## Kamera bu noktaya bakıyor mu (Boşluk Gölgesi bakılınca donar).
+func is_looking_at(point: Vector3, max_angle_deg := 35.0) -> bool:
+	var to := point - camera.global_position
+	return (-camera.global_transform.basis.z).angle_to(to) < deg_to_rad(max_angle_deg)
+
+
+## Balon Kafa yakalayınca: 8-16 blok ötede rastgele boş bir yere ışınlanır. Olduysa true.
+func teleport_nearby(rng_seed := -1) -> bool:
+	var rng := RandomNumberGenerator.new()
+	if rng_seed >= 0:
+		rng.seed = rng_seed
+	for i in 24:
+		var a := rng.randf() * TAU
+		var d := rng.randf_range(8.0, 16.0)
+		var x := floori(global_position.x + cos(a) * d)
+		var z := floori(global_position.z + sin(a) * d)
+		if not world.is_meshed_at(Vector3(x, 0, z)):
+			continue
+		var y := world.spawn_y(x, z)
+		if y < 0:
+			continue
+		global_position = Vector3(x + 0.5, y + 0.05, z + 0.5)
+		velocity = Vector3.ZERO
+		_knockback = Vector3.ZERO
+		_fall_peak = global_position.y
+		return true
+	return false
+
+
 func respawn() -> void:
+	_gas_timer = 0.0
 	saved_position = Vector3.INF
 	survival.reset()
 	_knockback = Vector3.ZERO

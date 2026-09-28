@@ -12,8 +12,13 @@ enum Habitat { OVERWORLD, YELLOW_HALLS, TOY_FACTORY }
 ## İsteğe bağlı "parts": [boyut, merkez, renk, (doku)] kutuları ve "face": [kenar, merkez] ile özel model;
 ## verilmezse boy/genişlikten genel bir model kurulur. Model -Z yönüne bakar.
 ## "face" kenarı sayı (kare) ya da Vector2 (dikdörtgen) olabilir. "face_glow": yüz gölgelenmez, karanlıkta da parlar.
+## "reach": saldırı mesafesine eklenen blok (uzun kollular). "ability": özel yetenek (mob.gd):
+##   hop: zıplayarak ilerler · stare: bakılınca donar, bakılmayınca hızlanır · hears: sadece koşan oyuncuyu duyar
+##   teleport: yakalayınca oyuncuyu ışınlar · gas: uyku gazı · ambush: yaklaşana kadar kıpırdamaz
+##   toss: oyuncuyu havaya atar · night_hostile: gece düşmanlaşır
+##   (dostlar) shockwave: çevredeki tüm düşmanları iter · stun: vurduğunu dondurur
 const MOBS := {
-	"tokmak": {"name": "Tokmakçı", "health": 16, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true,
+	"tokmak": {"name": "Tokmakçı", "reach": 0.8, "health": 16, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true,
 		"primary": Color("e8dcc0"), "secondary": Color("b8322f"), "height": 2.4, "width": 0.8, "speed": 3.0,
 		# Konsept: docs/konseptler/mob_tokmak_concept.png — uzun huş kütüğü gövde, kırmızı bere, tokmak ve fener.
 		"parts": [
@@ -47,7 +52,7 @@ const MOBS := {
 			[Vector3(0.06, 0.24, 0.06), Vector3(0.1, 1.11, 0), Color("4f8a86")],
 		],
 		"face": [0.46, Vector3(0, 0.77, -0.23)]},
-	"lavabo": {"name": "Lavabo Kafa", "health": 8, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD,
+	"lavabo": {"name": "Lavabo Kafa", "ability": "hop", "health": 8, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD,
 		"primary": Color("f4f4f4"), "secondary": Color("e7b99a"), "height": 1.5, "width": 0.8, "speed": 3.5,
 		# Konsept: docs/konseptler/mob_lavabo_concept.png — lavabo gövde, kıvırcık saçlı kafa, T kollar, boru ve yay bacak.
 		"parts": [
@@ -86,7 +91,7 @@ const MOBS := {
 			[Vector3(0.06, 0.04, 0.06), Vector3(0.07, 2.02, -0.1), Color("e02020")],
 		],
 		"face": [Vector2(0.46, 0.44), Vector3(0, 1.72, -0.25)]},
-	"basbekci": {"name": "Bas Bekçi", "health": 26, "damage": 4, "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
+	"basbekci": {"name": "Bas Bekçi", "ability": "shockwave", "health": 26, "damage": 4, "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
 		"primary": Color("333333"), "secondary": Color("111111"), "height": 2.05, "width": 0.8, "speed": 2.8,
 		# Konsept: docs/konseptler/mob_basbekci_concept.png — siyah takım, çift hoparlörlü kafa, sırtında kablo.
 		"parts": [
@@ -103,7 +108,7 @@ const MOBS := {
 			[Vector3(0.05, 0.8, 0.05), Vector3(0, 1.1, 0.2), Color("555555")],
 		],
 		"face": [Vector2(0.48, 0.58), Vector3(0, 1.7, -0.22)]},
-	"ekran": {"name": "Ekran Adam", "health": 20, "damage": 3, "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
+	"ekran": {"name": "Ekran Adam", "ability": "stun", "health": 20, "damage": 3, "behavior": Behavior.ALLY, "habitat": Habitat.OVERWORLD, "face_glow": true,
 		"primary": Color("6b1f2c"), "secondary": Color("7a5530"), "height": 2.1, "width": 0.7, "speed": 3.0,
 		# Konsept: docs/konseptler/mob_ekran_concept.png — bordo takım, ahşap kasalı tüplü TV kafa, iki anten.
 		"parts": [
@@ -123,7 +128,7 @@ const MOBS := {
 			[Vector3(0.03, 0.22, 0.03), Vector3(0.1, 2.12, 0), Color("888888")],
 		],
 		"face": [Vector2(0.56, 0.5), Vector3(0, 1.77, -0.22)]},
-	"bosluk": {"name": "Boşluk Gölgesi", "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true, "face_glow": true,
+	"bosluk": {"name": "Boşluk Gölgesi", "ability": "stare", "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true, "face_glow": true,
 		"primary": Color("0b0b0f"), "secondary": Color("1a1024"), "height": 2.7, "width": 0.6, "speed": 2.5,
 		# Konsept: docs/konseptler/mob_bosluk_concept.png — upuzun, sıska, simsiyah gövde; karanlıkta parlayan iki göz.
 		# Sarı Koridorlar boyutu gelene kadar geceleri normal dünyada doğar.
@@ -141,29 +146,29 @@ const MOBS := {
 		"face": [0.34, Vector3(0, 2.52, -0.17)]},
 	"siritkan": {"name": "Sırıtkan", "health": 12, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS, "face_glow": true,
 		"primary": Color("050505"), "secondary": Color("050505"), "height": 1.2, "width": 0.9, "speed": 2.2},
-	"balonkafa": {"name": "Balon Kafa", "health": 10, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS,
+	"balonkafa": {"name": "Balon Kafa", "ability": "teleport", "health": 10, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS,
 		"primary": Color("f2d21b"), "secondary": Color("f2d21b"), "height": 1.9, "width": 0.9, "speed": 3.8},
-	"pence": {"name": "Pençe", "health": 8, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS,
+	"pence": {"name": "Pençe", "ability": "hears", "health": 8, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS,
 		"primary": Color("b9b6ae"), "secondary": Color("1b1b1b"), "height": 1.0, "width": 1.2, "speed": 5.5},
-	"civit": {"name": "Çivit", "health": 24, "damage": 4, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
+	"civit": {"name": "Çivit", "reach": 1.5, "health": 24, "damage": 4, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("4b3bb0"), "secondary": Color("f0f0f0"), "height": 3.4, "width": 1.2, "speed": 2.4},
-	"yosun": {"name": "Yosun", "health": 18, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
+	"yosun": {"name": "Yosun", "ability": "hears", "health": 18, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("4c8a3a"), "secondary": Color("2e5b22"), "height": 3.0, "width": 0.8, "speed": 3.2},
 	"kivilcim": {"name": "Kıvılcım", "health": 6, "damage": 1, "behavior": Behavior.NEUTRAL, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("f2801e"), "secondary": Color("e85a8a"), "height": 1.0, "width": 1.0, "speed": 6.0},
-	"bando": {"name": "Bando", "health": 16, "damage": 3, "behavior": Behavior.NEUTRAL, "habitat": Habitat.TOY_FACTORY,
+	"bando": {"name": "Bando", "ability": "night_hostile", "health": 16, "damage": 3, "behavior": Behavior.NEUTRAL, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("c0202e"), "secondary": Color("2a4fb0"), "height": 2.2, "width": 1.2, "speed": 2.6},
-	"kocakurbaga": {"name": "Koca Kurbağa", "health": 30, "damage": 4, "behavior": Behavior.NEUTRAL, "habitat": Habitat.OVERWORLD,
+	"kocakurbaga": {"name": "Koca Kurbağa", "ability": "toss", "health": 30, "damage": 4, "behavior": Behavior.NEUTRAL, "habitat": Habitat.OVERWORLD,
 		"primary": Color("8fd13f"), "secondary": Color("5c9a25"), "height": 3.0, "width": 1.8, "speed": 1.8},
 	"pembeleylek": {"name": "Pembe Leylek", "health": 14, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("f07ab0"), "secondary": Color("f4c430"), "height": 2.6, "width": 0.9, "speed": 3.4},
-	"fermuar": {"name": "Fermuar", "health": 16, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
+	"fermuar": {"name": "Fermuar", "reach": 2.0, "health": 16, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("1f8a8a"), "secondary": Color("f5f5f5"), "height": 3.2, "width": 0.8, "speed": 4.0},
 	"dugme": {"name": "Düğme", "health": 20, "damage": 3, "behavior": Behavior.ALLY, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("f29b82"), "secondary": Color("f5d330"), "height": 3.0, "width": 0.8, "speed": 3.6},
-	"misil": {"name": "Mışıl", "health": 10, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
+	"misil": {"name": "Mışıl", "ability": "gas", "health": 10, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("b9a3e3"), "secondary": Color("f2e6a0"), "height": 1.2, "width": 1.0, "speed": 4.2},
-	"kutucuk": {"name": "Kutucuk", "health": 12, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
+	"kutucuk": {"name": "Kutucuk", "ability": "ambush", "health": 12, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("d9343a"), "secondary": Color("2f6fd9"), "height": 1.6, "width": 1.0, "speed": 3.0},
 }
 
