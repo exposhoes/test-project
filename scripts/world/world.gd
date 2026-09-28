@@ -22,6 +22,9 @@ var _center := Vector2i(2147483647, 0)
 ## Oyuncunun yaptığı değişiklikler: chunk -> {yerel indeks: blok}. Chunk yeniden üretilince uygulanır
 ## ve kayıt dosyasına yazılır, böylece uzaklaşınca ya da oyunu kapatınca kaybolmaz.
 var edits := {}
+## Yüklü chunk'lardaki fenerlerin ışıkları: blok konumu -> OmniLight3D.
+var _lights := {}
+const LIGHT_RANGE := 10.0
 
 
 func _ready() -> void:
@@ -62,7 +65,12 @@ func set_block(pos: Vector3i, id: int) -> void:
 		return
 	var lx := pos.x - c.x * Chunk.SIZE
 	var lz := pos.z - c.y * Chunk.SIZE
+	var old := chunk.get_local(lx, pos.y, lz)
 	chunk.set_local(lx, pos.y, lz, id)
+	if Blocks.is_light(old):
+		_remove_light(pos)
+	if Blocks.is_light(id):
+		_add_light(pos)
 	if not edits.has(c):
 		edits[c] = {}
 	edits[c][Chunk.index(lx, pos.y, lz)] = id
@@ -76,6 +84,33 @@ func set_block(pos: Vector3i, id: int) -> void:
 	elif lz == Chunk.SIZE - 1:
 		_remesh(c + Vector2i(0, 1))
 	block_changed.emit(pos, id)
+
+
+## pos'un dist blok yakınında fener var mı (Sırıtkan ışıktan kaçar).
+func near_light(pos: Vector3, dist: float) -> bool:
+	for p: Vector3i in _lights:
+		if (Vector3(p) + Vector3.ONE * 0.5).distance_to(pos) < dist:
+			return true
+	return false
+
+
+func _add_light(pos: Vector3i) -> void:
+	if _lights.has(pos):
+		return
+	var light := OmniLight3D.new()
+	light.light_color = Color("ffc864")
+	light.light_energy = 3.0
+	light.omni_attenuation = 0.6
+	light.omni_range = LIGHT_RANGE
+	light.position = Vector3(pos) + Vector3.ONE * 0.5
+	add_child(light)
+	_lights[pos] = light
+
+
+func _remove_light(pos: Vector3i) -> void:
+	if _lights.has(pos):
+		_lights[pos].queue_free()
+		_lights.erase(pos)
 
 
 func is_meshed_at(pos: Vector3) -> bool:
@@ -143,6 +178,8 @@ func _ensure_chunk(c: Vector2i) -> Chunk:
 		generator.generate(chunk)
 		for i: int in edits.get(c, {}):
 			chunk.blocks[i] = edits[c][i]
+			if Blocks.is_light(edits[c][i]):
+				_add_light(chunk.origin() + Chunk.position_of(i))
 		_chunks[c] = chunk
 		add_child(chunk)
 	return _chunks[c]
@@ -159,4 +196,7 @@ func _unload_far() -> void:
 		if absi(c.x - _center.x) > keep or absi(c.y - _center.y) > keep:
 			_chunks[c].queue_free()
 			_chunks.erase(c)
+			for p: Vector3i in _lights.keys():
+				if chunk_coord(p) == c:
+					_remove_light(p)
 			_meshed.erase(c)

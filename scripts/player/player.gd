@@ -16,8 +16,6 @@ const SAFE_FALL := 3.0
 const ATTACK_REACH := 3.5
 const ATTACK_DAMAGE := 4
 const APPLE_CHANCE := 0.2
-## Dost yaratıkları evcilleştiren eşya.
-const TAME_ITEM := Items.IRON
 ## Uyku gazındayken yürüme hızı çarpanı.
 const GAS_SLOW := 0.45
 ## Bu hızın üstünde yürümek sesle avlanan yaratıklara duyulur (joystick'i az itmek sessiz yürür).
@@ -274,13 +272,11 @@ func aimed_mob(include_tamed := true) -> Mob:
 	return best
 
 
-## Önündeki dost yaratığa elindeki demiri verip onu evcilleştirir. Olduysa true.
+## Önündeki yaratığa elindekini verip onu evcilleştirir (dostlar demir, Tüylüpaşa elma). Olduysa true.
 func try_tame() -> bool:
 	var slot := hud.selected_slot() if hud else 0
-	if inventory.item_at(slot) != TAME_ITEM:
-		return false
 	var mob := aimed_mob()
-	if mob == null or not mob.is_ally() or mob.tamed:
+	if mob == null or mob.tamed or mob.tame_item() == -1 or inventory.item_at(slot) != mob.tame_item():
 		return false
 	inventory.take_one(slot)
 	mob.tame(self)

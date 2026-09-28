@@ -38,6 +38,11 @@ static func index(x: int, y: int, z: int) -> int:
 	return x + z * SIZE + y * SIZE * SIZE
 
 
+## index()'in tersi: yerel konum.
+static func position_of(i: int) -> Vector3i:
+	return Vector3i(i % SIZE, i / (SIZE * SIZE), (i / SIZE) % SIZE)
+
+
 func get_local(x: int, y: int, z: int) -> int:
 	return blocks[index(x, y, z)]
 

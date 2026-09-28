@@ -35,6 +35,7 @@ enum {
 	CEILING_LIGHT,
 	FACTORY_PORTAL,
 	PLAYROOM_WALL,
+	LANTERN,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -72,6 +73,7 @@ const DEFS := {
 	CEILING_LIGHT: {"name": "Floresan Lamba", "all": "ceiling_light"},
 	FACTORY_PORTAL: {"name": "Fabrika Kapısı", "top": "planks", "side": "factory_portal", "bottom": "planks"},
 	PLAYROOM_WALL: {"name": "Oyun Odası Duvarı", "all": "playroom_wall"},
+	LANTERN: {"name": "Fener", "all": "lantern", "light": true},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -110,6 +112,7 @@ const PLACEHOLDER_COLORS := {
 	"ceiling_light": Color("fffbe6"),
 	"factory_portal": Color("e85a8a"),
 	"playroom_wall": Color("a9d6f0"),
+	"lantern": Color("ffd35a"),
 }
 
 
@@ -123,6 +126,11 @@ static func is_transparent(id: int) -> bool:
 
 static func is_breakable(id: int) -> bool:
 	return id != AIR and not DEFS[id].get("unbreakable", false)
+
+
+## Çevresini aydınlatan blok mu (fener).
+static func is_light(id: int) -> bool:
+	return id != AIR and DEFS[id].get("light", false)
 
 
 static func display_name(id: int) -> String:

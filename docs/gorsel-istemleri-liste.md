@@ -400,3 +400,10 @@ Konsept görselleri 1536×1024, diğer her şeyi 1024×1024 üret. Kaydettiğin 
    ```
    front of a magical toy doorway block: wooden door frame around a swirling rainbow of candy pink, sunny yellow and toy blue stripes like a spinning toy top, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
    ```
+
+## Fener
+
+96. **lantern.png**
+   ```
+   front of an old iron lantern block: dark iron frame with a cross bar, warm glowing yellow-orange flame light filling the glass panes, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```

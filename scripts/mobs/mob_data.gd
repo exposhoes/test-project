@@ -15,7 +15,9 @@ enum Habitat { OVERWORLD, YELLOW_HALLS, TOY_FACTORY }
 ## "reach": saldırı mesafesine eklenen blok (uzun kollular). "ability": özel yetenek (mob.gd):
 ##   hop: zıplayarak ilerler · stare: bakılınca donar, bakılmayınca hızlanır · hears: sadece koşan oyuncuyu duyar
 ##   teleport: yakalayınca oyuncuyu ışınlar · gas: uyku gazı · ambush: yaklaşana kadar kıpırdamaz
-##   toss: oyuncuyu havaya atar · night_hostile: gece düşmanlaşır
+##   toss: oyuncuyu havaya atar · night_hostile: gece düşmanlaşır · fears_light: fenerden ve elinde fener tutandan kaçar
+##   (evcil) warn: düşman yaklaşınca öterek haber verir
+## "tame_item": bu eşya verilince evcilleşir (dostlarda varsayılan demir).
 ##   (dostlar) shockwave: çevredeki tüm düşmanları iter · stun: vurduğunu dondurur
 const MOBS := {
 	"tokmak": {"name": "Tokmakçı", "reach": 0.8, "health": 16, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.OVERWORLD, "night_only": true,
@@ -35,7 +37,7 @@ const MOBS := {
 			[Vector3(0.14, 0.18, 0.14), Vector3(-0.3, 0.8, -0.2), Color("f2b33a")],
 		],
 		"face": [0.56, Vector3(0, 1.98, -0.25)]},
-	"tuylupasa": {"name": "Tüylüpaşa", "health": 4, "behavior": Behavior.PASSIVE, "habitat": Habitat.OVERWORLD,
+	"tuylupasa": {"name": "Tüylüpaşa", "ability": "warn", "tame_item": Items.APPLE, "health": 4, "behavior": Behavior.PASSIVE, "habitat": Habitat.OVERWORLD,
 		"primary": Color("4f8a86"), "secondary": Color("e3833a"), "height": 1.05, "width": 0.6, "speed": 2.0,
 		# Konsept: docs/konseptler/mob_tuylupasa_concept.png — teal gövde, huş renkli kafa, altın yelek, üç tüylü sorguç.
 		"parts": [
@@ -144,7 +146,7 @@ const MOBS := {
 			[Vector3(0.34, 0.36, 0.34), Vector3(0, 2.52, 0), Color("0b0b0f")],
 		],
 		"face": [0.34, Vector3(0, 2.52, -0.17)]},
-	"siritkan": {"name": "Sırıtkan", "health": 12, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS, "face_glow": true,
+	"siritkan": {"name": "Sırıtkan", "ability": "fears_light", "health": 12, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS, "face_glow": true,
 		"primary": Color("050505"), "secondary": Color("050505"), "height": 1.2, "width": 0.9, "speed": 2.2},
 	"balonkafa": {"name": "Balon Kafa", "ability": "teleport", "health": 10, "damage": 2, "behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS,
 		"primary": Color("f2d21b"), "secondary": Color("f2d21b"), "height": 1.9, "width": 0.9, "speed": 3.8},

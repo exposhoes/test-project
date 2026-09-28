@@ -55,7 +55,9 @@ tests/                      başsız duman testi, ekran görüntüsü
    yalnızca koşan oyuncuyu duyar (joystick'i az it = sessiz yürü); Lavabo Kafa zıplar; Kutucuk yaklaşana kadar pusuda
    bekler; Balon Kafa yakalayınca oyuncuyu ışınlar; Mışıl'ın uyku gazı yavaşlatıp ekranı karartır; Koca Kurbağa
    havaya atar; Bando gece düşmanlaşır; Çivit, Fermuar ve Tokmakçı uzaktan vurur. Dostlardan Bas Bekçi ses dalgasıyla
-   çevredeki düşmanları iter, Ekran Adam vurduğunu 2 saniye dondurur. Sırada: Sırıtkan ışıktan kaçma, Tüylüpaşa.
+   çevredeki düşmanları iter, Ekran Adam vurduğunu 2 saniye dondurur.
+   Fener (masada 1 kömür + 1 çubuk + 1 cam = 2 fener) etrafını aydınlatır; Sırıtkan fenerden ve elinde fener
+   tutandan kaçar. Tüylüpaşa elmayla evcilleşir, seni takip eder ve düşman yaklaşınca öterek haber verir.
 6. **Boyutlar:** "Sarı Koridorlar" (yapıldı, Backrooms esinli): masada 4 tahta + 2 altınla Koridor Kapısı yapılır,
    kapıya bakıp Koy'a basınca sonsuz sarı labirente geçilir (nemli halı, floresan tavan, duvarlarda altın/kristal).
    Orada Sırıtkan, Balon Kafa ve Pençe dolaşır; başlangıç odasındaki kapıdan yeryüzüne dönülür. Dostlar da gelir.

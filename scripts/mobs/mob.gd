@@ -5,6 +5,8 @@ extends CharacterBody3D
 ## oyuncuyu takip eder, yakındaki düşmanlarla savaşır. Özel yetenekler sonraki adımlarda eklenecek.
 
 signal died
+## Evcil Tüylüpaşa düşmanı fark edip öttü.
+signal warned
 
 const GRAVITY := 24.0
 const JUMP_VELOCITY := 7.5
@@ -33,6 +35,8 @@ const GAS_TIME := 4.0
 const TOSS_VELOCITY := 13.0
 const STUN_TIME := 2.0
 const SHOCKWAVE_RADIUS := 3.5
+const LIGHT_FEAR_RANGE := 6.0
+const WARN_COOLDOWN := 12.0
 
 var mob_id: String
 var data: Dictionary
@@ -49,6 +53,7 @@ var _stun_timer := 0.0
 var _hop_timer := 0.0
 var _heard_timer := 0.0
 var _awake := false
+var _warn_timer := 0.0
 
 var _angry := false
 var _flee_timer := 0.0
@@ -163,6 +168,13 @@ func is_ally() -> bool:
 	return data["behavior"] == MobData.Behavior.ALLY
 
 
+## Bu yaratığı evcilleştiren eşya; evcilleşmiyorsa -1. Dostlar demirle, Tüylüpaşa elmayla.
+func tame_item() -> int:
+	if data.has("tame_item"):
+		return data["tame_item"]
+	return Items.IRON if is_ally() else -1
+
+
 ## Dost yaratığı oyuncuya bağlar.
 func tame(owner: Node3D) -> void:
 	tamed = true
@@ -225,6 +237,18 @@ func _is_night() -> bool:
 	return main != null and main.has_method("is_night") and main.is_night()
 
 
+## Sırıtkan: yakında fener varsa ya da hedef elinde fener tutuyorsa korkar.
+func _afraid_of_light() -> bool:
+	if ability() != "fears_light":
+		return false
+	var main := get_parent()
+	var world = main.get("world") if main else null
+	if world and world.near_light(global_position, LIGHT_FEAR_RANGE):
+		return true
+	return target.has_method("held_item") and Blocks.is_light(target.held_item()) \
+		and target.global_position.distance_to(global_position) < LIGHT_FEAR_RANGE
+
+
 ## Kovalanacak hedefi algılıyor mu. "hears" koşanı duyar, "stare" bakılınca durur, "ambush" uyanınca kovalar.
 func _senses(dist: float) -> bool:
 	match ability():
@@ -268,7 +292,16 @@ func _ally_direction(delta: float) -> Vector3:
 		health = mini(health + 1, max_health())
 	if not is_instance_valid(owner_node):
 		return Vector3.ZERO
-	if not _is_valid_foe(_foe):
+	# Barışçıl evcil (Tüylüpaşa) savaşmaz; düşman yaklaşınca öter.
+	if data["behavior"] == MobData.Behavior.PASSIVE:
+		_warn_timer = maxf(_warn_timer - delta, 0.0)
+		if ability() == "warn" and _warn_timer <= 0.0 and _find_foe():
+			_warn_timer = WARN_COOLDOWN
+			if owner_node.get("hud"):
+				owner_node.hud.toast("%s ötüyor: düşman yakında!" % data["name"])
+			warned.emit()
+		_foe = null
+	elif not _is_valid_foe(_foe):
 		_foe = _find_foe()
 	if _foe:
 		var to_foe := _foe.global_position - global_position
@@ -358,6 +391,8 @@ func _physics_process(delta: float) -> void:
 		var dist := to_target.length()
 		if _flee_timer > 0.0:
 			_flee_timer -= delta
+			dir = -to_target.normalized()
+		elif _is_aggressive() and dist < CHASE_RANGE and _afraid_of_light():
 			dir = -to_target.normalized()
 		elif ability() == "stare" and _is_aggressive() and dist < CHASE_RANGE and _is_watched():
 			# Bakılırken olduğu yerde donar.

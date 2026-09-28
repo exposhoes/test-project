@@ -98,6 +98,11 @@ func _placeholder(texture_name: String) -> Image:
 				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.2) if frame else [base, Color("f2c230"), Color("2f6fd9")][band]
 			elif texture_name == "playroom_wall" and (Vector2(x % 16, y % 16).distance_to(Vector2(5, 6)) < 2.5 or (x + y * 3) % 23 == 0):
 				c = Color("fdf6c8")
+			elif texture_name == "lantern":
+				# Koyu demir çerçeve, ortada parlayan alev.
+				var edge := x < 3 or x >= TILE - 3 or y < 3 or y >= TILE - 3 or x == TILE / 2 or y == TILE / 2
+				var glow := 1.0 - Vector2(x, y).distance_to(Vector2(TILE / 2.0, TILE / 2.0)) / (TILE * 0.6)
+				c = Color("2a2522") if edge else base.lightened(glow * 0.6)
 			elif texture_name == "ceiling_tile" and (x % 16 == 0 or y % 16 == 0):
 				c = base.darkened(0.3)
 			elif texture_name == "ceiling_light":

@@ -256,6 +256,48 @@ func _initialize() -> void:
 	stunned.stun(Mob.STUN_TIME)
 	_check(stunned.is_stunned(), "Ekran Adam'ın vurduğu donmalı")
 	stunned.free()
+	# Fener ışık verir; Sırıtkan fenerden kaçar.
+	var lamp := Vector3i(player.global_position.floor()) + Vector3i(3, 0, 3)
+	world.set_block(lamp, Blocks.LANTERN)
+	_check(world.near_light(Vector3(lamp), 2.0), "fener ışık vermeli")
+	var smiler := Mob.create("siritkan")
+	smiler.target = player
+	main.add_child(smiler)
+	smiler.global_position = Vector3(lamp) + Vector3(1.5, 0.1, 0.5)
+	smiler.set_physics_process(false)
+	_check(smiler._afraid_of_light(), "Sırıtkan fenerin yanında korkmalı")
+	world.set_block(lamp, Blocks.AIR)
+	_check(not world.near_light(Vector3(lamp), 2.0) and not smiler._afraid_of_light(), "fener kırılınca ışık sönmeli")
+	smiler.free()
+	# Tüylüpaşa elmayla evcilleşir, düşman yaklaşınca öter.
+	var bird := Mob.create("tuylupasa")
+	main.add_child(bird)
+	player.rotation = Vector3.ZERO
+	player.camera.rotation.x = 0.0
+	bird.global_position = player.global_position - player.global_transform.basis.z * 1.5
+	bird.set_physics_process(false)
+	for i in Inventory.SIZE:
+		inv.slots[i] = {}
+	player.hud.select_slot(0)
+	inv.add(Items.IRON, 1)
+	_check(not player.try_tame(), "Tüylüpaşa demirle evcilleşmemeli")
+	inv.slots[0] = {}
+	inv.add(Items.APPLE, 1)
+	_check(player.try_tame() and bird.tamed and inv.count_of(Items.APPLE) == 0, "Tüylüpaşa elmayla evcilleşmeli")
+	var warned := [false]
+	bird.warned.connect(func() -> void: warned[0] = true)
+	var threat := Mob.create("lavabo")
+	main.add_child(threat)
+	threat.global_position = player.global_position + Vector3(4, 0, 0)
+	threat.set_physics_process(false)
+	bird.set_physics_process(true)
+	for i in 3:
+		await physics_frame
+	_check(warned[0], "Tüylüpaşa düşman yaklaşınca ötmeli")
+	threat.free()
+	bird.free()
+	for i in Inventory.SIZE:
+		inv.slots[i] = {}
 	player.apply_sleep_gas(0.5)
 	_check(player.is_gassed(), "uyku gazı yavaşlatmalı")
 	var before_tp := player.global_position

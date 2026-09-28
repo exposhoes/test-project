@@ -5,7 +5,7 @@ extends Control
 
 const SLOT := 56.0
 const GAP := 6.0
-const ROW_H := 58.0
+const ROW_H := 52.0
 const TABLE_RANGE := 4
 
 var hud: Hud
@@ -102,10 +102,10 @@ func _draw() -> void:
 		var rect := _recipe_rects[r]
 		var ok := _can_craft(recipe)
 		draw_rect(rect, Color(0.3, 0.55, 0.3, 0.45) if ok else Color(1, 1, 1, 0.07))
-		var icon_rect := Rect2(rect.position + Vector2(8, 9), Vector2(40, 40))
+		var icon_rect := Rect2(rect.position + Vector2(8, 6), Vector2(40, 40))
 		_draw_item(icon_rect, recipe["out"], recipe["count"], font)
 		var alpha := 1.0 if ok else 0.5
-		draw_string(font, rect.position + Vector2(58, 24), Items.display_name(recipe["out"]), HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 18, Color(1, 1, 1, alpha))
+		draw_string(font, rect.position + Vector2(58, 22), Items.display_name(recipe["out"]), HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 18, Color(1, 1, 1, alpha))
 		var parts := PackedStringArray()
 		for id in recipe["in"]:
 			parts.append("%d %s" % [recipe["in"][id], Items.display_name(id)])
@@ -114,7 +114,7 @@ func _draw() -> void:
 			needs += "  (masa)"
 		elif tab == 1:
 			needs += " + yakıt"
-		draw_string(font, rect.position + Vector2(58, 46), needs, HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 13, Color(1, 1, 1, alpha * 0.8))
+		draw_string(font, rect.position + Vector2(58, 42), needs, HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 13, Color(1, 1, 1, alpha * 0.8))
 
 
 func _draw_item(r: Rect2, id: int, count: int, font: Font) -> void:
