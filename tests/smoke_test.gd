@@ -361,12 +361,22 @@ func _initialize() -> void:
 	world = main.world
 	_check(main.dimension == Dimension.OVERWORLD and player.global_position.distance_to(before_pos) < 1.0, "fabrikadan yeryüzüne dönülmeli")
 
+	# Sesler: her efekt koddan üretilebilmeli, ortam sesleri döngülü olmalı.
+	var all_sounds := true
+	for sound in Sfx.NAMES:
+		var st := Sfx.stream(sound) as AudioStreamWAV
+		if st == null or st.data.size() < 1000:
+			all_sounds = false
+	_check(all_sounds, "tüm ses efektleri üretilmeli")
+	_check((Sfx.stream("hum_halls") as AudioStreamWAV).loop_mode == AudioStreamWAV.LOOP_FORWARD, "koridor uğultusu döngülü olmalı")
+	Sfx.play("break")
+
 	# Duraklatma ve ana menü.
 	player.hud.open_pause()
 	_check(paused and player.hud.is_menu_open(), "duraklatınca oyun durmalı")
 	player.hud._show_settings()
 	var settings_buttons := player.hud._pause_menu._buttons
-	_check(settings_buttons.size() == 3, "ayarlar menüsünde 3 düğme olmalı")
+	_check(settings_buttons.size() == 4, "ayarlar menüsünde 4 düğme olmalı")
 	var speed := Settings.look_speed
 	settings_buttons[0]["action"].call()
 	_check(Settings.look_speed != speed, "bakış hızı değişmeli")
@@ -375,7 +385,12 @@ func _initialize() -> void:
 	_check(world.render_distance == Settings.view_distance and Settings.view_distance == 6, "görüş mesafesi dünyaya uygulanmalı (%d)" % world.render_distance)
 	Settings.view_distance = Settings.BASE_VIEW
 	main.apply_settings()
+	var vol := Settings.volume
 	player.hud._pause_menu._buttons[2]["action"].call()
+	_check(Settings.volume != vol and AudioServer.is_bus_mute(0) == (Settings.volume == 0.0), "ses düzeyi değişmeli")
+	Settings.volume = 1.0
+	Settings.apply_volume()
+	player.hud._pause_menu._buttons[3]["action"].call()
 	_check(player.hud._pause_menu.title == "Duraklatıldı", "Geri ile duraklatma menüsüne dönülmeli")
 	player.hud.close_pause()
 	_check(not paused, "devam edince oyun sürmeli")

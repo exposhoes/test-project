@@ -300,6 +300,7 @@ func _ally_direction(delta: float) -> Vector3:
 			if owner_node.get("hud"):
 				owner_node.hud.toast("%s ötüyor: düşman yakında!" % data["name"])
 			warned.emit()
+			Sfx.play("chirp")
 		_foe = null
 	elif not _is_valid_foe(_foe):
 		_foe = _find_foe()

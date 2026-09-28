@@ -29,6 +29,8 @@ var pending_allies: Array = []
 var dimension := Dimension.OVERWORLD
 var dim_edits := {}
 var return_positions := {}
+## Boyutun ortam sesi (koridor uğultusu, fabrika müzik kutusu).
+var ambience := AudioStreamPlayer.new()
 
 
 func _ready() -> void:
@@ -179,6 +181,7 @@ func travel(portal_block := Blocks.HALLS_PORTAL) -> void:
 	player.world = world
 	hud.atlas = world.atlas
 	player.teleport(return_positions.get(dimension, Vector3.INF))
+	Sfx.play("portal", 0.0)
 	_apply_dimension_look()
 	hud.toast(Dimension.display_name(dimension))
 
@@ -243,11 +246,19 @@ func _setup_environment() -> void:
 	add_child(we)
 	_sun.shadow_enabled = false
 	add_child(_sun)
+	add_child(ambience)
 	_apply_dimension_look()
 
 
 ## Yeryüzünde gökyüzü ve güneş; kapalı boyutlarda gökyüzü yok, ışık ve sis boyutun renginde.
 func _apply_dimension_look() -> void:
+	var sound: String = Dimension.DEFS[dimension].get("ambience", "")
+	if sound == "":
+		ambience.stop()
+	else:
+		ambience.stream = Sfx.stream(sound)
+		ambience.volume_db = -6.0
+		ambience.play()
 	var indoor: Dictionary = Dimension.DEFS[dimension].get("indoor", {})
 	_sun.visible = indoor.is_empty()
 	if not indoor.is_empty():

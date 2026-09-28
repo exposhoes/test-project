@@ -68,6 +68,9 @@ tests/                      başsız duman testi, ekran görüntüsü
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
    ve "Kaydet ve Ana Menü". Ayarlar (ana menüde ve duraklatmada): bakış hızı 0,5x-2x,
    görüş mesafesi Çok yakın-Çok uzak (2-8 chunk); `user://settings.cfg` dosyasında saklanır.
+8b. **Ses (yapıldı):** kırma, koyma, vurma, yaralanma, yeme, toplama, üretim, kapı, alet kırılması, Tüylüpaşa ötüşü
+   ve uyku gazı efektleri; Sarı Koridorlar'da floresan uğultusu, Oyuncak Fabrikası'nda müzik kutusu. Sesler koddan
+   üretiliyor; `assets/sounds/<ad>.ogg` ya da `.wav` eklenince o kullanılır. Ayarlar'da Ses: Kapalı/Kısık/Açık.
 9. **Yayın:** Android (APK/AAB) ve iOS dışa aktarım ayarları, uygulama ikonu, mağaza görselleri.
 
 ## Çalıştırma

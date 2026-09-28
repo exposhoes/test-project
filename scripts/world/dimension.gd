@@ -6,12 +6,12 @@ extends RefCounted
 enum { OVERWORLD, HALLS, FACTORY }
 
 ## name: gösterilen ad. habitat: doğan yaratıkların yaşam alanı. portal: giriş kapısı bloğu.
-## indoor: gökyüzü yok, hep aynı ışık (background/ambient/fog renkleri ve sis yoğunluğu).
+## ambience: döngülü ortam sesi (Sfx). indoor: gökyüzü yok, hep aynı ışık (background/ambient/fog renkleri ve sis yoğunluğu).
 const DEFS := {
 	OVERWORLD: {"name": "Yeryüzü", "habitat": MobData.Habitat.OVERWORLD},
-	HALLS: {"name": "Sarı Koridorlar", "habitat": MobData.Habitat.YELLOW_HALLS, "portal": Blocks.HALLS_PORTAL,
+	HALLS: {"name": "Sarı Koridorlar", "habitat": MobData.Habitat.YELLOW_HALLS, "portal": Blocks.HALLS_PORTAL, "ambience": "hum_halls",
 		"indoor": {"background": Color("4a4326"), "ambient": Color("fff0b0"), "energy": 0.95, "fog": Color("b9a64e"), "fog_density": 0.045}},
-	FACTORY: {"name": "Oyuncak Fabrikası", "habitat": MobData.Habitat.TOY_FACTORY, "portal": Blocks.FACTORY_PORTAL,
+	FACTORY: {"name": "Oyuncak Fabrikası", "habitat": MobData.Habitat.TOY_FACTORY, "portal": Blocks.FACTORY_PORTAL, "ambience": "music_factory",
 		"indoor": {"background": Color("2b2440"), "ambient": Color("ffe8f4"), "energy": 1.0, "fog": Color("cfa9e0"), "fog_density": 0.022}},
 }
 

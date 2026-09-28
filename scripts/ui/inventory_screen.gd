@@ -182,7 +182,9 @@ func tap(pos: Vector2) -> void:
 				pass
 			elif tab == 1 and inv.smelt(recipe):
 				hud.toast("%s eritildi" % Items.display_name(recipe["out"]))
+				Sfx.play("craft")
 			elif tab == 0 and inv.craft(recipe):
 				hud.toast("%s üretildi" % Items.display_name(recipe["out"]))
+				Sfx.play("craft")
 			queue_redraw()
 			return

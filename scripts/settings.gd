@@ -1,6 +1,6 @@
 class_name Settings
 extends RefCounted
-## Oyuncu ayarları: bakış hızı ve görüş mesafesi. user://settings.cfg dosyasında saklanır.
+## Oyuncu ayarları: bakış hızı, görüş mesafesi ve ses düzeyi. user://settings.cfg dosyasında saklanır.
 
 const DEFAULT_PATH := "user://settings.cfg"
 ## Seçilebilir bakış hızı çarpanları.
@@ -11,11 +11,15 @@ const VIEW_NAMES := ["Çok yakın", "Yakın", "Orta", "Uzak", "Çok uzak"]
 ## Fog yoğunluğu bu mesafeye göre ayarlanır: uzak görüşte sis de uzaklaşır.
 const BASE_FOG := 0.012
 const BASE_VIEW := 4
+## Ses düzeyleri (0..1) ve adları.
+const VOLUMES := [0.0, 0.4, 1.0]
+const VOLUME_NAMES := ["Kapalı", "Kısık", "Açık"]
 
 ## Boş yol kaydetmeyi kapatır (testler).
 static var path := DEFAULT_PATH
 static var look_speed := 1.0
 static var view_distance := BASE_VIEW
+static var volume := 1.0
 static var _loaded := false
 
 
@@ -30,6 +34,8 @@ static func ensure_loaded() -> void:
 		return
 	look_speed = cfg.get_value("controls", "look_speed", look_speed)
 	view_distance = cfg.get_value("graphics", "view_distance", view_distance)
+	volume = cfg.get_value("audio", "volume", volume)
+	apply_volume()
 
 
 static func save() -> void:
@@ -38,6 +44,7 @@ static func save() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("controls", "look_speed", look_speed)
 	cfg.set_value("graphics", "view_distance", view_distance)
+	cfg.set_value("audio", "volume", volume)
 	cfg.save(path)
 
 
@@ -51,6 +58,23 @@ static func cycle_look_speed() -> void:
 static func cycle_view_distance() -> void:
 	view_distance = _next(VIEW_DISTANCES, view_distance)
 	save()
+
+
+## Sıradaki ses düzeyine geçer, uygular ve kaydeder.
+static func cycle_volume() -> void:
+	volume = _next(VOLUMES, volume)
+	apply_volume()
+	save()
+
+
+static func apply_volume() -> void:
+	AudioServer.set_bus_mute(0, volume <= 0.0)
+	AudioServer.set_bus_volume_db(0, linear_to_db(maxf(volume, 0.001)))
+
+
+static func volume_name() -> String:
+	var i := VOLUMES.find(volume)
+	return VOLUME_NAMES[i] if i != -1 else "%d%%" % int(volume * 100)
 
 
 static func view_name() -> String:
@@ -72,6 +96,9 @@ static func menu_buttons(changed: Callable, back: Callable) -> Array:
 			changed.call()},
 		{"label": "Görüş: %s" % view_name(), "action": func() -> void:
 			cycle_view_distance()
+			changed.call()},
+		{"label": "Ses: %s" % volume_name(), "action": func() -> void:
+			cycle_volume()
 			changed.call()},
 		{"label": "Geri", "action": back},
 	]

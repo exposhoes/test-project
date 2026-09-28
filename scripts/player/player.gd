@@ -192,6 +192,7 @@ func wear_held() -> void:
 	var slot := hud.selected_slot() if hud else 0
 	var id := inventory.item_at(slot)
 	if inventory.wear(slot) and hud:
+		Sfx.play("tool_break")
 		hud.toast("%s kırıldı!" % Items.display_name(id))
 
 
@@ -202,6 +203,7 @@ func break_target() -> void:
 	var id := world.get_block(pos)
 	if Blocks.is_breakable(id):
 		world.set_block(pos, Blocks.AIR)
+		Sfx.play("break")
 		var center := Vector3(pos) + Vector3.ONE * 0.5
 		var drop := Items.drop_for_block(id)
 		if drop != -1 and Items.harvests(id, held_item()):
@@ -226,6 +228,7 @@ func use_selected() -> void:
 	if food > 0:
 		if survival.hunger < Survival.MAX_HUNGER and inventory.take_one(slot):
 			survival.eat(food)
+			Sfx.play("eat")
 		return
 	if Items.is_block(id) and place_at_target(id):
 		inventory.take_one(slot)
@@ -237,7 +240,10 @@ func can_pick_up(_id: int) -> bool:
 
 ## Yerdeki eşyayı envantere alır; sığmayan miktarı döner.
 func pick_up(id: int, count: int) -> int:
-	return inventory.add(id, count)
+	var left := inventory.add(id, count)
+	if left < count:
+		Sfx.play("pickup", 0.2)
+	return left
 
 
 ## Önündeki en yakın yaratığa vurur. Vurduysa true döner (o zaman blok kırılmaz).
@@ -247,6 +253,7 @@ func attack() -> bool:
 	if best == null:
 		return false
 	best.take_damage(ATTACK_DAMAGE + Items.attack_bonus(held_item()), global_position)
+	Sfx.play("hit")
 	wear_held()
 	return true
 
@@ -291,6 +298,7 @@ func hurt(amount: int, from: Vector3) -> void:
 	if survival.dead:
 		return
 	survival.take_damage(amount)
+	Sfx.play("hurt")
 	var away := global_position - from
 	away.y = 0
 	_knockback = away.normalized() * 8.0
@@ -309,6 +317,8 @@ func teleport(pos: Vector3) -> void:
 
 ## Mışıl'ın uyku gazı: bir süre yavaşlar, ekran kararır.
 func apply_sleep_gas(seconds: float) -> void:
+	if _gas_timer <= 0.0:
+		Sfx.play("gas")
 	_gas_timer = maxf(_gas_timer, seconds)
 	if hud:
 		hud.show_gas(seconds)
@@ -379,6 +389,7 @@ func place_at_target(id: int) -> bool:
 	if Blocks.is_solid(world.get_block(pos)) or _overlaps_body(pos):
 		return false
 	world.set_block(pos, id)
+	Sfx.play("place")
 	return true
 
 
