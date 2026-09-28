@@ -8,10 +8,24 @@ $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 $apk = Join-Path $root "export\EmirCRAFT.apk"
 $pkg = "com.emircraft.game"
 
-if (-not (& $adb devices | Select-String "\tdevice$")) {
-	Write-Host "Çalışan emülatör yok. Device Manager'dan emülatörü başlatıp tekrar dene."
+# Emülatör açılıyorsa hazır olmasını bekle (en fazla ~3 dakika).
+Write-Host "Emülatör bekleniyor..."
+$ready = $false
+for ($i = 0; $i -lt 90; $i++) {
+	if (& $adb devices | Select-String "\tdevice$") {
+		$boot = (& $adb shell getprop sys.boot_completed 2>$null | Out-String).Trim()
+		if ($boot -eq "1") { $ready = $true; break }
+	} elseif ($i % 10 -eq 5) {
+		# "offline" takılmasını çözmek için adb bağlantısını yenile.
+		& $adb reconnect offline 2>&1 | Out-Null
+	}
+	Start-Sleep -Seconds 2
+}
+if (-not $ready) {
+	Write-Host "Emülatör hazır olmadı. Device Manager'da emülatörün ⋮ menüsünden Cold Boot Now yapıp tekrar dene."
 	exit 1
 }
+Write-Host "Emülatör hazır."
 
 # Buluttaki son değişiklikleri al; yerel değişiklik varsa çekmeden devam eder.
 Write-Host "Güncelleniyor..."
