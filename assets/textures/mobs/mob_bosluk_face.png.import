@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2uq3t5gw3xfg"
-path="res://.godot/imported/mob_tuylupasa_face.png-7ccb177d80e4abd540cc661cda847f5a.ctex"
+uid="uid://dnt2yc1salwtc"
+path="res://.godot/imported/mob_bosluk_face.png-c0b703c27768e839ff0497e6756c615c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/mobs/mob_tuylupasa_face.png"
-dest_files=["res://.godot/imported/mob_tuylupasa_face.png-7ccb177d80e4abd540cc661cda847f5a.ctex"]
+source_file="res://assets/textures/mobs/mob_bosluk_face.png"
+dest_files=["res://.godot/imported/mob_bosluk_face.png-c0b703c27768e839ff0497e6756c615c.ctex"]
 
 [params]
 

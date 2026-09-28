@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2uq3t5gw3xfg"
-path="res://.godot/imported/mob_tuylupasa_face.png-7ccb177d80e4abd540cc661cda847f5a.ctex"
+uid="uid://b65noksa60bun"
+path="res://.godot/imported/mob_ekran_face.png-254087e623980cb04a3a38e4d836901a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/mobs/mob_tuylupasa_face.png"
-dest_files=["res://.godot/imported/mob_tuylupasa_face.png-7ccb177d80e4abd540cc661cda847f5a.ctex"]
+source_file="res://assets/textures/mobs/mob_ekran_face.png"
+dest_files=["res://.godot/imported/mob_ekran_face.png-254087e623980cb04a3a38e4d836901a.ctex"]
 
 [params]
 

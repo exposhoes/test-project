@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2uq3t5gw3xfg"
-path="res://.godot/imported/mob_tuylupasa_face.png-7ccb177d80e4abd540cc661cda847f5a.ctex"
+uid="uid://di5txo86u4241"
+path="res://.godot/imported/mob_lavabo_face.png-863bc218d1ef029f9936431922458447.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/mobs/mob_tuylupasa_face.png"
-dest_files=["res://.godot/imported/mob_tuylupasa_face.png-7ccb177d80e4abd540cc661cda847f5a.ctex"]
+source_file="res://assets/textures/mobs/mob_lavabo_face.png"
+dest_files=["res://.godot/imported/mob_lavabo_face.png-863bc218d1ef029f9936431922458447.ctex"]
 
 [params]
 
