@@ -87,7 +87,7 @@ const DEFS := {
 	FACTORY_PORTAL: {"name": "Fabrika Kapısı", "top": "planks", "side": "factory_portal", "bottom": "planks"},
 	PLAYROOM_WALL: {"name": "Oyun Odası Duvarı", "all": "playroom_wall"},
 	LANTERN: {"name": "Fener", "all": "lantern", "light": true},
-	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks"},
+	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks", "transparent": true, "model": true},
 	BERRY_BUSH: {"name": "Çilek Çalısı", "all": "berry_bush", "transparent": true},
 	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks"},
 	PLASTER: {"name": "Sıva Duvar", "all": "plaster"},
@@ -159,6 +159,11 @@ const PLACEHOLDER_COLORS := {
 
 static func is_solid(id: int) -> bool:
 	return id != AIR
+
+
+## Blok yüzleri yerine 3D model ile çizilen bloklar (ör. yatak, BedModel).
+static func has_model(id: int) -> bool:
+	return DEFS.has(id) and DEFS[id].get("model", false)
 
 
 static func is_transparent(id: int) -> bool:

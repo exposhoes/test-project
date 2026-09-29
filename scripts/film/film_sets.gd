@@ -22,7 +22,7 @@ const CITY_MAX := Vector2i(100, 52)
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
 	"ev": {
-		"yatak": Vector3(1.5, 1.0, 2.0),          # Emir'in uzandığı yer (yatak üstü)
+		"yatak": Vector3(1.5, 0.42, 2.0),          # Emir'in uzandığı yer (yatak üstü)
 		"yatak_yani": Vector3(2.8, 0, 2.0),
 		"mutfak": Vector3(6.5, 0, 2.6),
 		"ocak": Vector3(7.5, 0, 1.4),
@@ -57,9 +57,9 @@ const POINTS := {
 		"dis": Vector3(6.5, 0, 14.0),
 		"danisma": Vector3(6.5, 0, 6.5),
 		"danisma_arka": Vector3(6.5, 0, 4.6),
-		"yatak_1": Vector3(1.5, 1.0, 2.0),
+		"yatak_1": Vector3(1.5, 0.42, 2.0),
 		"yatak_1_yani": Vector3(2.8, 0, 2.0),
-		"yatak_2": Vector3(11.5, 1.0, 2.0),
+		"yatak_2": Vector3(11.5, 0.42, 2.0),
 		"yatak_2_yani": Vector3(10.2, 0, 2.0),
 		"bekleme": Vector3(2.0, 0, 6.5),
 		"kam_ic": Vector3(6.5, 2.6, 8.0),
