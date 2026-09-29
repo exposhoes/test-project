@@ -10,6 +10,7 @@ const GROUND := 10
 const SETS := {
 	"ev": Vector3i(0, GROUND + 1, 0),
 	"okul": Vector3i(48, GROUND + 1, 0),
+	"hastane": Vector3i(-40, GROUND + 1, 0),
 }
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
@@ -44,6 +45,20 @@ const POINTS := {
 		"kam_tahta": Vector3(7.5, 2.2, 3.5),
 		"kam_bahce": Vector3(7.5, 5.0, 26.0),
 	},
+	"hastane": {
+		"giris": Vector3(6.5, 0, 9.0),
+		"dis": Vector3(6.5, 0, 14.0),
+		"danisma": Vector3(6.5, 0, 6.5),
+		"danisma_arka": Vector3(6.5, 0, 4.6),
+		"yatak_1": Vector3(1.5, 1.0, 2.0),
+		"yatak_1_yani": Vector3(2.8, 0, 2.0),
+		"yatak_2": Vector3(11.5, 1.0, 2.0),
+		"yatak_2_yani": Vector3(10.2, 0, 2.0),
+		"bekleme": Vector3(2.0, 0, 6.5),
+		"kam_ic": Vector3(6.5, 2.6, 8.0),
+		"kam_yatak": Vector3(4.6, 2.5, 6.4),
+		"kam_dis": Vector3(12.0, 4.5, 18.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -52,6 +67,7 @@ var _blocks := {}  # Vector3i -> blok id
 func _init() -> void:
 	_build_house(SETS["ev"])
 	_build_school(SETS["okul"])
+	_build_hospital(SETS["hastane"])
 
 
 ## Set noktasının dünya konumu: "ev.yatak" ya da doğrudan Vector3.
@@ -106,7 +122,7 @@ func _tree_spot(g: Vector2i) -> bool:
 	if lx < 3 or lx > 12 or lz < 3 or lz > 12:
 		return false
 	# Setlerin ve önlerindeki yolun çevresi boş kalsın.
-	if g.x > -8 and g.x < 72 and g.y > -8 and g.y < 32:
+	if g.x > -48 and g.x < 72 and g.y > -8 and g.y < 32:
 		return false
 	return (hash(g) % 23) == 0
 
@@ -196,3 +212,33 @@ func _build_school(o: Vector3i) -> void:
 	_fill(o, Vector3i(0, -1, 16), Vector3i(4, -1, 20), Blocks.SAND)
 	for c in [Vector3i(-1, 0, 15), Vector3i(5, 0, 15), Vector3i(-1, 0, 21), Vector3i(5, 0, 21)]:
 		_put(o + c, Blocks.TOY_BRICK_YELLOW)
+
+
+## Hastane: beyaz duvarlar, kapının üstünde kırmızı artı, içeride danışma masası, iki hasta yatağı, bekleme sandalyeleri.
+func _build_hospital(o: Vector3i) -> void:
+	_fill(o, Vector3i(-1, -1, -1), Vector3i(13, -1, 9), Blocks.COBBLESTONE)
+	_fill(o, Vector3i(0, -1, 0), Vector3i(12, -1, 8), Blocks.SNOW)
+	_walls(o, Vector3i(-1, 0, -1), Vector3i(13, 3, 9), Blocks.SNOW)
+	_fill(o, Vector3i(-1, 4, -1), Vector3i(13, 4, 9), Blocks.STONE)
+	_fill(o, Vector3i(6, 0, 9), Vector3i(7, 1, 9), Blocks.GLASS)
+	_fill(o, Vector3i(6, 0, 9), Vector3i(6, 1, 9), Blocks.AIR)
+	for x in [1, 2, 3, 9, 10, 11]:
+		_fill(o, Vector3i(x, 1, 9), Vector3i(x, 2, 9), Blocks.GLASS)
+	# Kırmızı artı (kapının üstünde).
+	_put(o + Vector3i(6, 3, 10), Blocks.TOY_BRICK_RED)
+	_put(o + Vector3i(6, 4, 10), Blocks.TOY_BRICK_RED)
+	_put(o + Vector3i(6, 5, 10), Blocks.TOY_BRICK_RED)
+	_put(o + Vector3i(5, 4, 10), Blocks.TOY_BRICK_RED)
+	_put(o + Vector3i(7, 4, 10), Blocks.TOY_BRICK_RED)
+	# Danışma masası, yataklar, bekleme sandalyeleri, ışıklar.
+	for x in range(5, 9):
+		_put(o + Vector3i(x, 0, 5), Blocks.CRAFTING_TABLE if x == 6 else Blocks.PLANKS)
+	for b in [Vector3i(1, 0, 1), Vector3i(1, 0, 2), Vector3i(11, 0, 1), Vector3i(11, 0, 2)]:
+		_put(o + b, Blocks.BED)
+	for z in [5, 7]:
+		_put(o + Vector3i(0, 0, z), Blocks.TOY_BRICK_BLUE)
+	_put(o + Vector3i(0, 2, 8), Blocks.LANTERN)
+	_put(o + Vector3i(12, 2, 8), Blocks.LANTERN)
+	_put(o + Vector3i(6, 2, 0), Blocks.LANTERN)
+	for z in range(10, 15):
+		_put(o + Vector3i(6, -1, z), Blocks.GRAVEL)

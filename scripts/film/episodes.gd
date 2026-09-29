@@ -282,6 +282,33 @@ const LIST := [
 			{"title": "Bilim eğlencelidir!\nBir sonraki bölümde görüşürüz!", "t": 3.5},
 		],
 	},
+	{
+		"id": "cilek", "name": "Bölüm 6: Çilek Karnı", "set": "hastane", "time": 0.45,
+		"steps": [
+			{"place": "emir", "at": "hastane.yatak_1", "lie": true},
+			{"place": "anne", "at": "hastane.yatak_1_yani", "look": "hastane.yatak_1"},
+			{"place": "doktor", "at": "hastane.danisma_arka", "look": "hastane.yatak_1"},
+			{"cam": "hastane.kam_dis", "look": "hastane.giris", "t": 0},
+			{"title": "Çilek Karnı", "t": 1.3},
+			{"cam": "hastane.kam_yatak", "look": "hastane.yatak_1", "t": 0},
+			{"say": "emir", "text": "Aaah karnım! Çok ağrıyor!"},
+			{"say": "anne", "text": "Doktor bey, lütfen bakar mısınız?"},
+			{"walk": "doktor", "to": Vector3(-38.6, 11, 3.6)},
+			{"turn": "doktor", "to": "hastane.yatak_1"},
+			{"say": "doktor", "text": "Merhaba Emir. Bugün ne yedin bakalım?"},
+			{"say": "emir", "text": "Hiç! Sadece birkaç çilek..."},
+			{"say": "anne", "text": "Birkaç mı? Bütün çalıyı bitirmişsin!"},
+			{"zoom": 0.5},
+			{"say": "doktor", "text": "Kaç tane yedin Emir?"},
+			{"say": "emir", "text": "Sayamadım ki... Çok hızlı yedim!"},
+			{"say": "doktor", "text": "Teşhis belli: Çilek karnı!"},
+			{"say": "doktor", "text": "İlacın: bol su ve bugün hiç çilek yok."},
+			{"shake": 0.4},
+			{"say": "emir", "text": "HİÇ Mİ?! Bu ilaç çok acı doktor bey!"},
+			{"say": "anne", "text": "Hahaha! Her şeyin fazlası zarar oğlum."},
+			{"title": "Her şeyin azı karar,\nçoğu zarar!", "t": 2.5},
+		],
+	},
 ]
 
 

@@ -69,6 +69,18 @@ const ACTORS := {
 			[Vector3(0.36, 0.06, 0.02), Vector3(0, 1.8, -0.26), Color("222222")],    # gözlük
 		],
 		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("8a8a8a"), "eyes": Color("2a2a2a")},
+	"doktor": {"name": "Doktor", "color": Color("6fe0d0"),
+		"parts": [
+			[Vector3(0.24, 0.8, 0.26), Vector3(-0.14, 0.4, 0), Color("4a8ab0")],
+			[Vector3(0.24, 0.8, 0.26), Vector3(0.14, 0.4, 0), Color("4a8ab0")],
+			[Vector3(0.6, 0.9, 0.36), Vector3(0, 1.1, 0), Color("fafafa")],       # uzun beyaz önlük
+			[Vector3(0.17, 0.62, 0.2), Vector3(-0.39, 1.17, 0), Color("fafafa")],
+			[Vector3(0.17, 0.62, 0.2), Vector3(0.39, 1.17, 0), Color("fafafa")],
+			[Vector3(0.1, 0.3, 0.04), Vector3(0.12, 1.25, -0.19), Color("333333")],  # steteskop
+			[Vector3(0.5, 0.5, 0.5), Vector3(0, 1.75, 0), Color("d9a57a")],
+			[Vector3(0.54, 0.12, 0.54), Vector3(0, 2.02, 0.02), Color("222222")],
+		],
+		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("222222"), "eyes": Color("222222")},
 }
 
 var actor_id: String

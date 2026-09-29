@@ -60,7 +60,7 @@ func play(id: String) -> void:
 	set_time(ep.get("time", 0.3))
 	var first: Dictionary = ep["steps"][0]
 	var set_id: String = ep["set"]
-	_move_camera(FilmSets.point(set_id + "." + ("kam_dis" if set_id == "ev" else "kam_bahce")), FilmSets.point(first.get("at", "ev.yatak")), 0)
+	_move_camera(FilmSets.point(set_id + "." + ("kam_bahce" if set_id == "okul" else "kam_dis")), FilmSets.point(first.get("at", "ev.yatak")), 0)
 	# Setin chunk'ları hazır olmadan başlama; bu sırada kayıt için geri say.
 	for n in [3, 2, 1]:
 		_show_title("Kayıt için hazırlan\n%d" % n)
@@ -212,7 +212,7 @@ func _setup_environment() -> void:
 	_env.sky = sky
 	_env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	_env.ambient_light_color = Color.WHITE
-	_env.ambient_light_energy = 0.75
+	_env.ambient_light_energy = 1.0
 	var we := WorldEnvironment.new()
 	we.environment = _env
 	add_child(we)
