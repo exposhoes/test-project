@@ -12,6 +12,7 @@ const SETS := {
 	"okul": Vector3i(48, GROUND + 1, 0),
 	"hastane": Vector3i(-40, GROUND + 1, 0),
 	"bakkal": Vector3i(0, GROUND + 1, -36),
+	"park": Vector3i(40, GROUND + 1, -36),
 }
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
@@ -71,6 +72,17 @@ const POINTS := {
 		"kam_tezgah": Vector3(3.0, 2.0, 6.8),
 		"kam_dis": Vector3(9.0, 4.0, 16.0),
 	},
+	"park": {
+		"bank": Vector3(4.5, 0, 6.0),
+		"bank_yani": Vector3(6.5, 0, 6.0),
+		"ortu": Vector3(10.0, 0, 9.0),
+		"ortu_yani": Vector3(11.5, 0, 10.5),
+		"agac": Vector3(3.0, 0, 11.0),
+		"giris": Vector3(8.0, 0, 16.0),
+		"kam_genel": Vector3(8.0, 5.0, 20.0),
+		"kam_ortu": Vector3(13.0, 2.2, 13.0),
+		"kam_bank": Vector3(5.5, 1.8, 9.5),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -81,6 +93,7 @@ func _init() -> void:
 	_build_school(SETS["okul"])
 	_build_hospital(SETS["hastane"])
 	_build_shop(SETS["bakkal"])
+	_build_park(SETS["park"])
 
 
 ## Set noktasının dünya konumu: "ev.yatak" ya da doğrudan Vector3.
@@ -283,3 +296,25 @@ func _build_shop(o: Vector3i) -> void:
 	_put(o + Vector3i(0, 2, 8), Blocks.LANTERN)
 	for z in range(10, 14):
 		_put(o + Vector3i(5, -1, z), Blocks.GRAVEL)
+
+
+## Park: çakıl yollar, banklar, piknik örtüsü (renkli oyuncak tuğlaları), büyük ağaçlar, çiçek çalıları.
+func _build_park(o: Vector3i) -> void:
+	for x in range(0, 17):
+		_put(o + Vector3i(x, -1, 14), Blocks.GRAVEL)
+	for z in range(0, 17):
+		_put(o + Vector3i(8, -1, z), Blocks.GRAVEL)
+	for x in range(3, 7):
+		_put(o + Vector3i(x, 0, 5), Blocks.PLANKS)
+	_put(o + Vector3i(3, 0, 6), Blocks.LOG)
+	_put(o + Vector3i(6, 0, 6), Blocks.LOG)
+	for z in range(8, 11):
+		for x in range(9, 12):
+			_put(o + Vector3i(x, -1, z), Blocks.TOY_BRICK_RED if (x + z) % 2 == 0 else Blocks.SNOW)
+	_put(o + Vector3i(10, 0, 8), Blocks.CHEST)
+	for t in [Vector3i(2, 0, 11), Vector3i(14, 0, 3), Vector3i(1, 0, 1)]:
+		_fill(o, t, t + Vector3i(0, 4, 0), Blocks.LOG)
+		_fill(o, t + Vector3i(-2, 3, -2), t + Vector3i(2, 5, 2), Blocks.LEAVES)
+		_fill(o, t + Vector3i(0, 3, 0), t + Vector3i(0, 4, 0), Blocks.LOG)
+	for b in [Vector3i(12, 0, 12), Vector3i(13, 0, 12), Vector3i(5, 0, 12), Vector3i(15, 0, 7)]:
+		_put(o + b, Blocks.BERRY_BUSH)
