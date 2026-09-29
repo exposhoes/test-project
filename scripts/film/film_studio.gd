@@ -55,6 +55,7 @@ func play(id: String) -> void:
 	var ep := Episodes.find(id)
 	playing = true
 	_panel.visible = false
+	set_portrait(ep.get("format", "short") == "short")
 	_clear_actors()
 	set_time(ep.get("time", 0.3))
 	var first: Dictionary = ep["steps"][0]
@@ -74,7 +75,8 @@ func play(id: String) -> void:
 	_title.visible = false
 	_set_bars(false)
 	playing = false
-	_show_menu()
+	set_portrait(false)
+	_show_menu(ep.get("format", "short"))
 
 
 func _run(s: Dictionary) -> void:
@@ -91,6 +93,11 @@ func _run(s: Dictionary) -> void:
 		if s.has("look"):
 			a.face_towards(FilmSets.point(s["look"]))
 	elif s.has("cam"):
+		# Başka sete geçerken oranın chunk'ları yüklenmeden kesme yapma.
+		var to := FilmSets.point(s["cam"])
+		world.update_center(to)
+		while not world.is_meshed_at(to):
+			await get_tree().process_frame
 		_move_camera(FilmSets.point(s["cam"]), FilmSets.point(s["look"]) + Vector3(0, LOOK_HEIGHT, 0), s.get("t", 0.0))
 		if s.get("t", 0.0) > 0:
 			await _wait(s["t"])
@@ -277,15 +284,38 @@ func _build_ui() -> void:
 	layer.add_child(_panel)
 
 
-func _show_menu() -> void:
+## format "": format seçimi; "short" / "long": o formattaki bölümler.
+func _show_menu(format := "") -> void:
 	_panel.visible = true
 	var buttons := []
-	for ep: Dictionary in Episodes.LIST:
-		var id: String = ep["id"]
-		buttons.append({"label": ep["name"], "action": func() -> void: play(id)})
-	buttons.append({"label": "Ana Menü", "action": func() -> void:
-		get_tree().change_scene_to_file(MENU_SCENE)})
+	if format == "":
+		_panel.subtitle = "Bir format seç"
+		buttons.append({"label": "Shorts (dikey, 30-60 sn)", "action": func() -> void: _show_menu("short")})
+		buttons.append({"label": "Uzun Bölüm (yatay, 5-10 dk)", "action": func() -> void: _show_menu("long")})
+		buttons.append({"label": "Ana Menü", "action": func() -> void:
+			get_tree().change_scene_to_file(MENU_SCENE)})
+	else:
+		_panel.subtitle = "Bir bölüm seç, ekran kaydını başlat"
+		for ep: Dictionary in Episodes.of_format(format):
+			var id: String = ep["id"]
+			buttons.append({"label": ep["name"], "action": func() -> void: play(id)})
+		buttons.append({"label": "Geri", "action": func() -> void: _show_menu()})
 	_panel.set_buttons(buttons)
+
+
+## Shorts dikey çekilir: telefonda ekran dik döner, bilgisayarda pencere 9:16 olur.
+## Diyalog kutusu ve başlık dar ekrana göre ayarlanır.
+func set_portrait(on: bool) -> void:
+	if OS.has_feature("mobile"):
+		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_PORTRAIT if on else DisplayServer.SCREEN_SENSOR_LANDSCAPE)
+	elif DisplayServer.get_name() != "headless":
+		DisplayServer.window_set_size(Vector2i(405, 720) if on else Vector2i(1280, 720))
+	_box.anchor_left = 0.04 if on else 0.12
+	_box.anchor_right = 0.96 if on else 0.88
+	_box.offset_top = -330 if on else -210
+	_box.offset_bottom = -90 if on else -64
+	_title.add_theme_font_size_override("font_size", 44 if on else 64)
+	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if on else TextServer.AUTOWRAP_OFF
 
 
 func _show_title(text: String) -> void:
