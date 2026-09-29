@@ -2,10 +2,16 @@
 
 Her istem eksiksiz. Hiçbir şey ekleme veya çıkarma, olduğu gibi kopyala-yapıştır. Sırayla üret, dosyayı yazılan adla kaydet.
 
-## 1. bed_top.png
+## 1a. bed_head_top.png
 Klasör: `assets/textures/blocks/`
 ```
-Photorealistic top-down view of a made single bed, white cotton duvet with soft natural wrinkles, a plump white pillow along the top edge, a blue striped band across the duvet, visible fabric weave, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+Photorealistic photograph, extreme close-up top-down view of the head end of a made bed, a white pillow in the upper half, below it a folded white cotton duvet edge with a blue stripe, the fabric fills the entire square edge to edge with no background visible, no bed frame, no outlines, no line art, not a drawing, real fabric texture, soft even lighting, no shadows, square 1:1, 512x512, no text
+```
+
+## 1b. bed_foot_top.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic photograph, extreme close-up top-down view of a white cotton duvet surface with soft natural wrinkles, the fabric fills the entire square edge to edge with no background visible, no pillow, no bed frame, no outlines, no line art, not a drawing, real fabric texture, soft even lighting, no shadows, square 1:1, 512x512, no text
 ```
 
 ## 2. bed_side.png
