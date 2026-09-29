@@ -1,0 +1,2 @@
+Mehmet'in kendi ses kayıtları buraya: <bölüm id>/01.ogg, 02.ogg ... (bölümdeki konuşma sırasıyla).
+Kayıt yoksa telefonun Türkçe metin okuma sesi kullanılır.

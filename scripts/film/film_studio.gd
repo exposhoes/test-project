@@ -19,6 +19,9 @@ var playing := false
 var fast := false
 ## Eşyalara takılmadan yol bulunamayan yürüyüş sayısı (testler 0 bekler).
 var route_failures := 0
+var voice := FilmVoice.new()
+var _episode_id := ""
+var _line := 0
 
 var _sun := DirectionalLight3D.new()
 var _env := Environment.new()
@@ -38,6 +41,7 @@ func _ready() -> void:
 	get_tree().paused = false
 	_setup_environment()
 	add_child(world)
+	add_child(voice)
 	world.render_distance = 3
 	world.generator = FilmSets.new()
 	camera.fov = 62.0
@@ -56,6 +60,9 @@ func _process(_delta: float) -> void:
 func play(id: String) -> void:
 	var ep := Episodes.find(id)
 	playing = true
+	_episode_id = ep["id"]
+	_line = 0
+	voice.enabled = not fast
 	_panel.visible = false
 	set_portrait(ep.get("format", "short") == "short")
 	_clear_actors()
@@ -164,6 +171,8 @@ func _say(id: String, text: String) -> void:
 	_text_label.visible_characters = 0
 	_box.visible = true
 	a.talking = true
+	_line += 1
+	var voiced := voice.speak(id, text, _episode_id, _line)
 	var total := text.length()
 	var t := 0.0
 	while _text_label.visible_characters < total:
@@ -173,8 +182,13 @@ func _say(id: String, text: String) -> void:
 		_text_label.visible_characters = mini(total, int(t * TYPE_SPEED))
 		await get_tree().process_frame
 	_text_label.visible_characters = -1
+	# Ses sürdükçe ağız oynasın; ses bitince kısa bir nefes payı.
+	var limit := t + 12.0
+	while not fast and voice.speaking() and t < limit:
+		t += get_process_delta_time()
+		await get_tree().process_frame
 	a.talking = false
-	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t)
+	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t if not voiced else 0.35)
 
 
 func _wait(sec: float) -> void:
