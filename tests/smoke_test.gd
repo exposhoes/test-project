@@ -408,6 +408,25 @@ func _initialize() -> void:
 	_check(not player.has_bed(), "yatak kırılınca doğma noktası silinmeli")
 	for i in 5:
 		await process_frame
+	# Sandık: eşya konur, alınır, kırılınca içindekiler yere saçılır.
+	var chest_cell := Vector3i(player.global_position.floor()) + Vector3i(-2, 0, 0)
+	world.set_block(chest_cell, Blocks.CHEST)
+	var chest_box := world.chest_at(chest_cell)
+	inv.add(Blocks.BRICKS, 10)
+	var brick_i := -1
+	for i in Inventory.SIZE:
+		if inv.item_at(i) == Blocks.BRICKS:
+			brick_i = i
+	InventoryScreen.move_stack(inv, brick_i, chest_box)
+	_check(chest_box.count_of(Blocks.BRICKS) >= 10 and world.chest_at(chest_cell).count_of(Blocks.BRICKS) >= 10, "sandığa konan eşya sandıkta kalmalı")
+	InventoryScreen.move_stack(chest_box, 0, inv)
+	_check(chest_box.count_of(Blocks.BRICKS) == 0 and inv.count_of(Blocks.BRICKS) > 0, "sandıktan eşya alınabilmeli")
+	InventoryScreen.move_stack(inv, brick_i, chest_box)
+	for d in get_nodes_in_group("item_drops"):
+		d.free()
+	player._target = {"hit": chest_cell}
+	player.break_target()
+	_check(not world.chests.has(chest_cell) and get_nodes_in_group("item_drops").size() >= 1, "kırılan sandığın içi yere saçılmalı")
 	var menu: Node = load("res://scenes/menu.tscn").instantiate()
 	root.add_child(menu)
 	await process_frame

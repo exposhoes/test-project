@@ -206,6 +206,12 @@ func break_target() -> void:
 	var id := world.get_block(pos)
 	if Blocks.is_breakable(id):
 		world.set_block(pos, Blocks.AIR)
+		# Kırılan sandığın içindekiler yere saçılır.
+		if id == Blocks.CHEST and world.chests.has(pos):
+			for slot: Dictionary in world.chests[pos]:
+				if not slot.is_empty():
+					ItemDrop.spawn(get_parent(), Vector3(pos) + Vector3.ONE * 0.5, slot["id"], slot["count"])
+			world.chests.erase(pos)
 		Sfx.play("break")
 		var center := Vector3(pos) + Vector3.ONE * 0.5
 		var drop := Items.drop_for_block(id)
@@ -220,6 +226,10 @@ func break_target() -> void:
 func use_selected() -> void:
 	if not _target.is_empty() and Dimension.is_portal(world.get_block(_target["hit"])):
 		used_portal.emit(world.get_block(_target["hit"]))
+		return
+	if not _target.is_empty() and world.get_block(_target["hit"]) == Blocks.CHEST:
+		if hud:
+			hud.open_inventory(world.chest_at(_target["hit"]))
 		return
 	if not _target.is_empty() and world.get_block(_target["hit"]) == Blocks.BED:
 		use_bed(_target["hit"])

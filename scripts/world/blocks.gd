@@ -37,6 +37,7 @@ enum {
 	PLAYROOM_WALL,
 	LANTERN,
 	BED,
+	CHEST,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -76,6 +77,7 @@ const DEFS := {
 	PLAYROOM_WALL: {"name": "Oyun Odası Duvarı", "all": "playroom_wall"},
 	LANTERN: {"name": "Fener", "all": "lantern", "light": true},
 	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks"},
+	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -117,6 +119,8 @@ const PLACEHOLDER_COLORS := {
 	"lantern": Color("ffd35a"),
 	"bed_top": Color("c8323c"),
 	"bed_side": Color("8a5a32"),
+	"chest_top": Color("a8733e"),
+	"chest_side": Color("a8733e"),
 }
 
 

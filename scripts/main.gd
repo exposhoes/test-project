@@ -28,6 +28,7 @@ var pending_allies: Array = []
 ## Şu anki boyut, her boyutun blok değişiklikleri ve oyuncunun her boyuttan ayrıldığı yer.
 var dimension := Dimension.OVERWORLD
 var dim_edits := {}
+var dim_chests := {}
 var return_positions := {}
 ## Boyutun ortam sesi (koridor uğultusu, fabrika müzik kutusu).
 var ambience := AudioStreamPlayer.new()
@@ -158,6 +159,7 @@ func travel(portal_block := Blocks.HALLS_PORTAL) -> void:
 	if target_dim == -1:
 		return
 	dim_edits[dimension] = world.edits
+	dim_chests[dimension] = world.chests
 	return_positions[dimension] = player.global_position
 	for node in get_tree().get_nodes_in_group("item_drops"):
 		node.queue_free()
@@ -194,6 +196,7 @@ func _make_world(p_seed: int) -> World:
 	if not dim_edits.has(dimension):
 		dim_edits[dimension] = {}
 	w.edits = dim_edits[dimension]
+	w.chests = dim_chests.get(dimension, {})
 	w.render_distance = Settings.view_distance
 	return w
 

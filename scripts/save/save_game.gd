@@ -13,6 +13,7 @@ static func save(path: String, main: Node) -> bool:
 	var world: World = main.world
 	var dead := player.survival.dead
 	main.dim_edits[main.dimension] = world.edits
+	main.dim_chests[main.dimension] = world.chests
 	var pos := player.global_position if player.is_spawned() else player.saved_position
 	var data := {
 		"version": VERSION,
@@ -20,6 +21,7 @@ static func save(path: String, main: Node) -> bool:
 		"time_of_day": main.time_of_day,
 		"dimension": main.dimension,
 		"dim_edits": main.dim_edits,
+		"dim_chests": main.dim_chests,
 		"return_positions": main.return_positions,
 		"player": {
 			# Ölüyken kaydedilirse bir sonraki açılışta başlangıç noktasında dolu canla doğar.
@@ -83,6 +85,18 @@ static func apply_world(data: Dictionary, main: Node) -> void:
 		main.dim_edits[main.dimension] = {}
 	main.world.dimension = main.dimension
 	main.world.edits = main.dim_edits[main.dimension]
+	# Sandık dizileri yazılı (Array[Dictionary]) olmalı; kayıttan gelen düz diziler dönüştürülür.
+	main.dim_chests = {}
+	var saved: Dictionary = data.get("dim_chests", {})
+	for dim in saved:
+		var chests := {}
+		for pos in saved[dim]:
+			var slots: Array[Dictionary] = []
+			for slot in saved[dim][pos]:
+				slots.append(slot)
+			chests[pos] = slots
+		main.dim_chests[dim] = chests
+	main.world.chests = main.dim_chests.get(main.dimension, {})
 	main.time_of_day = data["time_of_day"]
 
 

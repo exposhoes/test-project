@@ -553,6 +553,43 @@ def bed_side(rng):
     return img
 
 
+def chest_side(rng):
+    # Ahşap tahtalar, koyu kenarlar, ortada metal kilit.
+    img = new(hx("a8733e"))
+    px = img.load()
+    for y in range(32):
+        for x in range(32):
+            c = hx("a8733e")
+            if y % 8 == 0:
+                c = hx("7a4f28")
+            elif (x * 3 + y * 5 + rng.randrange(4)) % 11 == 0:
+                c = hx("b8844c")
+            if x < 2 or x > 29 or y < 2 or y > 29:
+                c = hx("5a3a1c")
+            if y in (12, 13):
+                c = hx("5a3a1c")
+            px[x, y] = c
+    for y in range(10, 19):
+        for x in range(13, 19):
+            px[x, y] = hx("3a3a3a") if x in (13, 18) or y in (10, 18) else hx("d8d8d0")
+    px[15, 15] = px[16, 15] = hx("3a3a3a")
+    return img
+
+
+def chest_top(rng):
+    img = new(hx("a8733e"))
+    px = img.load()
+    for y in range(32):
+        for x in range(32):
+            c = hx("b07a42") if (x // 8) % 2 else hx("a8733e")
+            if x % 8 == 0:
+                c = hx("7a4f28")
+            if x < 2 or x > 29 or y < 2 or y > 29:
+                c = hx("5a3a1c")
+            px[x, y] = c
+    return img
+
+
 TEX = {
     "grass_side": grass_side, "grass_top": grass_top, "dirt": dirt, "stone": stone,
     "cobblestone": cobblestone, "sand": sand, "gravel": gravel, "log_side": log_side,
@@ -571,6 +608,7 @@ TEX = {
     "ceiling_tile": ceiling_tile, "ceiling_light": ceiling_light, "factory_portal": factory_portal,
     "playroom_wall": playroom_wall, "lantern": lantern,
     "bed_top": bed_top, "bed_side": bed_side,
+    "chest_side": chest_side, "chest_top": chest_top,
 }
 
 if __name__ == "__main__":

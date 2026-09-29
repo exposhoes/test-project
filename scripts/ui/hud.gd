@@ -217,11 +217,12 @@ func close_pause() -> void:
 	touch.visible = DisplayServer.is_touchscreen_available() or OS.has_feature("mobile")
 
 
-func open_inventory() -> void:
+## chest verilirse sağda tarifler yerine sandığın yuvaları gösterilir.
+func open_inventory(chest: Inventory = null) -> void:
 	touch.release_all()
 	touch.visible = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	_inventory_screen.open()
+	_inventory_screen.open(chest)
 
 
 func close_inventory() -> void:

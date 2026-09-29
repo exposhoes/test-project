@@ -24,6 +24,9 @@ var _center := Vector2i(2147483647, 0)
 var edits := {}
 ## Yüklü chunk'lardaki fenerlerin ışıkları: blok konumu -> OmniLight3D.
 var _lights := {}
+## Sandık içerikleri: blok konumu -> 27 yuvalık dizi. Kayıtta boyut başına saklanır.
+var chests := {}
+const CHEST_SIZE := 27
 ## Mesh'ler arka plan iş parçacıklarında hazırlanır; ana iş parçacığı yalnızca sonucu uygular.
 ## Kapatılırsa (ya da tek çekirdekte) eski eşzamanlı yol kullanılır.
 var threaded := OS.get_processor_count() > 1
@@ -91,6 +94,16 @@ func set_block(pos: Vector3i, id: int) -> void:
 	elif lz == Chunk.SIZE - 1:
 		_remesh(c + Vector2i(0, 1))
 	block_changed.emit(pos, id)
+
+
+## Konumdaki sandığın eşyaları (ilk açılışta boş sandık oluşturur).
+func chest_at(pos: Vector3i) -> Inventory:
+	if not chests.has(pos):
+		var empty: Array[Dictionary] = []
+		for i in CHEST_SIZE:
+			empty.append({})
+		chests[pos] = empty
+	return Inventory.new(CHEST_SIZE, chests[pos])
 
 
 ## pos'un dist blok yakınında fener var mı (Sırıtkan ışıktan kaçar).

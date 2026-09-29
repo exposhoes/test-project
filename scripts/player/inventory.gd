@@ -13,8 +13,12 @@ var slots: Array[Dictionary] = []
 var fuel := 0
 
 
-func _init() -> void:
-	for i in SIZE:
+## size: oyuncu için 36, sandık için 27. slots verilirse o dizi kullanılır (sandık içeriği dünyada saklanır).
+func _init(size := SIZE, p_slots = null) -> void:
+	if p_slots != null:
+		slots = p_slots
+		return
+	for i in size:
 		slots.append({})
 
 
@@ -55,7 +59,7 @@ func can_fit(id: int, count: int) -> bool:
 func remove(id: int, count: int) -> bool:
 	if count_of(id) < count:
 		return false
-	for i in range(SIZE - 1, -1, -1):
+	for i in range(slots.size() - 1, -1, -1):
 		if count == 0:
 			break
 		if not slots[i].is_empty() and slots[i]["id"] == id:
