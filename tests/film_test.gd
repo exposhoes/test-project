@@ -13,6 +13,23 @@ func _init() -> void:
 			if pos.y < FilmSets.GROUND:
 				fails += 1
 				print("FAIL nokta yerin altında: ", set_id, ".", p)
+	# Senaryolardaki her set noktası gerçekten tanımlı mı (yoksa oyun o adımda hata verir, test yine geçerdi).
+	for ep: Dictionary in Episodes.LIST:
+		if not FilmSets.SETS.has(ep["set"]):
+			fails += 1
+			print("FAIL bilinmeyen set: ", ep["set"])
+		for step: Dictionary in ep["steps"]:
+			for key in ["at", "look", "to", "cam"]:
+				var v = step.get(key)
+				if v is String:
+					var parts := String(v).split(".")
+					if parts.size() != 2 or not FilmSets.POINTS.has(parts[0]) or not FilmSets.POINTS[parts[0]].has(parts[1]):
+						fails += 1
+						print("FAIL tanımsız nokta: ", ep["id"], " ", v)
+	for set_id in FilmSets.SETS:
+		if not FilmSets.POINTS.has(set_id):
+			fails += 1
+			print("FAIL noktasız set: ", set_id)
 	for ep: Dictionary in Episodes.LIST:
 		await studio.play(ep["id"])
 		if studio.playing:

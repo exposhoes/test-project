@@ -425,6 +425,31 @@ const LIST := [
 			{"title": "Paylaşınca daha lezzetli!", "t": 2.5},
 		],
 	},
+	{
+		"id": "asi", "name": "Bölüm 11: Aşı Günü", "set": "hastane", "time": 0.4,
+		"steps": [
+			{"place": "emir", "at": "hastane.bekleme", "look": "hastane.danisma"},
+			{"place": "anne", "at": Vector3(-38.0, 11, 7.6), "look": "hastane.bekleme"},
+			{"place": "doktor", "at": "hastane.danisma_arka", "look": "hastane.danisma"},
+			{"cam": "hastane.kam_ic", "look": "hastane.bekleme", "t": 0},
+			{"title": "Aşı Günü", "t": 1.3},
+			{"say": "emir", "text": "Anne, ben aslında hiç hasta değilim. Gidelim mi?"},
+			{"say": "anne", "text": "Aşı hasta olmamak için yapılır Emir."},
+			{"say": "doktor", "text": "Sıradaki kahramanımız... Emir!"},
+			{"zoom": 0.5},
+			{"say": "emir", "text": "Kahraman mı? Ben mi?"},
+			{"walk": "emir", "to": "hastane.danisma"},
+			{"turn": "emir", "to": "hastane.danisma_arka"},
+			{"say": "doktor", "text": "Evet! Aşı olan herkes mikroplara karşı süper güç kazanır."},
+			{"say": "emir", "text": "Süper güç mü? Tamam, hazırım! Gözlerimi kapatıyorum..."},
+			{"say": "doktor", "text": "Bitti bile!"},
+			{"shake": 0.3},
+			{"say": "emir", "text": "Ne? Hiç acımadı! Karınca ısırığı gibiydi!"},
+			{"say": "anne", "text": "Gördün mü? Korkulacak bir şey yokmuş."},
+			{"say": "emir", "text": "Artık mikroplar benden korksun!"},
+			{"title": "Aşı olan süper kahraman olur!", "t": 2.5},
+		],
+	},
 ]
 
 
