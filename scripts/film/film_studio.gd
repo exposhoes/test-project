@@ -113,6 +113,22 @@ func _run(s: Dictionary) -> void:
 		set_time(s["time"])
 	elif s.has("wait"):
 		await _wait(s["wait"])
+	elif s.has("zoom"):
+		# Komik anda hızlı yakınlaşma vuruşu (Shorts tarzı), sonra geri.
+		var tw := create_tween()
+		tw.tween_property(camera, "fov", 38.0, 0.12)
+		tw.tween_interval(maxf(0.1, s["zoom"]))
+		tw.tween_property(camera, "fov", 62.0, 0.2)
+		if not fast:
+			await tw.finished
+	elif s.has("shake"):
+		var base := camera.position
+		var tw := create_tween()
+		for i in int(maxf(1.0, s["shake"] * 20.0)):
+			tw.tween_property(camera, "position", base + Vector3(randf_range(-0.08, 0.08), randf_range(-0.08, 0.08), 0), 0.05)
+		tw.tween_property(camera, "position", base, 0.05)
+		if not fast:
+			await tw.finished
 
 
 func _say(id: String, text: String) -> void:

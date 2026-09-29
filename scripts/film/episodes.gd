@@ -14,6 +14,9 @@ extends RefCounted
 ##   {"hide": "emir"}                                   sahneden çıkarır
 ##   {"time": 0.26}                                     günün saati (0.25 gündoğumu, 0.5 öğle)
 ##   {"wait": sn}
+##   {"zoom": sn}                                      komik anda hızlı yakınlaşma
+##   {"shake": sn}                                     kamera sarsıntısı
+## Yazım kuralları: docs/senaryo-rehberi.md
 
 const LIST := [
 	{
@@ -126,6 +129,32 @@ const LIST := [
 			{"say": "zeynep", "text": "Hahaha! O köpek bütün sınıfın ödevini yiyecek!"},
 			{"say": "ogretmen", "text": "Tamam, tamam! Yarın ödevler kuru ve eksiksiz gelsin!"},
 			{"title": "Ödevini zamanında yap,\nköpeğe fırsat verme!", "t": 3.0},
+		],
+	},
+	{
+		"id": "noobpro", "name": "Bölüm 5: Acemi vs Usta", "set": "ev", "time": 0.3,
+		"steps": [
+			{"place": "ali", "at": "ev.masa", "look": "ev.ocak"},
+			{"place": "zeynep", "at": "ev.mutfak", "look": "ev.ocak"},
+			{"cam": "ev.kam_mutfak", "look": "ev.masa", "t": 0},
+			{"title": "Acemi vs Usta: Kahvaltı", "t": 1.3},
+			{"say": "ali", "text": "Acemi kahvaltı hazırlıyor..."},
+			{"say": "ali", "text": "Elmayı ocağa koydum, on saat bekleyeceğim!"},
+			{"zoom": 0.4},
+			{"cam": "ev.kam_oda", "look": "ev.mutfak", "t": 0},
+			{"say": "zeynep", "text": "Usta kahvaltı hazırlıyor!"},
+			{"say": "zeynep", "text": "Fırın elma, çilek, hepsi on saniyede hazır!"},
+			{"place": "emir", "at": "ev.kapi_ici", "look": "ev.mutfak"},
+			{"cam": "ev.kam_yatak", "look": "ev.kapi_ici", "t": 0},
+			{"say": "emir", "text": "Peki ya dâhi kahvaltı?"},
+			{"walk": "emir", "to": "ev.masa"},
+			{"say": "emir", "text": "Anneeee! Kahvaltı hazır mı?"},
+			{"place": "anne", "at": "ev.ocak", "look": "ev.masa"},
+			{"shake": 0.4},
+			{"say": "anne", "text": "Hazır oğlum, gel otur!"},
+			{"zoom": 0.5},
+			{"say": "emir", "text": "İşte dâhi yöntemi: Annem!"},
+			{"title": "Sen hangisisin?\nYorumlara yaz!", "t": 2.5},
 		],
 	},
 ]
