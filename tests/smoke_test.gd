@@ -408,6 +408,18 @@ func _initialize() -> void:
 	_check(not player.has_bed(), "yatak kırılınca doğma noktası silinmeli")
 	for i in 5:
 		await process_frame
+	# Yiyecek: çilek çalısı 2 çilek bırakır, elma fırında pişer.
+	_check(Items.drop_for_block(Blocks.BERRY_BUSH) == Items.BERRIES and Items.food_value(Items.BERRIES) > 0, "çalı çilek bırakmalı")
+	var baked := Items.SMELTING.filter(func(r: Dictionary) -> bool: return r["out"] == Items.BAKED_APPLE)
+	_check(baked.size() == 1 and Items.food_value(Items.BAKED_APPLE) > Items.food_value(Items.APPLE), "fırın elma elmadan doyurucu olmalı")
+	var gen := TerrainGenerator.new(1337)
+	var bushes := 0
+	for cx in 4:
+		var ch := Chunk.new(Vector2i(cx, 0), null)
+		gen.generate(ch)
+		bushes += ch.blocks.count(Blocks.BERRY_BUSH)
+		ch.free()
+	_check(bushes > 0, "arazide çilek çalısı çıkmalı (%d)" % bushes)
 	# Görevler: eşya ve olaylarla tamamlanır.
 	_check(main.quests.done.has("log") or main.quests.done.has("table"), "eşya alınca görev tamamlanmalı: %s" % [main.quests.done])
 	main.quests.event("tame")

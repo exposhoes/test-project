@@ -14,6 +14,8 @@ const RUBY := 1005
 const CRYSTAL := 1006
 const RAW_IRON := 1007
 const RAW_GOLD := 1008
+const BERRIES := 1009
+const BAKED_APPLE := 1050
 const WOOD_PICKAXE := 1010
 const STONE_PICKAXE := 1011
 const IRON_PICKAXE := 1012
@@ -53,6 +55,10 @@ const DEFS := {
 	APPLE: {"name": "Elma", "icon": "item_apple", "food": 4,
 		"colors": {"r": Color("d8263f"), "d": Color("8e1426"), "g": Color("3b8a2a"), "b": Color("5e4426"), "w": Color("f7a0a8")},
 		"pattern": ["____bg__", "___bgg__", "_rrbrr__", "rwrrrrr_", "rrrrrrr_", "rrrrrrd_", "_rrrrd__", "__rdd___"]},
+	BERRIES: {"name": "Çilek", "icon": "item_berries", "food": 2,
+		"colors": {"h": Color("e0303c"), "d": Color("9a1a24"), "w": Color("ffd0d4")}, "pattern": NUGGET},
+	BAKED_APPLE: {"name": "Fırın Elma", "icon": "item_baked_apple", "food": 8,
+		"colors": {"h": Color("b8581c"), "d": Color("7a3410"), "w": Color("f2c27a")}, "pattern": NUGGET},
 	STICK: {"name": "Çubuk", "icon": "item_stick", "colors": {"s": HANDLE},
 		"pattern": ["______s_", "_____s__", "____s___", "___s____", "__s_____", "_s______", "________", "________"]},
 	COAL: {"name": "Kömür", "icon": "item_coal", "colors": {"h": Color("262626"), "d": Color("0d0d0d"), "w": Color("555555")},
@@ -84,6 +90,7 @@ const BLOCK_DROPS := {
 	Blocks.GRASS: Blocks.DIRT,
 	Blocks.STONE: Blocks.COBBLESTONE,
 	Blocks.LEAVES: -1,
+	Blocks.BERRY_BUSH: BERRIES,
 	Blocks.GLASS: -1,
 	Blocks.COAL_ORE: COAL,
 	Blocks.IRON_ORE: RAW_IRON,
@@ -107,6 +114,7 @@ const MINING := {
 	Blocks.FACTORY_PORTAL: {"time": 2.0, "tool": "axe"},
 	Blocks.LANTERN: {"time": 0.5},
 	Blocks.BED: {"time": 0.6},
+	Blocks.BERRY_BUSH: {"time": 0.2},
 	Blocks.CHEST: {"time": 0.8},
 	Blocks.STONE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
 	Blocks.COBBLESTONE: {"time": 4.0, "tool": "pickaxe", "tier": 1},
@@ -152,6 +160,7 @@ const SMELTING := [
 	{"out": Blocks.GLASS, "count": 1, "in": {Blocks.SAND: 1}},
 	{"out": Blocks.STONE, "count": 1, "in": {Blocks.COBBLESTONE: 1}},
 	{"out": COAL, "count": 1, "in": {Blocks.LOG: 1}},
+	{"out": BAKED_APPLE, "count": 1, "in": {APPLE: 1}},
 ]
 
 ## Yakıtlar ve kaç eritmeye yettikleri; fırın bu sırayla yakar.

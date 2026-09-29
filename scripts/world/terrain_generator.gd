@@ -37,6 +37,8 @@ func generate(chunk: Chunk) -> void:
 				chunk.set_local(x, y, z, _block_for(gx, y, gz, h))
 			if _tree_here(gx, gz, h) and x >= 2 and x <= Chunk.SIZE - 3 and z >= 2 and z <= Chunk.SIZE - 3:
 				_place_tree(chunk, x, h + 1, z)
+			elif _bush_here(gx, gz, h) and chunk.get_local(x, h + 1, z) == Blocks.AIR:
+				chunk.set_local(x, h + 1, z, Blocks.BERRY_BUSH)
 
 
 func _block_for(x: int, y: int, z: int, surface: int) -> int:
@@ -66,6 +68,11 @@ func _block_for(x: int, y: int, z: int, surface: int) -> int:
 
 func _tree_here(x: int, z: int, surface: int) -> bool:
 	return surface > BEACH_HEIGHT and surface < SNOW_HEIGHT and _roll(x, -1, z) < 8
+
+
+## Çimenlikte seyrek çilek çalıları (yiyecek).
+func _bush_here(x: int, z: int, surface: int) -> bool:
+	return surface > BEACH_HEIGHT and surface < SNOW_HEIGHT and _roll(x, -3, z) < 5
 
 
 func _place_tree(chunk: Chunk, x: int, y: int, z: int) -> void:

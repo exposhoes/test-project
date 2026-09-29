@@ -590,6 +590,25 @@ def chest_top(rng):
     return img
 
 
+def berry_bush(rng):
+    # Sık yapraklı çalı, kırmızı çilekler; kenarlarda az boşluk.
+    img = new(hx("3f7a2a"))
+    px = img.load()
+    greens = [hx("2f5e1e"), hx("3f7a2a"), hx("4f9434"), hx("62a842")]
+    for y in range(32):
+        for x in range(32):
+            px[x, y] = greens[rng.randrange(4)]
+            if (x < 2 or x > 29 or y < 2) and rng.random() < 0.5:
+                px[x, y] = (0, 0, 0, 0)
+    for _ in range(9):
+        cx, cy = rng.randrange(3, 28), rng.randrange(3, 28)
+        for dx, dy in ((0, 0), (1, 0), (0, 1), (1, 1)):
+            px[cx + dx, cy + dy] = hx("e0303c")
+        px[cx, cy] = hx("ff8a94")
+        px[cx + 1, cy + 1] = hx("9a1a24")
+    return img
+
+
 TEX = {
     "grass_side": grass_side, "grass_top": grass_top, "dirt": dirt, "stone": stone,
     "cobblestone": cobblestone, "sand": sand, "gravel": gravel, "log_side": log_side,
@@ -609,6 +628,7 @@ TEX = {
     "playroom_wall": playroom_wall, "lantern": lantern,
     "bed_top": bed_top, "bed_side": bed_side,
     "chest_side": chest_side, "chest_top": chest_top,
+    "berry_bush": berry_bush,
 }
 
 if __name__ == "__main__":

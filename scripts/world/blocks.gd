@@ -38,6 +38,7 @@ enum {
 	LANTERN,
 	BED,
 	CHEST,
+	BERRY_BUSH,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -77,6 +78,7 @@ const DEFS := {
 	PLAYROOM_WALL: {"name": "Oyun Odası Duvarı", "all": "playroom_wall"},
 	LANTERN: {"name": "Fener", "all": "lantern", "light": true},
 	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks"},
+	BERRY_BUSH: {"name": "Çilek Çalısı", "all": "berry_bush", "transparent": true},
 	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks"},
 }
 
@@ -120,6 +122,7 @@ const PLACEHOLDER_COLORS := {
 	"bed_top": Color("c8323c"),
 	"bed_side": Color("8a5a32"),
 	"chest_top": Color("a8733e"),
+	"berry_bush": Color("3f7a2a"),
 	"chest_side": Color("a8733e"),
 }
 

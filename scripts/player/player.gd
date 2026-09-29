@@ -216,7 +216,7 @@ func break_target() -> void:
 		var center := Vector3(pos) + Vector3.ONE * 0.5
 		var drop := Items.drop_for_block(id)
 		if drop != -1 and Items.harvests(id, held_item()):
-			ItemDrop.spawn(get_parent(), center, drop)
+			ItemDrop.spawn(get_parent(), center, drop, 2 if id == Blocks.BERRY_BUSH else 1)
 		if id == Blocks.LEAVES and randf() < APPLE_CHANCE:
 			ItemDrop.spawn(get_parent(), center, Items.APPLE)
 		wear_held()

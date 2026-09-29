@@ -344,6 +344,28 @@ def armor(m, trim):
     return fn
 
 
+def berries():
+    ic = Icon()
+    for cx, cy, r in ((11.5, 20.5, 5.0), (20.5, 19.5, 5.0), (16.0, 13.5, 4.5)):
+        ic.disc(cx, cy, r, RUBY)
+    for cx, cy in ((11, 15), (20, 14), (16, 9)):
+        ic.put(cx, cy, LEAF[2]); ic.put(cx + 1, cy, LEAF[3])
+    return ic.image()
+
+
+def baked_apple():
+    baked = pal("4a1e08", "7a3410", "b8581c", "d88a3a", "f8d8a0")
+    ic = Icon()
+    ic.disc(11.5, 18.5, 7.5, baked)
+    ic.disc(20.5, 18.5, 7.5, baked, spec=False)
+    ic.disc(16.0, 22.0, 7.0, baked, spec=False)
+    ic.capsule((15.5, 12.0), (16.5, 7.0), 1.0, HANDLE)
+    # Buhar.
+    for p in ((10, 6), (11, 5), (10, 4), (21, 7), (22, 6), (21, 5)):
+        ic.put(*p, pal("dddddd")[0])
+    return ic.image()
+
+
 TEX = {
     "item_apple": apple, "item_stick": stick, "item_coal": coal,
     "item_iron": ingot(IRON), "item_gold": ingot(GOLD),
@@ -355,6 +377,7 @@ TEX = {
     "item_sword_wood": sword(WOOD, WOOD), "item_sword_stone": sword(STONE),
     "item_sword_iron": sword(IRON), "item_sword_ruby": sword(RUBY, GOLD),
     "item_armor_iron": armor(IRON, IRON), "item_armor_ruby": armor(RUBY, GOLD),
+    "item_berries": berries, "item_baked_apple": baked_apple,
 }
 
 if __name__ == "__main__":
