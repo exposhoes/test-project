@@ -309,6 +309,33 @@ const LIST := [
 			{"title": "Her şeyin azı karar,\nçoğu zarar!", "t": 2.5},
 		],
 	},
+	{
+		"id": "bakkal1", "name": "Bölüm 7: Çilekle Alışveriş", "set": "bakkal", "time": 0.4,
+		"steps": [
+			{"place": "bakkal", "at": "bakkal.tezgah_arka", "look": "bakkal.kapi"},
+			{"place": "emir", "at": "bakkal.dis", "look": "bakkal.kapi"},
+			{"cam": "bakkal.kam_dis", "look": "bakkal.kapi", "t": 0},
+			{"title": "Çilekle Alışveriş", "t": 1.3},
+			{"say": "emir", "text": "Bugün dondurma alacağım! Param da hazır!"},
+			{"cam": "bakkal.kam_ic", "look": "bakkal.tezgah_on", "t": 0},
+			{"walk": "emir", "to": "bakkal.tezgah_on"},
+			{"turn": "emir", "to": "bakkal.tezgah_arka"},
+			{"say": "bakkal", "text": "Hoş geldin Emir! Ne alıyorsun?"},
+			{"say": "emir", "text": "En büyük çikolatalı dondurma lütfen!"},
+			{"say": "bakkal", "text": "Buyur. Beş lira oluyor."},
+			{"cam": "bakkal.kam_tezgah", "look": "bakkal.tezgah_on", "t": 0},
+			{"say": "emir", "text": "Buyurun! Beş tane çilek!"},
+			{"zoom": 0.6},
+			{"say": "bakkal", "text": "Çilek mi? Evladım bu para değil ki!"},
+			{"say": "emir", "text": "Ama oyunda çilekle her şey alınıyor!"},
+			{"say": "bakkal", "text": "Hahaha! Burası gerçek bakkal, oyun değil!"},
+			{"shake": 0.3},
+			{"say": "emir", "text": "Peki... Çilekli dondurma yapar mısınız?"},
+			{"say": "bakkal", "text": "Anlaştık! Çilekleri ver, dondurma benden!"},
+			{"say": "emir", "text": "Yaşasın! Takas en iyi alışveriş!"},
+			{"title": "Sen olsan ne ile takas ederdin?\nYorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 

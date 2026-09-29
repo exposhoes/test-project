@@ -81,6 +81,19 @@ const ACTORS := {
 			[Vector3(0.54, 0.12, 0.54), Vector3(0, 2.02, 0.02), Color("222222")],
 		],
 		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("222222"), "eyes": Color("222222")},
+	"bakkal": {"name": "Bakkal Amca", "color": Color("ffb347"),
+		"parts": [
+			[Vector3(0.26, 0.8, 0.28), Vector3(-0.15, 0.4, 0), Color("5a4630")],
+			[Vector3(0.26, 0.8, 0.28), Vector3(0.15, 0.4, 0), Color("5a4630")],
+			[Vector3(0.66, 0.75, 0.4), Vector3(0, 1.17, 0), Color("8fb8e0")],       # gömlek
+			[Vector3(0.62, 0.6, 0.06), Vector3(0, 1.05, -0.22), Color("e8e2cf")],   # önlük
+			[Vector3(0.18, 0.62, 0.2), Vector3(-0.42, 1.2, 0), Color("8fb8e0")],
+			[Vector3(0.18, 0.62, 0.2), Vector3(0.42, 1.2, 0), Color("8fb8e0")],
+			[Vector3(0.52, 0.52, 0.52), Vector3(0, 1.8, 0), SKIN],
+			[Vector3(0.4, 0.08, 0.04), Vector3(0, 1.68, -0.27), Color("6a6a6a")],   # bıyık
+			[Vector3(0.56, 0.1, 0.56), Vector3(0, 2.08, 0.02), Color("9a9a9a")],
+		],
+		"face": [0.48, Vector3(0, 1.8, -0.26)], "hair": Color("9a9a9a"), "eyes": Color("2a2a2a")},
 }
 
 var actor_id: String

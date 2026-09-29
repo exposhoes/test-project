@@ -284,8 +284,10 @@ func _build_ui() -> void:
 	layer.add_child(_panel)
 
 
-## format "": format seçimi; "short" / "long": o formattaki bölümler.
-func _show_menu(format := "") -> void:
+const PAGE_SIZE := 4
+
+## format "": format seçimi; "short" / "long": o formattaki bölümler (sayfa sayfa, ekrana sığsın).
+func _show_menu(format := "", page := 0) -> void:
 	_panel.visible = true
 	var buttons := []
 	if format == "":
@@ -295,10 +297,15 @@ func _show_menu(format := "") -> void:
 		buttons.append({"label": "Ana Menü", "action": func() -> void:
 			get_tree().change_scene_to_file(MENU_SCENE)})
 	else:
-		_panel.subtitle = "Bir bölüm seç, ekran kaydını başlat"
-		for ep: Dictionary in Episodes.of_format(format):
+		var list := Episodes.of_format(format)
+		var pages := maxi(1, ceili(list.size() / float(PAGE_SIZE)))
+		page = posmod(page, pages)
+		_panel.subtitle = "Bir bölüm seç, ekran kaydını başlat" + ("  (%d/%d)" % [page + 1, pages] if pages > 1 else "")
+		for ep: Dictionary in list.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE):
 			var id: String = ep["id"]
 			buttons.append({"label": ep["name"], "action": func() -> void: play(id)})
+		if pages > 1:
+			buttons.append({"label": "Diğer bölümler >", "action": func() -> void: _show_menu(format, page + 1)})
 		buttons.append({"label": "Geri", "action": func() -> void: _show_menu()})
 	_panel.set_buttons(buttons)
 

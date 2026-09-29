@@ -11,6 +11,7 @@ const SETS := {
 	"ev": Vector3i(0, GROUND + 1, 0),
 	"okul": Vector3i(48, GROUND + 1, 0),
 	"hastane": Vector3i(-40, GROUND + 1, 0),
+	"bakkal": Vector3i(0, GROUND + 1, -36),
 }
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
@@ -59,6 +60,17 @@ const POINTS := {
 		"kam_yatak": Vector3(4.6, 2.5, 6.4),
 		"kam_dis": Vector3(12.0, 4.5, 18.0),
 	},
+	"bakkal": {
+		"kapi": Vector3(5.5, 0, 8.6),
+		"dis": Vector3(5.5, 0, 12.0),
+		"tezgah_on": Vector3(5.5, 0, 4.4),
+		"tezgah_arka": Vector3(5.5, 0, 2.2),
+		"raf": Vector3(1.6, 0, 5.0),
+		"dondurma": Vector3(9.3, 0, 5.0),
+		"kam_ic": Vector3(8.5, 2.4, 7.6),
+		"kam_tezgah": Vector3(3.0, 2.0, 6.8),
+		"kam_dis": Vector3(9.0, 4.0, 16.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -68,6 +80,7 @@ func _init() -> void:
 	_build_house(SETS["ev"])
 	_build_school(SETS["okul"])
 	_build_hospital(SETS["hastane"])
+	_build_shop(SETS["bakkal"])
 
 
 ## Set noktasının dünya konumu: "ev.yatak" ya da doğrudan Vector3.
@@ -122,7 +135,7 @@ func _tree_spot(g: Vector2i) -> bool:
 	if lx < 3 or lx > 12 or lz < 3 or lz > 12:
 		return false
 	# Setlerin ve önlerindeki yolun çevresi boş kalsın.
-	if g.x > -48 and g.x < 72 and g.y > -8 and g.y < 32:
+	if g.x > -48 and g.x < 72 and g.y > -48 and g.y < 32:
 		return false
 	return (hash(g) % 23) == 0
 
@@ -242,3 +255,31 @@ func _build_hospital(o: Vector3i) -> void:
 	_put(o + Vector3i(6, 2, 0), Blocks.LANTERN)
 	for z in range(10, 15):
 		_put(o + Vector3i(6, -1, z), Blocks.GRAVEL)
+
+
+## Mahalle bakkalı: tuğla dükkân, camlı vitrin, renkli tente, tezgâh, raflar (sandıklar), dondurma dolabı.
+func _build_shop(o: Vector3i) -> void:
+	_fill(o, Vector3i(-1, -1, -1), Vector3i(11, -1, 9), Blocks.COBBLESTONE)
+	_fill(o, Vector3i(0, -1, 0), Vector3i(10, -1, 8), Blocks.PLANKS)
+	_walls(o, Vector3i(-1, 0, -1), Vector3i(11, 3, 9), Blocks.BRICKS)
+	_fill(o, Vector3i(-1, 4, -1), Vector3i(11, 4, 9), Blocks.PLANKS)
+	_fill(o, Vector3i(5, 0, 9), Vector3i(5, 1, 9), Blocks.AIR)
+	for x in [1, 2, 3, 7, 8, 9]:
+		_fill(o, Vector3i(x, 0, 9), Vector3i(x, 2, 9), Blocks.GLASS)
+	# Çizgili tente.
+	for x in range(-1, 12):
+		_put(o + Vector3i(x, 3, 10), Blocks.TOY_BRICK_RED if x % 2 == 0 else Blocks.SNOW)
+	# Tezgâh, raflar, dondurma dolabı.
+	for x in range(3, 8):
+		_put(o + Vector3i(x, 0, 3), Blocks.PLANKS)
+	_put(o + Vector3i(5, 0, 3), Blocks.CRAFTING_TABLE)
+	for z in range(1, 8):
+		_put(o + Vector3i(0, 0, z), Blocks.CHEST)
+		_put(o + Vector3i(0, 1, z), Blocks.CHEST if z % 2 == 0 else Blocks.BERRY_BUSH)
+	for z in range(4, 7):
+		_put(o + Vector3i(10, 0, z), Blocks.GLASS)
+		_put(o + Vector3i(10, 1, z), Blocks.TOY_BRICK_BLUE)
+	_put(o + Vector3i(5, 2, 0), Blocks.LANTERN)
+	_put(o + Vector3i(0, 2, 8), Blocks.LANTERN)
+	for z in range(10, 14):
+		_put(o + Vector3i(5, -1, z), Blocks.GRAVEL)

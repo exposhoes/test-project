@@ -30,3 +30,9 @@ Pixel art front-facing square face of a friendly elderly school teacher for a bl
 
 F8. film_logo.png (YouTube kapak ve açılış için)
 Bright playful logo text "EmirCRAFT" made of chunky 3D voxel blocks, grass and dirt block letters with a small red clapperboard next to it, cheerful sky blue background with pixel clouds, kids cartoon style, high contrast, 1280x720
+
+F9. doktor_face.png
+Pixel art front-facing square face of a friendly young doctor for a blocky voxel game, light tan skin, short neat black hair, warm dark eyes, reassuring smile, flat colors, crisp hard pixel edges, fills the whole square, 64x64
+
+F10. bakkal_face.png
+Pixel art front-facing square face of a cheerful elderly neighborhood shopkeeper for a blocky voxel game, peach skin, short grey hair, thick grey mustache, twinkling kind eyes, big smile, flat colors, crisp hard pixel edges, fills the whole square, 64x64
