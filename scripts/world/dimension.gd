@@ -10,8 +10,10 @@ enum { OVERWORLD, HALLS, FACTORY }
 const DEFS := {
 	OVERWORLD: {"name": "Yeryüzü", "habitat": MobData.Habitat.OVERWORLD},
 	HALLS: {"name": "Sarı Koridorlar", "habitat": MobData.Habitat.YELLOW_HALLS, "portal": Blocks.HALLS_PORTAL, "ambience": "hum_halls",
+		"boss": {"id": "floresan", "spawn": Vector3(32.5, 0, 22.5)},
 		"indoor": {"background": Color("4a4326"), "ambient": Color("fff0b0"), "energy": 0.95, "fog": Color("b9a64e"), "fog_density": 0.045}},
 	FACTORY: {"name": "Oyuncak Fabrikası", "habitat": MobData.Habitat.TOY_FACTORY, "portal": Blocks.FACTORY_PORTAL, "ambience": "music_factory",
+		"boss": {"id": "patron", "spawn": Vector3(30.5, 0, 6.5)},
 		"indoor": {"background": Color("2b2440"), "ambient": Color("ffe8f4"), "energy": 1.0, "fog": Color("cfa9e0"), "fog_density": 0.022}},
 }
 

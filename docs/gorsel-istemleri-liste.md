@@ -419,3 +419,15 @@ Konsept görselleri 1536×1024, diğer her şeyi 1024×1024 üret. Kaydettiğin 
    ```
    concept sheet of an original giant toy factory robot boss for a blocky voxel game: boxy grey-blue metal body with a big yellow chest panel, thick short legs, long arms ending in red boxy fists, square head with glowing red eyes and a yellow grille mouth, a small antenna with a red light bulb on top, front, side and back views in a row, chunky voxel style, plain black background, no text, no watermark, 16:9 aspect ratio
    ```
+
+## Floresan Dev (Sarı Koridorlar boss'u)
+
+99. **mob_floresan_face.png**
+   ```
+   front face of a tall eerie office-hallway giant whose head is a glowing ceiling light panel: pale cream-yellow glowing plastic panel with a thin grey frame, two empty square black eyes and a thin straight black mouth, faint diagonal light streaks, pixel art character face texture, 32x32 pixel grid, hard pixel edges, limited palette, flat front view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```
+
+100. **mob_floresan_concept.png**
+   ```
+   concept sheet of an original tall thin creepy giant for a blocky voxel game, inspired by endless yellow office hallways: long beige legs and very long thin arms, narrow khaki torso, head is a glowing cream ceiling light panel with an empty square-eyed face, front, side and back views in a row, chunky voxel style, plain black background, no text, no watermark, 16:9 aspect ratio
+   ```

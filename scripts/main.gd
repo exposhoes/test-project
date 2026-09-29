@@ -33,11 +33,9 @@ var return_positions := {}
 ## Boyutun ortam sesi (koridor uğultusu, fabrika müzik kutusu).
 var ambience := AudioStreamPlayer.new()
 var quests := Quests.new()
-## Fabrika Patronu yenildi mi (kayıtta saklanır) ve şu an sahnedeki boss.
-var boss_defeated := false
+## Yenilen boss'lar (kimlik -> true, kayıtta saklanır) ve şu an sahnedeki boss.
+var boss_defeated := {}
 var boss: Mob
-## Boss'un Oyuncak Fabrikası'nda beklediği salonun ortası.
-const BOSS_SPAWN := Vector3(30.5, 0, 6.5)
 const BOSS_BAR_RANGE := 32.0
 
 
@@ -222,34 +220,46 @@ func _make_world(p_seed: int) -> World:
 	return w
 
 
-## Fabrikada boss yoksa ve yenilmediyse salonuna koyar; yakındayken can çubuğunu gösterir.
+## Boyutun boss'u yoksa ve yenilmediyse salonuna koyar; yakındayken can çubuğunu gösterir.
 func _update_boss() -> void:
-	if dimension == Dimension.FACTORY and not boss_defeated and not is_instance_valid(boss):
-		if world.is_meshed_at(BOSS_SPAWN):
-			spawn_boss(BOSS_SPAWN)
+	var def: Dictionary = Dimension.DEFS[dimension].get("boss", {})
+	if not def.is_empty() and not boss_defeated.has(def["id"]) and not is_instance_valid(boss):
+		if world.is_meshed_at(def["spawn"]):
+			spawn_boss(def["spawn"], def["id"])
 	var near := is_instance_valid(boss) and boss.global_position.distance_to(player.global_position) < BOSS_BAR_RANGE
 	hud.show_boss_bar(boss if near else null)
 
 
-func spawn_boss(at: Vector3) -> Mob:
-	boss = Mob.create("patron")
+func spawn_boss(at: Vector3, id := "patron") -> Mob:
+	boss = Mob.create(id)
 	boss.target = player
 	add_child(boss)
+	# Yer duvarın içine düşerse en yakın boş hücre aranır.
+	var spot := at
 	var y := world.spawn_y(floori(at.x), floori(at.z))
-	boss.global_position = Vector3(at.x, maxi(y, 0) + 0.1, at.z)
+	for r in range(1, 8):
+		if y >= 0:
+			break
+		for d: Vector3 in [Vector3(r, 0, 0), Vector3(-r, 0, 0), Vector3(0, 0, r), Vector3(0, 0, -r)]:
+			var yy := world.spawn_y(floori(at.x + d.x), floori(at.z + d.z))
+			if yy >= 0:
+				spot = at + d
+				y = yy
+				break
+	boss.global_position = Vector3(spot.x, maxi(y, 0) + 0.1, spot.z)
 	boss.died.connect(_on_boss_died.bind(boss))
 	return boss
 
 
 func _on_boss_died(b: Mob) -> void:
-	boss_defeated = true
+	boss_defeated[b.mob_id] = true
 	var at := b.global_position + Vector3(0, 1, 0)
-	ItemDrop.spawn(self, at, Items.CRYSTAL, 4)
-	ItemDrop.spawn(self, at, Items.RUBY, 4)
-	ItemDrop.spawn(self, at, Items.GOLD, 6)
-	hud.toast("Fabrika Patronu yenildi!")
+	var loot: Dictionary = b.data.get("loot", {})
+	for id in loot:
+		ItemDrop.spawn(self, at, id, loot[id])
+	hud.toast("%s yenildi!" % b.data["name"])
 	Sfx.play("portal")
-	quests.event("boss")
+	quests.event("boss_" + b.mob_id)
 
 
 ## Evcil bir dostu oyuncunun yanında doğurur.

@@ -101,7 +101,9 @@ static func apply_world(data: Dictionary, main: Node) -> void:
 	main.world.chests = main.dim_chests.get(main.dimension, {})
 	main.time_of_day = data["time_of_day"]
 	main.quests.done = data.get("quests", {})
-	main.boss_defeated = data.get("boss_defeated", false)
+	# İlk sürümde yalnızca Fabrika Patronu vardı ve true/false saklanıyordu.
+	var bosses = data.get("boss_defeated", {})
+	main.boss_defeated = bosses if bosses is Dictionary else ({"patron": true} if bosses else {})
 
 
 ## Oyuncu sahneye eklendikten sonra çağrılır.

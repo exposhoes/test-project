@@ -17,10 +17,11 @@ const LIST := [
 	{"id": "tame", "text": "Bir yaratığı evcilleştir", "event": "tame"},
 	{"id": "lantern", "text": "Fener yap", "item": Blocks.LANTERN},
 	{"id": "halls", "text": "Sarı Koridorlar'a gir", "event": "dimension_%d" % Dimension.HALLS},
+	{"id": "boss_halls", "text": "Floresan Dev'i yen", "event": "boss_floresan"},
 	{"id": "iron_armor", "text": "Demir zırh yap", "item": Items.IRON_ARMOR},
 	{"id": "factory", "text": "Oyuncak Fabrikası'na gir", "event": "dimension_%d" % Dimension.FACTORY},
 	{"id": "ruby_sword", "text": "Yakut kılıç yap", "item": Items.RUBY_SWORD},
-	{"id": "boss", "text": "Fabrika Patronu'nu yen", "event": "boss"},
+	{"id": "boss", "text": "Fabrika Patronu'nu yen", "event": "boss_patron"},
 	{"id": "ruby_armor", "text": "Yakut zırh yap", "item": Items.RUBY_ARMOR},
 	{"id": "crystal_pickaxe", "text": "Kristal kazma yap", "item": Items.CRYSTAL_PICKAXE},
 ]

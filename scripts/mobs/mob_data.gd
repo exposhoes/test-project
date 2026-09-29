@@ -259,7 +259,19 @@ const MOBS := {
 		],
 		"face": [Vector2(1.2, 0.9), Vector3(0, 2.55, -0.52)]},
 	# Boss: kendiliğinden doğmaz; Oyuncak Fabrikası'na ilk girişte bir salonda bekler (main.gd).
-	"patron": {"name": "Fabrika Patronu", "boss": true, "ability": "toss", "reach": 1.5, "health": 120, "damage": 5,
+	"floresan": {"name": "Floresan Dev", "boss": true, "reach": 0.8, "health": 90, "damage": 4,
+		"behavior": Behavior.HOSTILE, "habitat": Habitat.YELLOW_HALLS, "loot": {Items.CRYSTAL: 3, Items.GOLD: 8},
+		"primary": Color("d8cf9a"), "secondary": Color("8a8150"), "height": 3.5, "width": 1.2, "speed": 3.3, "face_glow": true,
+		"parts": [
+			[Vector3(0.28, 1.6, 0.28), Vector3(-0.25, 0.8, 0), Color("8a8150")],
+			[Vector3(0.28, 1.6, 0.28), Vector3(0.25, 0.8, 0), Color("8a8150")],
+			[Vector3(0.9, 1.1, 0.5), Vector3(0, 2.1, 0), Color("b8ae72")],
+			[Vector3(0.2, 1.7, 0.2), Vector3(-0.58, 1.75, 0), Color("a89f66")],
+			[Vector3(0.2, 1.7, 0.2), Vector3(0.58, 1.75, 0), Color("a89f66")],
+			[Vector3(1.0, 0.7, 0.6), Vector3(0, 3.0, 0), Color("fff6c8")],
+		],
+		"face": [Vector2(1.0, 0.7), Vector3(0, 3.0, -0.32)]},
+	"patron": {"name": "Fabrika Patronu", "boss": true, "loot": {Items.CRYSTAL: 4, Items.RUBY: 4, Items.GOLD: 6}, "ability": "toss", "reach": 1.5, "health": 120, "damage": 5,
 		"behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("5a6a7a"), "secondary": Color("f2c230"), "height": 4.6, "width": 2.2, "speed": 2.2,
 		"parts": [
