@@ -687,6 +687,33 @@ const LIST := [
 			{"title": "Sen sabah kaç kere 5 dakika daha dersin? Yorumlara yaz!", "t": 2.5},
 		],
 	},
+	{
+		"id": "penalti", "name": "Bölüm 17: Penaltı Ustası", "set": "saha", "time": 0.4,
+		"steps": [
+			{"place": "emir", "at": "saha.penalti", "look": "saha.kale_sol"},
+			{"place": "ali", "at": "saha.kale_sol", "look": "saha.penalti"},
+			{"place": "zeynep", "at": "saha.kenar", "look": "saha.penalti"},
+			{"cam": "saha.kam_genel", "look": "saha.orta", "t": 0},
+			{"title": "Penaltı Ustası", "t": 1.3},
+			{"say": "zeynep", "text": "Son dakika! Skor berabere! Penaltı Emir'de!"},
+			{"cam": "saha.kam_kale", "look": "saha.penalti", "t": 0},
+			{"say": "ali", "text": "Emir, kaleci benim. Hiçbir top geçmez!"},
+			{"say": "emir", "text": "Ali, arkana bak! Uçan inek!"},
+			{"turn": "ali", "to": "saha.kenar"},
+			{"say": "ali", "text": "Nerede? Nerede?!"},
+			{"zoom": 0.6},
+			{"walk": "emir", "to": "saha.kale_sol"},
+			{"shake": 0.4},
+			{"say": "zeynep", "text": "GOOOL! Emir kazandı!"},
+			{"turn": "ali", "to": "saha.kale_sol"},
+			{"say": "ali", "text": "Hile bu! Uçan inek yoktu!"},
+			{"cam": "saha.kam_kenar", "look": "saha.kenar", "t": 0},
+			{"say": "zeynep", "text": "Ali... Arkana bak."},
+			{"say": "ali", "text": "Beni ikinci kez kandıramazsın!"},
+			{"say": "emir", "text": "Ciddiyim Ali! Bu sefer gerçekten uçan inek var!"},
+			{"title": "Sence gol sayılır mı? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 

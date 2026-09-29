@@ -13,6 +13,7 @@ const SETS := {
 	"hastane": Vector3i(-40, GROUND + 1, 0),
 	"bakkal": Vector3i(0, GROUND + 1, -36),
 	"park": Vector3i(40, GROUND + 1, -36),
+	"saha": Vector3i(-40, GROUND + 1, -36),
 }
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
@@ -83,6 +84,17 @@ const POINTS := {
 		"kam_ortu": Vector3(8.2, 2.0, 7.0),
 		"kam_bank": Vector3(5.5, 1.8, 9.5),
 	},
+	"saha": {
+		"orta": Vector3(11.0, 0, 7.0),
+		"kale_sol": Vector3(2.0, 0, 7.0),
+		"kale_sag": Vector3(20.0, 0, 7.0),
+		"penalti": Vector3(6.0, 0, 7.0),
+		"kenar": Vector3(11.0, 0, 15.5),
+		"kenar_2": Vector3(13.0, 0, 15.5),
+		"kam_genel": Vector3(11.0, 6.0, 22.0),
+		"kam_kale": Vector3(9.0, 2.2, 9.5),
+		"kam_kenar": Vector3(12.0, 2.0, 12.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -94,6 +106,7 @@ func _init() -> void:
 	_build_hospital(SETS["hastane"])
 	_build_shop(SETS["bakkal"])
 	_build_park(SETS["park"])
+	_build_field(SETS["saha"])
 
 
 ## Set noktasının dünya konumu: "ev.yatak" ya da doğrudan Vector3.
@@ -318,3 +331,20 @@ func _build_park(o: Vector3i) -> void:
 		_fill(o, t + Vector3i(0, 3, 0), t + Vector3i(0, 4, 0), Blocks.LOG)
 	for b in [Vector3i(12, 0, 12), Vector3i(13, 0, 12), Vector3i(5, 0, 12), Vector3i(15, 0, 7)]:
 		_put(o + b, Blocks.BERRY_BUSH)
+
+
+## Futbol sahası: beyaz çizgiler, iki kale, kenarda seyirci bankı.
+func _build_field(o: Vector3i) -> void:
+	for x in range(0, 23):
+		_put(o + Vector3i(x, -1, 0), Blocks.SNOW)
+		_put(o + Vector3i(x, -1, 14), Blocks.SNOW)
+	for z in range(0, 15):
+		_put(o + Vector3i(0, -1, z), Blocks.SNOW)
+		_put(o + Vector3i(22, -1, z), Blocks.SNOW)
+		_put(o + Vector3i(11, -1, z), Blocks.SNOW)
+	for gx in [0, 22]:
+		_fill(o, Vector3i(gx, 0, 5), Vector3i(gx, 2, 5), Blocks.LOG)
+		_fill(o, Vector3i(gx, 0, 9), Vector3i(gx, 2, 9), Blocks.LOG)
+		_fill(o, Vector3i(gx, 2, 5), Vector3i(gx, 2, 9), Blocks.LOG)
+	for x in range(9, 16):
+		_put(o + Vector3i(x, 0, 17), Blocks.PLANKS)
