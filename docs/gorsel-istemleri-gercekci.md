@@ -1,94 +1,219 @@
-# Gerçekçi görsel istemleri (yatak, kitaplık, karakterler)
+# Gerçekçi görsel istemleri (tam liste)
 
-Hepsini **kare (1:1), 512x512** üret; oyuna koyarken ben 128'e küçültüp atlasa ekleyeceğim.
-İstemler İngilizce, olduğu gibi yapıştır. Dosya adları her istemin başında.
-İpucu: aynı grubun (ör. yatak üstü + yatak yanı) hepsini **aynı sohbette/aynı seed ile** üret ki renkler tutsun.
+Her istem eksiksiz. Hiçbir şey ekleme veya çıkarma, olduğu gibi kopyala-yapıştır. Sırayla üret, dosyayı yazılan adla kaydet.
 
-Ortak ek (blok dokuları için sonuna ekle): `seamless tileable, flat even lighting, no shadows, no perspective, top-down or straight-on orthographic, no text, no watermark`
+## 1. bed_top.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic top-down view of a made single bed, white cotton duvet with soft natural wrinkles, a plump white pillow along the top edge, a blue striped band across the duvet, visible fabric weave, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-## A. Yatak  →  assets/textures/blocks/
+## 2. bed_side.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic side view of a single bed, lower half is a warm oak wooden bed frame with visible wood grain, upper half is a blue and white duvet hanging over the edge in soft folds, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-A1. bed_top.png
-Photorealistic top-down view of a made single bed: white cotton duvet with soft natural wrinkles, a plump white pillow at the top edge, blue striped border on the duvet, fabric weave visible, filling the whole square, straight overhead orthographic, soft even lighting, no shadows, no text
+## 3. bookshelf.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic front view of a wooden bookshelf with three shelves completely full of hardcover books in varied muted colors red green navy mustard and brown, plain spines, dark walnut wooden frame with visible grain, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-A2. bed_side.png
-Photorealistic straight-on side view of a wooden bed frame: warm oak headboard/footboard wood grain on the lower half, blue and white duvet hanging over the edge in soft folds on the upper half, filling the whole square, orthographic, even lighting, no text
+## 4. bookshelf_top.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic dark walnut wooden board seen from above, fine natural wood grain, square 1:1 image, 512x512, seamless tileable texture, fills the whole square edge to edge, flat even lighting, no shadows, no perspective, orthographic view, no text, no watermark, no border
+```
 
-A3. bed_pillow.png
-Photorealistic close-up of a white cotton pillow with a light blue pillowcase seam, soft wrinkles, fabric weave, filling the whole square, straight-on, even lighting
+## 5. planks.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic oak wood planks, warm honey color, four horizontal boards, visible grain and small knots, square 1:1 image, 512x512, seamless tileable texture, fills the whole square edge to edge, flat even lighting, no shadows, no perspective, orthographic view, no text, no watermark, no border
+```
 
-## B. Kitaplık ve ev eşyaları  →  assets/textures/blocks/
+## 6. dark_planks.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic dark walnut parquet floor planks, horizontal boards, fine grain, slight sheen, square 1:1 image, 512x512, seamless tileable texture, fills the whole square edge to edge, flat even lighting, no shadows, no perspective, orthographic view, no text, no watermark, no border
+```
 
-B1. bookshelf.png
-Photorealistic straight-on front view of a wooden bookshelf with three shelves full of hardcover books in varied muted colors (red, green, navy, mustard, brown), visible gold lettering-free spines, dark walnut wood frame with grain, filling the whole square, orthographic, even lighting, no text
+## 7. plaster.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic warm off-white painted plaster wall, very subtle rough surface, square 1:1 image, 512x512, seamless tileable texture, fills the whole square edge to edge, flat even lighting, no shadows, no perspective, orthographic view, no text, no watermark, no border
+```
 
-B2. bookshelf_top.png
-Photorealistic top view of a dark walnut wood board with fine wood grain, seamless, filling the whole square
+## 8. roof_tile.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic terracotta red clay roof tiles in staggered overlapping rows, slightly weathered, square 1:1 image, 512x512, seamless tileable texture, fills the whole square edge to edge, flat even lighting, no shadows, no perspective, orthographic view, no text, no watermark, no border
+```
 
-B3. planks.png
-Photorealistic seamless oak wood planks texture, warm honey color, visible grain and small knots, 4 horizontal boards, top-down, even lighting
+## 9. rug.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic top-down view of a Turkish wool rug, deep red field, cream and gold geometric border, diamond medallion pattern, visible wool fibers, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-B4. dark_planks.png
-Photorealistic seamless dark walnut parquet floor planks, horizontal boards, fine grain, slight sheen, top-down, even lighting
+## 10. chest_side.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic front view of a wooden treasure chest, oak wood with grain, dark iron bands, a small brass lock in the center, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-B5. plaster.png
-Photorealistic seamless warm off-white painted plaster wall, very subtle roughness, even lighting
+## 11. chest_top.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic top view of a wooden treasure chest lid, oak planks with dark iron bands across, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-B6. roof_tile.png
-Photorealistic seamless terracotta clay roof tiles in staggered overlapping rows, slightly weathered, orthographic, even lighting
+## 12. crafting_top.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic top-down view of a carpenter workbench surface, worn oak tabletop with saw marks, light pencil lines and a few nail holes, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-B7. rug.png
-Photorealistic top-down Turkish wool rug, deep red field with cream and gold geometric border and diamond medallion pattern, visible wool fibers, filling the whole square
+## 13. crafting_side.png
+Klasör: `assets/textures/blocks/`
+```
+Photorealistic front view of a wooden carpenter workbench side, oak wood with hanging tools silhouettes saw hammer and pliers on the wood, square 1:1 image, 512x512, fills the whole square edge to edge, orthographic straight-on view, flat even lighting, no shadows, no text, no watermark, no border
+```
 
-B8. chest_side.png
-Photorealistic straight-on front of a wooden treasure chest with dark iron bands and a brass lock, oak grain, filling the whole square, orthographic, even lighting
+## 14. emir_face.png
+Klasör: `assets/textures/actors/`
+```
+Cheerful 8 year old village boy, warm peach skin, short messy dark brown hair with a fringe, big friendly brown eyes, rosy cheeks, mouth closed with a warm gentle smile, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-B9. crafting_top.png
-Photorealistic top-down view of a carpenter's workbench surface: worn oak tabletop with saw marks, small pencil lines, a few nail holes, filling the whole square, even lighting
+## 15. emir_face_talk.png
+Klasör: `assets/textures/actors/`
+```
+Cheerful 8 year old village boy, warm peach skin, short messy dark brown hair with a fringe, big friendly brown eyes, rosy cheeks, mouth open mid-sentence as if talking happily, same character same lighting same background, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-## C. Karakter yüzleri  →  assets/textures/actors/<kod>_face.png  (+ _face_talk.png)
+## 16. anne_face.png
+Klasör: `assets/textures/actors/`
+```
+Kind young mother in her early 30s, warm peach skin, long dark brown hair falling on both sides of the face, soft brown eyes, rosy cheeks, mouth closed with a warm gentle smile, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-Hepsi: `front-facing passport-style portrait, face fills the whole square, neutral light grey background, soft studio lighting, photorealistic, stylized 3D animated-film look (Pixar-like, not a real person), no text`
-Konuşan hal için aynı istemi kullanıp sonuna `, mouth open mid-sentence` ekle.
+## 17. anne_face_talk.png
+Klasör: `assets/textures/actors/`
+```
+Kind young mother in her early 30s, warm peach skin, long dark brown hair falling on both sides of the face, soft brown eyes, rosy cheeks, mouth open mid-sentence as if talking happily, same character same lighting same background, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-C1. emir_face.png
-Cheerful 8 year old village boy, warm peach skin, short messy dark brown hair with fringe, big friendly brown eyes, rosy cheeks, gentle smile
+## 18. ali_face.png
+Klasör: `assets/textures/actors/`
+```
+Energetic 8 year old boy, light tan skin, short black hair, bright black eyes, a missing front tooth, mouth closed with a warm gentle smile, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-C2. anne_face.png
-Kind young mother in her early 30s, warm skin, long dark brown hair falling on both sides, soft brown eyes, warm gentle smile
+## 19. ali_face_talk.png
+Klasör: `assets/textures/actors/`
+```
+Energetic 8 year old boy, light tan skin, short black hair, bright black eyes, a missing front tooth, mouth open mid-sentence as if talking happily, same character same lighting same background, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-C3. ali_face.png
-Energetic 8 year old boy, light tan skin, short black hair, mischievous grin with a missing front tooth, bright black eyes
+## 20. zeynep_face.png
+Klasör: `assets/textures/actors/`
+```
+Clever 8 year old girl, peach skin with light freckles, copper ginger hair with a fringe, bright green eyes, mouth closed with a warm gentle smile, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-C4. zeynep_face.png
-Clever 8 year old girl, peach skin with light freckles, copper ginger hair with fringe, bright green eyes, confident smile
+## 21. zeynep_face_talk.png
+Klasör: `assets/textures/actors/`
+```
+Clever 8 year old girl, peach skin with light freckles, copper ginger hair with a fringe, bright green eyes, mouth open mid-sentence as if talking happily, same character same lighting same background, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-C5. ogretmen_face.png
-Friendly elderly school teacher, peach skin, short grey hair, thin black rectangular glasses, kind eye wrinkles, warm smile
+## 22. ogretmen_face.png
+Klasör: `assets/textures/actors/`
+```
+Friendly elderly school teacher, peach skin, short grey hair, thin black rectangular glasses, kind wrinkles around the eyes, mouth closed with a warm gentle smile, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-C6. doktor_face.png
-Friendly young doctor, light tan skin, short neat black hair, warm dark eyes, reassuring smile, white collar visible at the bottom
+## 23. ogretmen_face_talk.png
+Klasör: `assets/textures/actors/`
+```
+Friendly elderly school teacher, peach skin, short grey hair, thin black rectangular glasses, kind wrinkles around the eyes, mouth open mid-sentence as if talking happily, same character same lighting same background, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-C7. bakkal_face.png
-Cheerful elderly neighborhood shopkeeper, peach skin, short grey hair, thick grey mustache, twinkling kind eyes, big smile
+## 24. doktor_face.png
+Klasör: `assets/textures/actors/`
+```
+Friendly young male doctor, light tan skin, short neat black hair, warm dark eyes, white coat collar visible at the bottom, mouth closed with a warm gentle smile, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-## D. Karakter kıyafet dokuları  →  assets/textures/actors/<kod>_<parça>.png
+## 25. doktor_face_talk.png
+Klasör: `assets/textures/actors/`
+```
+Friendly young male doctor, light tan skin, short neat black hair, warm dark eyes, white coat collar visible at the bottom, mouth open mid-sentence as if talking happily, same character same lighting same background, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-Kare, düz, kalıp/model yok, sadece kumaşın kendisi: `seamless fabric texture, flat even lighting, no folds, no shadows, no text`
+## 26. bakkal_face.png
+Klasör: `assets/textures/actors/`
+```
+Cheerful elderly neighborhood shopkeeper, peach skin, short grey hair, thick grey mustache, twinkling kind eyes, mouth closed with a warm gentle smile, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-D1. emir_shirt.png — `photorealistic red cotton t-shirt jersey fabric, fine knit weave`
-D2. emir_jeans.png — `photorealistic mid-blue denim fabric, visible diagonal twill weave, slight fading`
-D3. anne_dress.png — `photorealistic soft pink cotton fabric with a tiny white floral print`
-D4. ali_shirt.png — `photorealistic sky blue cotton jersey fabric with thin white stripes`
-D5. zeynep_shirt.png — `photorealistic lavender purple cotton knit fabric`
-D6. ogretmen_jacket.png — `photorealistic green wool tweed blazer fabric, fine herringbone weave`
-D7. doktor_coat.png — `photorealistic crisp white medical coat cotton fabric, subtle weave`
-D8. bakkal_apron.png — `photorealistic orange canvas apron fabric, coarse weave`
+## 27. bakkal_face_talk.png
+Klasör: `assets/textures/actors/`
+```
+Cheerful elderly neighborhood shopkeeper, peach skin, short grey hair, thick grey mustache, twinkling kind eyes, mouth open mid-sentence as if talking happily, same character same lighting same background, square 1:1 image, 512x512, front-facing passport-style portrait, the face fills the whole square, neutral light grey background, soft studio lighting, high quality stylized 3D animated-film character look, not a real person, no text, no watermark
+```
 
-## E. Tam boy karakter kartı (isteğe bağlı, afiş/kapak için)
+## 28. emir_shirt.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic red cotton t-shirt jersey fabric, fine knit weave, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
 
-E1. emir_ali_kapak.png (16:9, 1280x720)
-Two stylized 3D animated-film boys standing side by side in a sunny village street: a cheerful 8 year old boy with messy dark brown hair, red t-shirt and blue jeans, and a mischievous 8 year old boy with short black hair, sky blue striped shirt, missing front tooth, warm golden hour light, soft depth of field, Pixar-like look, no text
+## 29. emir_jeans.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic mid-blue denim fabric, visible diagonal twill weave, slight fading, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
 
-## Nasıl teslim edilecek
-Görselleri bana ekleyerek gönder; ben adlandırıp doğru klasöre koyar, atlası 128 px destekleyecek şekilde güncellerim. Önce **A1-A2 (yatak) ve B1 (kitaplık)** ile başlayıp nasıl göründüğüne bakalım, beğenirsen gerisini üretirsin.
+## 30. anne_dress.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic soft pink cotton fabric with a tiny white floral print, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
+
+## 31. ali_shirt.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic sky blue cotton jersey fabric with thin white horizontal stripes, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
+
+## 32. zeynep_shirt.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic lavender purple cotton knit fabric, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
+
+## 33. ogretmen_jacket.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic green wool tweed fabric, fine herringbone weave, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
+
+## 34. doktor_coat.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic crisp white cotton medical coat fabric, subtle weave, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
+
+## 35. bakkal_apron.png
+Klasör: `assets/textures/actors/`
+```
+Photorealistic orange canvas apron fabric, coarse weave, square 1:1 image, 512x512, seamless tileable fabric texture, flat fabric with no folds, fills the whole square edge to edge, flat even lighting, no shadows, no text, no watermark
+```
+
+## 36. emir_ali_kapak.png
+Klasör: `docs/`
+```
+Wide 16:9 image, 1280x720, two stylized 3D animated-film boys standing side by side on a sunny village street, on the left a cheerful 8 year old boy with messy dark brown hair, red t-shirt and blue jeans, on the right a mischievous 8 year old boy with short black hair, sky blue striped shirt and a missing front tooth, warm golden hour light, soft depth of field, high quality animated movie look, not real people, no text, no watermark
+```
