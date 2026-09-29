@@ -89,7 +89,7 @@ const DEFS := {
 	LANTERN: {"name": "Fener", "all": "lantern", "light": true},
 	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks", "transparent": true, "model": true, "model_height": 0.5625},
 	BERRY_BUSH: {"name": "Çilek Çalısı", "all": "berry_bush", "transparent": true},
-	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks"},
+	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks", "transparent": true, "model": true, "model_height": 0.88},
 	PLASTER: {"name": "Sıva Duvar", "all": "plaster"},
 	ROOF_TILE: {"name": "Kiremit", "all": "roof_tile"},
 	BOOKSHELF: {"name": "Kitaplık", "top": "planks", "side": "bookshelf", "bottom": "planks", "model": true, "model_height": 1.0},

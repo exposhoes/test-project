@@ -149,15 +149,15 @@ func _refresh_model(pos: Vector3i) -> void:
 		if not lay.is_empty():
 			node = BedModel.create(lay["dir"], lay["length"])
 			node.position = Vector3(pos) + Vector3(0.5, 0, 0.5)
-	elif id == Blocks.BOOKSHELF:
-		node = BookshelfModel.create(pos, func(p: Vector3i) -> bool: return Blocks.is_transparent(get_block(p)))
+	elif CubeModel.has(id):
+		node = CubeModel.create(id, pos, func(p: Vector3i) -> bool: return Blocks.is_transparent(get_block(p)) and not Blocks.has_model(get_block(p)))
 		node.position = Vector3(pos)
 	if node:
 		add_child(node)
 		_models[pos] = node
 
 
-const MODEL_BLOCKS := [Blocks.BED, Blocks.BOOKSHELF]
+const MODEL_BLOCKS := [Blocks.BED, Blocks.BOOKSHELF, Blocks.CHEST]
 
 
 ## Chunk ilk kez mesh'lenirken içindeki model bloklarını kurar.

@@ -18,7 +18,11 @@ func _initialize() -> void:
 		emir.set_lying(true)
 		emir.face_towards(FilmSets.point("ev.yatak") + Vector3(0, 0, -1))
 	var cam_pos := FilmSets.point("ev.yatak") + Vector3(2.4, 1.6, 2.2)
-	studio._move_camera(cam_pos, FilmSets.point("ev.yatak") + Vector3(0, 0.1, 0), 0)
+	var look := FilmSets.point("ev.yatak") + Vector3(0, 0.1, 0)
+	if args.has("oda"):  # "oda": sandıkları da gören geniş açı
+		cam_pos = FilmSets.point("ev.yatak") + Vector3(3.2, 1.9, 4.6)
+		look = FilmSets.point("ev.yatak") + Vector3(0.6, 0, 0.6)
+	studio._move_camera(cam_pos, look, 0)
 	while not studio.world.is_meshed_at(FilmSets.point("ev.yatak")):
 		await process_frame
 	for i in 60:
