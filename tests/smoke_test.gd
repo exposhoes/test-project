@@ -408,6 +408,10 @@ func _initialize() -> void:
 	_check(not player.has_bed(), "yatak kırılınca doğma noktası silinmeli")
 	for i in 5:
 		await process_frame
+	# Görevler: eşya ve olaylarla tamamlanır.
+	_check(main.quests.done.has("log") or main.quests.done.has("table"), "eşya alınca görev tamamlanmalı: %s" % [main.quests.done])
+	main.quests.event("tame")
+	_check(main.quests.done.has("tame") and main.hud._quest_label.text.begins_with("Görev"), "olayla görev tamamlanmalı")
 	# Zırh: çantada olması hasarı azaltır ve hak harcar.
 	inv.add(Items.IRON_ARMOR)
 	var armor_slot := inv.best_armor_slot()

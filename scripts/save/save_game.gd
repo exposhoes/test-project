@@ -35,6 +35,7 @@ static func save(path: String, main: Node) -> bool:
 			"bed": player.bed_position,
 		},
 		"allies": _allies(main),
+		"quests": main.quests.done,
 	}
 	# Önce geçici dosyaya yazılır; yazarken uygulama kapanırsa eski kayıt bozulmaz.
 	var tmp := path + ".tmp"
@@ -98,6 +99,7 @@ static func apply_world(data: Dictionary, main: Node) -> void:
 		main.dim_chests[dim] = chests
 	main.world.chests = main.dim_chests.get(main.dimension, {})
 	main.time_of_day = data["time_of_day"]
+	main.quests.done = data.get("quests", {})
 
 
 ## Oyuncu sahneye eklendikten sonra çağrılır.

@@ -32,6 +32,7 @@ var dim_chests := {}
 var return_positions := {}
 ## Boyutun ortam sesi (koridor uğultusu, fabrika müzik kutusu).
 var ambience := AudioStreamPlayer.new()
+var quests := Quests.new()
 
 
 func _ready() -> void:
@@ -62,6 +63,15 @@ func _ready() -> void:
 	if not save.is_empty():
 		SaveGame.apply_player(save, player)
 		hud.toast("Kaldığın yerden devam")
+	quests.completed.connect(_on_quest_completed)
+	player.inventory.changed.connect(func() -> void: quests.check_inventory(player.inventory))
+	hud.show_quest(quests)
+
+
+func _on_quest_completed(text: String) -> void:
+	hud.toast("Görev tamam: %s" % text)
+	Sfx.play("craft")
+	hud.show_quest(quests)
 
 
 ## Ayarlar menüsünde değişen görüş mesafesini ve sisi uygular.
@@ -186,6 +196,7 @@ func travel(portal_block := Blocks.HALLS_PORTAL) -> void:
 	Sfx.play("portal", 0.0)
 	_apply_dimension_look()
 	hud.toast(Dimension.display_name(dimension))
+	quests.event("dimension_%d" % dimension)
 
 
 func _make_world(p_seed: int) -> World:
@@ -221,6 +232,7 @@ func spawn_ally(id: String, health := -1) -> Mob:
 ## Evcil dostlar uzaklaşınca silinmez ve yaratık sınırına sayılmaz.
 func _on_tamed(mob: Mob) -> void:
 	_mobs.erase(mob)
+	quests.event("tame")
 	mob.died.connect(func() -> void: hud.toast("%s öldü" % mob.data["name"]))
 
 

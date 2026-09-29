@@ -29,6 +29,7 @@ func _initialize() -> void:
 	main.world.chest_at(chest_cell).add(Items.RUBY, 3)
 	var bed := Vector3(cell) + Vector3(0.5, 1, 0.5)
 	player.bed_position = bed
+	main.quests.event("tame")
 	_check(main.save_game(), "kayıt yazılmalı")
 	main.free()
 
@@ -38,6 +39,7 @@ func _initialize() -> void:
 	_check(main.world.get_block(dug) == Blocks.AIR, "kazılan blok boş kalmalı")
 	_check(main.world.chest_at(chest_cell).count_of(Items.RUBY) == 3, "sandık içeriği geri gelmeli")
 	_check(player.bed_position == bed, "yatak doğma noktası geri gelmeli")
+	_check(main.quests.done.has("tame"), "tamamlanan görevler geri gelmeli")
 	_check(player.inventory.count_of(Items.IRON_PICKAXE) == 1 and player.inventory.count_of(Blocks.PLANKS) == 17, "envanter geri gelmeli")
 	_check(player.inventory.uses_at(0) == Items.max_uses(Items.IRON_PICKAXE) - 5 and player.inventory.fuel == 3, "alet hakkı ve yakıt geri gelmeli")
 	_check(player.survival.hunger == 11, "açlık geri gelmeli")

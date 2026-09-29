@@ -16,6 +16,7 @@ var _slots: Array[Panel] = []
 var _hotbar := HBoxContainer.new()
 var _name_label := Label.new()
 var _status := StatusBar.new()
+var _quest_label := Label.new()
 var _toast := Label.new()
 var _toast_timer := 0.0
 var _damage_flash := ColorRect.new()
@@ -88,6 +89,13 @@ func _ready() -> void:
 	_status.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_status.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_status.position.y -= SLOT_SIZE + 40
+
+	_quest_label.position = Vector2(16, 12)
+	_quest_label.add_theme_font_size_override("font_size", 18)
+	_quest_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	_quest_label.add_theme_constant_override("outline_size", 5)
+	_quest_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(_quest_label)
 
 	_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_toast.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -241,6 +249,13 @@ func select_slot_at(pos: Vector2) -> bool:
 
 
 ## Ekranın üstünde birkaç saniye görünen kısa mesaj.
+## Sol üstte sıradaki görev ve ilerleme.
+func show_quest(q: Quests) -> void:
+	var next := q.current()
+	var total := Quests.LIST.size()
+	_quest_label.text = "Görev %d/%d: %s" % [q.count_done() + 1, total, next] if next != "" else "Bütün görevler tamam! (%d/%d)" % [total, total]
+
+
 func toast(text: String) -> void:
 	_toast.text = text
 	_toast_timer = 2.5
