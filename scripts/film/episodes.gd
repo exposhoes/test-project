@@ -79,6 +79,30 @@ const LIST := [
 			{"title": "Ali Emir'i bulabilecek mi?\nDevamı gelecek bölümde!", "t": 3.0},
 		],
 	},
+	{
+		"id": "hasta", "name": "Bölüm 3: Sahte Hasta", "set": "ev", "time": 0.28,
+		"steps": [
+			{"place": "emir", "at": "ev.yatak", "lie": true},
+			{"place": "anne", "at": "ev.kapi_ici", "look": "ev.yatak"},
+			{"cam": "ev.kam_dis", "look": "ev.kapi_disi", "t": 0},
+			{"title": "EmirCRAFT\nBölüm 3: Sahte Hasta", "t": 2.5},
+			{"cam": "ev.kam_yatak", "look": "ev.yatak", "t": 1.5},
+			{"say": "emir", "text": "(Bugün matematik sınavı var... Bir planım var!)"},
+			{"say": "emir", "text": "Anneee... Öhö öhö! Çok hastayım, okula gidemem..."},
+			{"walk": "anne", "to": "ev.yatak_yani"},
+			{"turn": "anne", "to": "ev.yatak"},
+			{"say": "anne", "text": "Hmm... Ateşin var mı bakalım?"},
+			{"say": "emir", "text": "Evet! Çok yüksek! Belki bin derece!"},
+			{"say": "anne", "text": "Bin derece mi? O zaman bugünkü lunaparka gidemeyiz..."},
+			{"lie": "emir", "value": false},
+			{"place": "emir", "at": "ev.yatak_yani", "look": "ev.mutfak"},
+			{"turn": "anne", "to": "ev.yatak_yani"},
+			{"say": "emir", "text": "LUNAPARK MI?! İyileştim! Mucize oldu!"},
+			{"say": "anne", "text": "Hahaha! Lunapark hafta sonu. Şimdi hadi okula, sınavın var!"},
+			{"say": "emir", "text": "Eyvah... Yakalandım!"},
+			{"title": "Yalan söyleyen yakalanır!", "t": 2.5},
+		],
+	},
 ]
 
 
