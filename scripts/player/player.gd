@@ -46,6 +46,7 @@ var _break_progress := 0.0
 var saved_position := Vector3.INF
 ## Yeryüzünde son yatılan yatağın üstü; ölünce orada doğulur (yatak kırılmışsa başlangıçta).
 var bed_position := Vector3.INF
+var _respawning_at_bed := false
 const BED_SAFE_RANGE := 8.0
 
 
@@ -381,7 +382,10 @@ func teleport_nearby(rng_seed := -1) -> bool:
 
 func respawn() -> void:
 	_gas_timer = 0.0
-	saved_position = bed_position if has_bed() else Vector3.INF
+	# Yatağın chunk'ı uzakta boşaltılmış olabilir; yerinde olup olmadığı doğarken (_try_spawn) sınanır.
+	var bed_ok := bed_position != Vector3.INF and world != null and world.dimension == Dimension.OVERWORLD
+	saved_position = bed_position if bed_ok else Vector3.INF
+	_respawning_at_bed = bed_ok
 	survival.reset()
 	_knockback = Vector3.ZERO
 	_spawned = false
@@ -454,6 +458,14 @@ func _try_spawn() -> void:
 	world.update_center(spawn)
 	if not world.is_meshed_at(spawn):
 		return
+	if _respawning_at_bed:
+		_respawning_at_bed = false
+		if not has_bed():
+			# Yatak kırılmış: başlangıç noktasında doğ.
+			bed_position = Vector3.INF
+			saved_position = Vector3.INF
+			_toast("Yatağın kayıp, başlangıçta doğdun")
+			return
 	if saved_position == Vector3.INF:
 		global_position = Vector3(spawn.x, world.spawn_y(floori(spawn.x), floori(spawn.z)) + 0.5, spawn.z)
 	else:
@@ -470,7 +482,7 @@ func armored_damage(amount: int) -> int:
 	if slot < 0 or amount <= 0:
 		return amount
 	var id := inventory.item_at(slot)
-	var reduced := roundi(amount * (1.0 - Items.armor_value(id)))
+	var reduced := maxi(1, roundi(amount * (1.0 - Items.armor_value(id))))
 	if inventory.wear(slot):
 		Sfx.play("tool_break")
 		_toast("%s kırıldı!" % Items.display_name(id))

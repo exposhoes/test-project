@@ -405,6 +405,7 @@ func _initialize() -> void:
 	_check(not player.use_bed(bed_cell) and player.has_bed(), "gündüz yatak yalnızca doğma noktası kaydetmeli")
 	player.respawn()
 	_check(player.saved_position.is_equal_approx(Vector3(bed_cell) + Vector3(0.5, 1, 0.5)), "ölünce yatakta doğulmalı")
+	player._respawning_at_bed = false
 	world.set_block(bed_cell, Blocks.AIR)
 	_check(not player.has_bed(), "yatak kırılınca doğma noktası silinmeli")
 	for i in 5:

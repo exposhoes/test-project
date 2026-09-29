@@ -241,6 +241,8 @@ func _ensure_chunk(c: Vector2i) -> Chunk:
 
 
 func _remesh(c: Vector2i) -> void:
+	if not _chunks.has(c):
+		return
 	if _meshed.has(c) or _jobs.has(c):
 		_versions[c] = _versions.get(c, 0) + 1
 		_chunks[c].rebuild(atlas, material)
