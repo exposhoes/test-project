@@ -242,7 +242,8 @@ func _build_school(o: Vector3i) -> void:
 	_fill(o, Vector3i(0, -1, 0), Vector3i(14, -1, 10), Blocks.PLANKS)
 	_walls(o, Vector3i(-1, 0, -1), Vector3i(15, 3, 11), Blocks.BRICKS)
 	_fill(o, Vector3i(-1, 4, -1), Vector3i(15, 4, 11), Blocks.STONE)
-	_fill(o, Vector3i(-1, 5, -1), Vector3i(15, 5, -1), Blocks.BRICKS)
+	_fill(o, Vector3i(-2, 5, -2), Vector3i(16, 5, 12), Blocks.ROOF_TILE)
+	_fill(o, Vector3i(0, 6, 0), Vector3i(14, 6, 10), Blocks.ROOF_TILE)
 	# Kapı ve pencereler.
 	_fill(o, Vector3i(7, 0, 11), Vector3i(8, 1, 11), Blocks.AIR)
 	for x in [1, 2, 4, 5, 10, 11, 13]:
@@ -257,8 +258,13 @@ func _build_school(o: Vector3i) -> void:
 	for row in [4, 7]:
 		for x in [3, 4, 5, 9, 10, 11]:
 			_put(o + Vector3i(x, 0, row), Blocks.PLANKS)
-	_put(o + Vector3i(3, 2, 5), Blocks.LANTERN)
-	_put(o + Vector3i(11, 2, 5), Blocks.LANTERN)
+	# Tavan lambaları, kitaplıklar, zemin ve sınıf panosu.
+	for lx in [3, 7, 11]:
+		_put(o + Vector3i(lx, 3, 5), Blocks.CEILING_LIGHT)
+	_fill(o, Vector3i(0, 0, 1), Vector3i(0, 1, 3), Blocks.BOOKSHELF)
+	_fill(o, Vector3i(14, 0, 1), Vector3i(14, 1, 3), Blocks.BOOKSHELF)
+	_fill(o, Vector3i(0, -1, 0), Vector3i(14, -1, 10), Blocks.DARK_PLANKS)
+	_fill(o, Vector3i(1, 1, 10), Vector3i(4, 2, 10), Blocks.PLAYROOM_WALL)
 	# Bahçe: kapıdan yol, renkli oyuncak tuğlalarından kaydırak ve kum havuzu.
 	for z in range(12, 20):
 		_fill(o, Vector3i(7, -1, z), Vector3i(8, -1, z), Blocks.GRAVEL)
@@ -268,6 +274,8 @@ func _build_school(o: Vector3i) -> void:
 	_fill(o, Vector3i(0, -1, 16), Vector3i(4, -1, 20), Blocks.SAND)
 	for c in [Vector3i(-1, 0, 15), Vector3i(5, 0, 15), Vector3i(-1, 0, 21), Vector3i(5, 0, 21)]:
 		_put(o + c, Blocks.TOY_BRICK_YELLOW)
+	for x in [1, 2, 3, 4, 5, 10, 11, 12, 13]:
+		_put(o + Vector3i(x, 0, 12), Blocks.FLOWERS)
 
 
 ## Hastane: beyaz duvarlar, kapının üstünde kırmızı artı, içeride danışma masası, iki hasta yatağı, bekleme sandalyeleri.
