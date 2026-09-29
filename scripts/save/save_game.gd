@@ -36,6 +36,7 @@ static func save(path: String, main: Node) -> bool:
 		},
 		"allies": _allies(main),
 		"quests": main.quests.done,
+		"boss_defeated": main.boss_defeated,
 	}
 	# Önce geçici dosyaya yazılır; yazarken uygulama kapanırsa eski kayıt bozulmaz.
 	var tmp := path + ".tmp"
@@ -100,6 +101,7 @@ static func apply_world(data: Dictionary, main: Node) -> void:
 	main.world.chests = main.dim_chests.get(main.dimension, {})
 	main.time_of_day = data["time_of_day"]
 	main.quests.done = data.get("quests", {})
+	main.boss_defeated = data.get("boss_defeated", false)
 
 
 ## Oyuncu sahneye eklendikten sonra çağrılır.

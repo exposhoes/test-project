@@ -407,3 +407,15 @@ Konsept görselleri 1536×1024, diğer her şeyi 1024×1024 üret. Kaydettiğin 
    ```
    front of an old iron lantern block: dark iron frame with a cross bar, warm glowing yellow-orange flame light filling the glass panes, seamless tileable square pixel art block texture for a sandbox voxel game, 32x32 pixel grid, hard pixel edges, limited palette, top-down flat view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
    ```
+
+## Fabrika Patronu (boss)
+
+97. **mob_patron_face.png**
+   ```
+   front face of a giant angry toy factory robot boss: grey-blue painted metal plate, two glowing red rectangular eyes under thick black angled brows, a yellow grille mouth with dark slots, four small rivets in the corners, pixel art character face texture, 32x32 pixel grid, hard pixel edges, limited palette, flat front view, even lighting, no perspective, no border, no text, no watermark, 1:1 aspect ratio
+   ```
+
+98. **mob_patron_concept.png**
+   ```
+   concept sheet of an original giant toy factory robot boss for a blocky voxel game: boxy grey-blue metal body with a big yellow chest panel, thick short legs, long arms ending in red boxy fists, square head with glowing red eyes and a yellow grille mouth, a small antenna with a red light bulb on top, front, side and back views in a row, chunky voxel style, plain black background, no text, no watermark, 16:9 aspect ratio
+   ```

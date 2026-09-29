@@ -197,8 +197,10 @@ func take_damage(amount: int, from: Vector3) -> void:
 	health -= amount
 	var away := global_position - from
 	away.y = 0
-	_knockback = away.normalized() * 7.0
-	velocity.y = 4.0
+	# Boss ağırdır: az geri itilir, havaya kalkmaz.
+	var heavy: bool = data.get("boss", false)
+	_knockback = away.normalized() * (1.5 if heavy else 7.0)
+	velocity.y = 0.0 if heavy else 4.0
 	_flash(true)
 	if tamed:
 		pass

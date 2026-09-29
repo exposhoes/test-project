@@ -33,6 +33,12 @@ var return_positions := {}
 ## Boyutun ortam sesi (koridor uğultusu, fabrika müzik kutusu).
 var ambience := AudioStreamPlayer.new()
 var quests := Quests.new()
+## Fabrika Patronu yenildi mi (kayıtta saklanır) ve şu an sahnedeki boss.
+var boss_defeated := false
+var boss: Mob
+## Boss'un Oyuncak Fabrikası'nda beklediği salonun ortası.
+const BOSS_SPAWN := Vector3(30.5, 0, 6.5)
+const BOSS_BAR_RANGE := 32.0
 
 
 func _ready() -> void:
@@ -117,6 +123,7 @@ func _process(delta: float) -> void:
 		for ally in pending_allies:
 			spawn_ally(ally["id"], ally["health"])
 		pending_allies.clear()
+		_update_boss()
 		_spawn_timer -= delta
 		if _spawn_timer <= 0.0:
 			_spawn_timer = SPAWN_INTERVAL
@@ -177,6 +184,9 @@ func travel(portal_block := Blocks.HALLS_PORTAL) -> void:
 		if is_instance_valid(mob):
 			mob.queue_free()
 	_mobs.clear()
+	if is_instance_valid(boss):
+		boss.queue_free()
+	boss = null
 	# Dostlar da gelir: oyuncu yeni dünyada belirince yanında doğarlar.
 	for node in get_tree().get_nodes_in_group("allies"):
 		var ally := node as Mob
@@ -210,6 +220,36 @@ func _make_world(p_seed: int) -> World:
 	w.chests = dim_chests.get(dimension, {})
 	w.render_distance = Settings.view_distance
 	return w
+
+
+## Fabrikada boss yoksa ve yenilmediyse salonuna koyar; yakındayken can çubuğunu gösterir.
+func _update_boss() -> void:
+	if dimension == Dimension.FACTORY and not boss_defeated and not is_instance_valid(boss):
+		if world.is_meshed_at(BOSS_SPAWN):
+			spawn_boss(BOSS_SPAWN)
+	var near := is_instance_valid(boss) and boss.global_position.distance_to(player.global_position) < BOSS_BAR_RANGE
+	hud.show_boss_bar(boss if near else null)
+
+
+func spawn_boss(at: Vector3) -> Mob:
+	boss = Mob.create("patron")
+	boss.target = player
+	add_child(boss)
+	var y := world.spawn_y(floori(at.x), floori(at.z))
+	boss.global_position = Vector3(at.x, maxi(y, 0) + 0.1, at.z)
+	boss.died.connect(_on_boss_died.bind(boss))
+	return boss
+
+
+func _on_boss_died(b: Mob) -> void:
+	boss_defeated = true
+	var at := b.global_position + Vector3(0, 1, 0)
+	ItemDrop.spawn(self, at, Items.CRYSTAL, 4)
+	ItemDrop.spawn(self, at, Items.RUBY, 4)
+	ItemDrop.spawn(self, at, Items.GOLD, 6)
+	hud.toast("Fabrika Patronu yenildi!")
+	Sfx.play("portal")
+	quests.event("boss")
 
 
 ## Evcil bir dostu oyuncunun yanında doğurur.

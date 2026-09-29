@@ -17,6 +17,8 @@ var _hotbar := HBoxContainer.new()
 var _name_label := Label.new()
 var _status := StatusBar.new()
 var _quest_label := Label.new()
+var _boss_bar := ProgressBar.new()
+var _boss_name := Label.new()
 var _toast := Label.new()
 var _toast_timer := 0.0
 var _damage_flash := ColorRect.new()
@@ -96,6 +98,31 @@ func _ready() -> void:
 	_quest_label.add_theme_constant_override("outline_size", 5)
 	_quest_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_quest_label)
+
+	# Boss can çubuğu: üstte ortada, boss yakındayken görünür.
+	_boss_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_boss_bar.custom_minimum_size = Vector2(420, 18)
+	_boss_bar.position = Vector2(-210, 44)
+	_boss_bar.size = Vector2(420, 18)
+	_boss_bar.show_percentage = false
+	_boss_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = Color("d9343a")
+	_boss_bar.add_theme_stylebox_override("fill", fill)
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0, 0, 0, 0.6)
+	_boss_bar.add_theme_stylebox_override("background", bg)
+	_boss_bar.visible = false
+	root.add_child(_boss_bar)
+	_boss_name.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	_boss_name.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_boss_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_boss_name.position.y = 14
+	_boss_name.add_theme_font_size_override("font_size", 20)
+	_boss_name.add_theme_color_override("font_outline_color", Color.BLACK)
+	_boss_name.add_theme_constant_override("outline_size", 5)
+	_boss_name.visible = false
+	root.add_child(_boss_name)
 
 	_toast.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_toast.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -249,6 +276,16 @@ func select_slot_at(pos: Vector2) -> bool:
 
 
 ## Ekranın üstünde birkaç saniye görünen kısa mesaj.
+## Boss yakındayken adını ve canını gösterir; null gizler.
+func show_boss_bar(b: Mob) -> void:
+	_boss_bar.visible = b != null
+	_boss_name.visible = b != null
+	if b:
+		_boss_bar.max_value = b.max_health()
+		_boss_bar.value = maxi(b.health, 0)
+		_boss_name.text = b.data["name"]
+
+
 ## Sol üstte sıradaki görev ve ilerleme.
 func show_quest(q: Quests) -> void:
 	var next := q.current()

@@ -258,6 +258,24 @@ const MOBS := {
 			[Vector3(0.08, 0.15, 0.08), Vector3(0, 3.07, 0), Color("2a2a1a")],
 		],
 		"face": [Vector2(1.2, 0.9), Vector3(0, 2.55, -0.52)]},
+	# Boss: kendiliğinden doğmaz; Oyuncak Fabrikası'na ilk girişte bir salonda bekler (main.gd).
+	"patron": {"name": "Fabrika Patronu", "boss": true, "ability": "toss", "reach": 1.5, "health": 120, "damage": 5,
+		"behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
+		"primary": Color("5a6a7a"), "secondary": Color("f2c230"), "height": 4.6, "width": 2.2, "speed": 2.2,
+		"parts": [
+			[Vector3(0.6, 1.4, 0.7), Vector3(-0.5, 0.7, 0), Color("3a4550")],
+			[Vector3(0.6, 1.4, 0.7), Vector3(0.5, 0.7, 0), Color("3a4550")],
+			[Vector3(1.9, 1.7, 1.2), Vector3(0, 2.25, 0), Color("5a6a7a")],
+			[Vector3(1.2, 0.9, 0.04), Vector3(0, 2.3, -0.62), Color("f2c230")],
+			[Vector3(0.5, 1.6, 0.5), Vector3(-1.25, 2.1, 0), Color("4a5866")],
+			[Vector3(0.5, 1.6, 0.5), Vector3(1.25, 2.1, 0), Color("4a5866")],
+			[Vector3(0.7, 0.5, 0.7), Vector3(-1.25, 1.1, 0), Color("d9343a")],
+			[Vector3(0.7, 0.5, 0.7), Vector3(1.25, 1.1, 0), Color("d9343a")],
+			[Vector3(1.3, 1.1, 1.1), Vector3(0, 3.65, 0), Color("6a7a8a")],
+			[Vector3(0.1, 0.5, 0.1), Vector3(0, 4.45, 0), Color("2a2a2a")],
+			[Vector3(0.25, 0.25, 0.25), Vector3(0, 4.7, 0), Color("ff3030")],
+		],
+		"face": [Vector2(1.1, 0.9), Vector3(0, 3.65, -0.57)], "face_glow": true},
 	"pembeleylek": {"name": "Pembe Leylek", "health": 14, "damage": 3, "behavior": Behavior.HOSTILE, "habitat": Habitat.TOY_FACTORY,
 		"primary": Color("f07ab0"), "secondary": Color("f4c430"), "height": 2.6, "width": 0.9, "speed": 3.4,
 		# Konsept: docs/konseptler/mob_pembeleylek_concept.png
@@ -336,6 +354,6 @@ static func ids_for(habitat: int, night: bool) -> PackedStringArray:
 	var ids := PackedStringArray()
 	for id in MOBS:
 		var m: Dictionary = MOBS[id]
-		if m["habitat"] == habitat and (night or not m.get("night_only", false)):
+		if m["habitat"] == habitat and not m.get("boss", false) and (night or not m.get("night_only", false)):
 			ids.append(id)
 	return ids

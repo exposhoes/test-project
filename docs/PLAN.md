@@ -74,6 +74,9 @@ tests/                      başsız duman testi, ekran görüntüsü
    evcilleştir → boyutlar → yakut/kristal eşyalar). Bitince duyuru ve ses; kayıtta saklanır. `scripts/quests.gd`.
 5f. **Yiyecek (yapıldı):** çimenlikte seyrek Çilek Çalısı (kırınca 2 çilek, 2 açlık); fırında elma pişer:
    Fırın Elma 8 açlık doldurur.
+6b. **Boss (yapıldı):** Fabrika Patronu (120 can, 5 hasar, havaya atar, az geri itilir) Oyuncak Fabrikası'na ilk
+   girişte başlangıcın yakınındaki salonda bekler. Yakınken üstte can çubuğu; yenilince 4 kristal, 4 yakut, 6 altın
+   bırakır ve bir daha gelmez (kayıtta). Görsel istemleri 97-98.
 7. **Performans (kısmen):** chunk mesh üretimi tablolarla ~3 kat hızlı (33 → 11 ms/chunk) ve arka plan iş parçacıklarında (WorkerThreadPool, en çok 3 iş); blok kırma/koyma anında mesh'lenir. Kalan: greedy meshing.
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
    ve "Kaydet ve Ana Menü". Ayarlar (ana menüde ve duraklatmada): bakış hızı 0,5x-2x,

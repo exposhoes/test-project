@@ -143,7 +143,8 @@ func _initialize() -> void:
 	var mob := Mob.create("tokmak")
 	root.add_child(mob)
 	_check(mob.get_child_count() > 0, "yaratık modeli kurulmalı")
-	_check(MobData.MOBS.size() == 20, "20 yaratık tanımlı olmalı")
+	_check(MobData.MOBS.size() == 21, "20 yaratık ve 1 boss tanımlı olmalı")
+	_check(not MobData.ids_for(MobData.Habitat.TOY_FACTORY, true).has("patron"), "boss kendiliğinden doğmamalı")
 
 	# Hayatta kalma: hasar, yaratık saldırısı, yaratığa vurma, ölüm ve yeniden doğma.
 	var survival := player.survival
@@ -408,6 +409,18 @@ func _initialize() -> void:
 	_check(not player.has_bed(), "yatak kırılınca doğma noktası silinmeli")
 	for i in 5:
 		await process_frame
+	# Boss: yenilince ganimet bırakır, bir daha gelmez.
+	var b: Mob = main.spawn_boss(player.global_position + Vector3(6, 0, 0))
+	await process_frame
+	main._update_boss()
+	_check(main.hud._boss_bar.visible and main.hud._boss_name.text == "Fabrika Patronu", "boss yakındayken can çubuğu görünmeli")
+	for d in get_nodes_in_group("item_drops"):
+		d.free()
+	b.take_damage(b.max_health(), player.global_position)
+	await process_frame
+	main._update_boss()
+	_check(main.boss_defeated and main.quests.done.has("boss") and get_nodes_in_group("item_drops").size() >= 3 and not main.hud._boss_bar.visible,
+		"boss yenilince ganimet, görev ve çubuk kapanmalı")
 	# Yiyecek: çilek çalısı 2 çilek bırakır, elma fırında pişer.
 	_check(Items.drop_for_block(Blocks.BERRY_BUSH) == Items.BERRIES and Items.food_value(Items.BERRIES) > 0, "çalı çilek bırakmalı")
 	var baked := Items.SMELTING.filter(func(r: Dictionary) -> bool: return r["out"] == Items.BAKED_APPLE)
