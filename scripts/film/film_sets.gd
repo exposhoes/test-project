@@ -306,6 +306,15 @@ func _build_hospital(o: Vector3i) -> void:
 	_put(o + Vector3i(6, 2, 0), Blocks.LANTERN)
 	for z in range(10, 15):
 		_put(o + Vector3i(6, -1, z), Blocks.GRAVEL)
+	# Gerçekçi dokunuşlar: karo tavan ve floresan lambalar, yatak aralarında perde, girişte çiçekler.
+	_fill(o, Vector3i(0, 3, 0), Vector3i(12, 3, 8), Blocks.CEILING_TILE)
+	for l in [Vector3i(3, 3, 2), Vector3i(9, 3, 2), Vector3i(6, 3, 6)]:
+		_put(o + l, Blocks.CEILING_LIGHT)
+	_fill(o, Vector3i(3, 0, 0), Vector3i(3, 1, 1), Blocks.PLAYROOM_WALL)
+	_fill(o, Vector3i(9, 0, 0), Vector3i(9, 1, 1), Blocks.PLAYROOM_WALL)
+	_fill(o, Vector3i(0, -1, 0), Vector3i(12, -1, 8), Blocks.PLASTER)
+	for x in [3, 4, 8, 9]:
+		_put(o + Vector3i(x, 0, 10), Blocks.FLOWERS)
 
 
 ## Mahalle bakkalı: tuğla dükkân, camlı vitrin, renkli tente, tezgâh, raflar (sandıklar), dondurma dolabı.
@@ -334,6 +343,11 @@ func _build_shop(o: Vector3i) -> void:
 	_put(o + Vector3i(0, 2, 8), Blocks.LANTERN)
 	for z in range(10, 14):
 		_put(o + Vector3i(5, -1, z), Blocks.GRAVEL)
+	# Arka duvarda renkli ürün rafları, kapıda paspas, önde saksı çiçekleri.
+	_fill(o, Vector3i(1, 0, 0), Vector3i(9, 1, 0), Blocks.BOOKSHELF)
+	_put(o + Vector3i(5, -1, 8), Blocks.RUG)
+	for x in [2, 3, 7, 8]:
+		_put(o + Vector3i(x, 0, 11), Blocks.FLOWERS)
 
 
 ## Park: çakıl yollar, banklar, piknik örtüsü (renkli oyuncak tuğlaları), büyük ağaçlar, çiçek çalıları.
@@ -356,6 +370,12 @@ func _build_park(o: Vector3i) -> void:
 		_fill(o, t + Vector3i(0, 3, 0), t + Vector3i(0, 4, 0), Blocks.LOG)
 	for b in [Vector3i(12, 0, 12), Vector3i(13, 0, 12), Vector3i(5, 0, 12), Vector3i(15, 0, 7)]:
 		_put(o + b, Blocks.BERRY_BUSH)
+	# Sokak lambaları ve çiçek tarhları.
+	for l in [Vector3i(7, 0, 13), Vector3i(9, 0, 3), Vector3i(1, 0, 13)]:
+		_fill(o, l, l + Vector3i(0, 2, 0), Blocks.LOG)
+		_put(o + l + Vector3i(0, 3, 0), Blocks.LANTERN)
+	for f in [Vector3i(12, 0, 1), Vector3i(13, 0, 1), Vector3i(14, 0, 1), Vector3i(0, 0, 7), Vector3i(0, 0, 8), Vector3i(15, 0, 13), Vector3i(16, 0, 13)]:
+		_put(o + f, Blocks.FLOWERS)
 
 
 ## Futbol sahası: beyaz çizgiler, iki kale, kenarda seyirci bankı.
