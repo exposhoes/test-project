@@ -24,6 +24,13 @@ var _center := Vector2i(2147483647, 0)
 var edits := {}
 ## Yüklü chunk'lardaki fenerlerin ışıkları: blok konumu -> OmniLight3D.
 var _lights := {}
+## Mesh'ler arka plan iş parçacıklarında hazırlanır; ana iş parçacığı yalnızca sonucu uygular.
+## Kapatılırsa (ya da tek çekirdekte) eski eşzamanlı yol kullanılır.
+var threaded := OS.get_processor_count() > 1
+const MAX_JOBS := 3
+var _jobs := {}  # Vector2i -> {"task": id, "out": {}, "version": int}
+## Chunk her anında yeniden mesh'lendiğinde artar; eski iş parçacığı sonuçları böylece atılır.
+var _versions := {}
 const LIGHT_RANGE := 10.0
 
 
@@ -162,14 +169,49 @@ func update_center(pos: Vector3) -> void:
 
 
 func _process(_delta: float) -> void:
+	_collect_jobs()
 	var budget := meshes_per_frame
 	while budget > 0 and not _pending.is_empty():
+		if threaded and _jobs.size() >= MAX_JOBS:
+			break
 		var c: Vector2i = _pending.pop_front()
+		if _jobs.has(c):
+			continue
 		for n in [c, c + Vector2i(1, 0), c + Vector2i(-1, 0), c + Vector2i(0, 1), c + Vector2i(0, -1)]:
 			_ensure_chunk(n)
-		_chunks[c].rebuild(atlas, material)
-		_meshed[c] = true
+		if threaded:
+			_start_job(c)
+		else:
+			_chunks[c].rebuild(atlas, material)
+			_meshed[c] = true
 		budget -= 1
+
+
+func _start_job(c: Vector2i) -> void:
+	Chunk._prepare_tables(atlas)
+	var snap: Array = _chunks[c].snapshot()
+	var out := {}
+	var task := WorkerThreadPool.add_task(func() -> void: out["data"] = Chunk.build_arrays(snap))
+	_jobs[c] = {"task": task, "out": out, "version": _versions.get(c, 0)}
+
+
+## Biten işlerin sonucunu uygular; bu arada boşaltılan ya da elle yeniden mesh'lenen chunk'ınkini atar.
+func _collect_jobs() -> void:
+	for c: Vector2i in _jobs.keys():
+		var job: Dictionary = _jobs[c]
+		if not WorkerThreadPool.is_task_completed(job["task"]):
+			continue
+		WorkerThreadPool.wait_for_task_completion(job["task"])
+		_jobs.erase(c)
+		if _chunks.has(c) and job["version"] == _versions.get(c, 0):
+			_chunks[c].apply_arrays(job["out"]["data"], material)
+			_meshed[c] = true
+
+
+func _exit_tree() -> void:
+	for c: Vector2i in _jobs:
+		WorkerThreadPool.wait_for_task_completion(_jobs[c]["task"])
+	_jobs.clear()
 
 
 func _ensure_chunk(c: Vector2i) -> Chunk:
@@ -186,8 +228,10 @@ func _ensure_chunk(c: Vector2i) -> Chunk:
 
 
 func _remesh(c: Vector2i) -> void:
-	if _meshed.has(c):
+	if _meshed.has(c) or _jobs.has(c):
+		_versions[c] = _versions.get(c, 0) + 1
 		_chunks[c].rebuild(atlas, material)
+		_meshed[c] = true
 
 
 func _unload_far() -> void:

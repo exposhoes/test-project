@@ -58,6 +58,7 @@ func origin() -> Vector3i:
 ## Yüz tablosu düz dizilere açılır: iç döngüde sözlük ve dizi ayırma olmasın diye (telefonda asıl maliyet buydu).
 static var _face_verts := PackedVector3Array()
 static var _face_shade := PackedColorArray()
+static var _face_normals := PackedVector3Array()
 ## Blok kimliğine göre şeffaflık ve atlas başına (kimlik*6+yüz)*4 köşe UV'si önbelleği.
 static var _transparent := PackedByteArray()
 static var _uv_atlas: BlockAtlas
@@ -69,6 +70,7 @@ static func _prepare_tables(atlas: BlockAtlas) -> void:
 		for f in 6:
 			for v: Vector3 in FACES[f]["verts"]:
 				_face_verts.append(v)
+			_face_normals.append(Vector3(FACES[f]["dir"]))
 			var s: float = FACES[f]["shade"]
 			_face_shade.append(Color(s, s, s))
 		_transparent.resize(256)
@@ -95,17 +97,31 @@ func _neighbor_blocks(dx: int, dz: int) -> PackedByteArray:
 	return c.blocks if c else PackedByteArray()
 
 
+## Mesh'lemek için gereken veriler: kendi blokları ve dört komşunun blokları. Paket diziler değer olarak
+## kopyalandığından bu anlık görüntü arka plan iş parçacığına güvenle verilebilir.
+func snapshot() -> Array:
+	return [blocks, _neighbor_blocks(1, 0), _neighbor_blocks(-1, 0), _neighbor_blocks(0, 1), _neighbor_blocks(0, -1)]
+
+
+## Anında (ana iş parçacığında) yeniden mesh'ler; blok kırıp koyunca kullanılır.
 func rebuild(atlas: BlockAtlas, material: Material) -> void:
 	_prepare_tables(atlas)
+	apply_arrays(build_arrays(snapshot()), material)
+
+
+## Saf fonksiyon: sahne ağacına dokunmaz, iş parçacığında çalışabilir. _prepare_tables önce ana
+## iş parçacığında çağrılmış olmalı.
+static func build_arrays(snap: Array) -> Dictionary:
+	var blocks: PackedByteArray = snap[0]
+	var east: PackedByteArray = snap[1]
+	var west: PackedByteArray = snap[2]
+	var south: PackedByteArray = snap[3]
+	var north: PackedByteArray = snap[4]
 	var verts := PackedVector3Array()
 	var normals := PackedVector3Array()
 	var uvs := PackedVector2Array()
 	var colors := PackedColorArray()
 	var indices := PackedInt32Array()
-	var east := _neighbor_blocks(1, 0)
-	var west := _neighbor_blocks(-1, 0)
-	var south := _neighbor_blocks(0, 1)
-	var north := _neighbor_blocks(0, -1)
 	const LAYER := SIZE * SIZE
 	# Tamamen boş üst katmanları atla.
 	var top := HEIGHT - 1
@@ -140,7 +156,7 @@ func rebuild(atlas: BlockAtlas, material: Material) -> void:
 					var start := verts.size()
 					var k := (id * 6 + f) * 4
 					var p := Vector3(x, y, z)
-					var normal := Vector3(FACES[f]["dir"])
+					var normal := _face_normals[f]
 					var shade := _face_shade[f]
 					for v in 4:
 						verts.append(p + _face_verts[f * 4 + v])
@@ -153,31 +169,34 @@ func rebuild(atlas: BlockAtlas, material: Material) -> void:
 					indices.append(start)
 					indices.append(start + 2)
 					indices.append(start + 3)
-
-	if verts.is_empty():
-		_mesh_instance.mesh = null
-		_collision.shape = null
-		return
-
-	var arrays := []
-	arrays.resize(Mesh.ARRAY_MAX)
-	arrays[Mesh.ARRAY_VERTEX] = verts
-	arrays[Mesh.ARRAY_NORMAL] = normals
-	arrays[Mesh.ARRAY_TEX_UV] = uvs
-	arrays[Mesh.ARRAY_COLOR] = colors
-	arrays[Mesh.ARRAY_INDEX] = indices
-	var mesh := ArrayMesh.new()
-	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
-	mesh.surface_set_material(0, material)
-	_mesh_instance.mesh = mesh
-
 	var collision_faces := PackedVector3Array()
 	collision_faces.resize(indices.size())
 	for j in indices.size():
 		collision_faces[j] = verts[indices[j]]
+	return {"verts": verts, "normals": normals, "uvs": uvs, "colors": colors, "indices": indices, "collision": collision_faces}
+
+
+## build_arrays sonucunu mesh ve çarpışma şekline çevirir (ana iş parçacığında).
+func apply_arrays(data: Dictionary, material: Material) -> void:
+	var verts: PackedVector3Array = data["verts"]
+	if verts.is_empty():
+		_mesh_instance.mesh = null
+		_collision.shape = null
+		return
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = verts
+	arrays[Mesh.ARRAY_NORMAL] = data["normals"]
+	arrays[Mesh.ARRAY_TEX_UV] = data["uvs"]
+	arrays[Mesh.ARRAY_COLOR] = data["colors"]
+	arrays[Mesh.ARRAY_INDEX] = data["indices"]
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	mesh.surface_set_material(0, material)
+	_mesh_instance.mesh = mesh
 	var shape := ConcavePolygonShape3D.new()
 	shape.backface_collision = true
-	shape.set_faces(collision_faces)
+	shape.set_faces(data["collision"])
 	_collision.shape = shape
 
 
