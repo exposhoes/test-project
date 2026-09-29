@@ -174,3 +174,12 @@ func _fuel_to_burn(recipe: Dictionary) -> int:
 		if count_of(id) >= recipe["in"].get(id, 0) + 1:
 			return id
 	return -1
+
+
+## En iyi zırhın yuvası (yoksa -1).
+func best_armor_slot() -> int:
+	var best := -1
+	for i in slots.size():
+		if not slots[i].is_empty() and Items.armor_value(slots[i]["id"]) > (Items.armor_value(slots[best]["id"]) if best >= 0 else 0.0):
+			best = i
+	return best

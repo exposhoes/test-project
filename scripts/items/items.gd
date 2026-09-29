@@ -25,6 +25,8 @@ const WOOD_SWORD := 1030
 const STONE_SWORD := 1031
 const IRON_SWORD := 1032
 const RUBY_SWORD := 1033
+const IRON_ARMOR := 1040
+const RUBY_ARMOR := 1041
 
 const MAX_STACK := 64
 const ICON_DIR := "res://assets/textures/items/"
@@ -39,6 +41,7 @@ const HANDLE := Color("6e4a2a")
 const PICK := ["_hhhhh__", "h__s__h_", "___s____", "___s____", "___s____", "___s____", "___s____", "________"]
 const AXE := ["__shh___", "__shhh__", "__shh___", "__s_____", "__s_____", "__s_____", "__s_____", "________"]
 const SWORD := ["___h____", "___h____", "___h____", "___h____", "___h____", "_gggg___", "___s____", "___s____"]
+const ARMOR := ["________", "hh_ww_hh", "hhhhhhhh", "_hhhhhh_", "_hhdhhh_", "_hhdhhh_", "_hhhhhh_", "________"]
 const INGOT := ["________", "________", "__hhhh__", "_hhhhhh_", "hhhhhhd_", "_dddddd_", "________", "________"]
 const NUGGET := ["________", "________", "__hh____", "_hhwhh__", "_hhhhhh_", "__hhhdd_", "___ddd__", "________"]
 const GEM := ["________", "__hhh___", "_hhhhh__", "hhwhhhh_", "_hhhhd__", "__hhd___", "___d____", "________"]
@@ -71,6 +74,9 @@ const DEFS := {
 	STONE_SWORD: {"uses": 130, "name": "Taş Kılıç", "icon": "item_sword_stone", "damage": 3, "stack": 1, "colors": {"h": STONE, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
 	IRON_SWORD: {"uses": 250, "name": "Demir Kılıç", "icon": "item_sword_iron", "damage": 4, "stack": 1, "colors": {"h": IRONC, "g": HANDLE, "s": HANDLE}, "pattern": SWORD},
 	RUBY_SWORD: {"uses": 800, "name": "Yakut Kılıç", "icon": "item_sword_ruby", "damage": 6, "stack": 1, "colors": {"h": Color("d8263f"), "g": Color("f2cf3c"), "s": HANDLE}, "pattern": SWORD},
+	# "armor": yaratık vuruşundan azaltılan pay. Çantada olması yeter; her vuruşta bir hak harcar.
+	IRON_ARMOR: {"uses": 200, "name": "Demir Zırh", "icon": "item_armor_iron", "armor": 0.4, "stack": 1, "colors": {"h": IRONC, "w": Color.WHITE}, "pattern": ARMOR},
+	RUBY_ARMOR: {"uses": 500, "name": "Yakut Zırh", "icon": "item_armor_ruby", "armor": 0.6, "stack": 1, "colors": {"h": Color("d8263f"), "w": Color("f2cf3c")}, "pattern": ARMOR},
 }
 
 ## Kırılınca bırakılan eşya; -1 hiçbir şey bırakmaz. Listede olmayan blok kendini bırakır.
@@ -128,6 +134,8 @@ const RECIPES := [
 	{"out": IRON_SWORD, "count": 1, "in": {IRON: 2, STICK: 1}, "table": true},
 	{"out": CRYSTAL_PICKAXE, "count": 1, "in": {CRYSTAL: 3, STICK: 2}, "table": true},
 	{"out": RUBY_SWORD, "count": 1, "in": {RUBY: 2, GOLD: 1, STICK: 1}, "table": true},
+	{"out": IRON_ARMOR, "count": 1, "in": {IRON: 8}, "table": true},
+	{"out": RUBY_ARMOR, "count": 1, "in": {RUBY: 6, GOLD: 2}, "table": true},
 	{"out": Blocks.FURNACE, "count": 1, "in": {Blocks.COBBLESTONE: 8}, "table": true},
 	{"out": Blocks.HALLS_PORTAL, "count": 1, "in": {Blocks.PLANKS: 4, GOLD: 2}, "table": true},
 	{"out": Blocks.CHEST, "count": 1, "in": {Blocks.PLANKS: 8}, "table": true},
@@ -181,6 +189,11 @@ static func tool_tier(id: int) -> int:
 ## Aletin toplam kullanım hakkı; alet değilse 0.
 static func max_uses(id: int) -> int:
 	return DEFS[id].get("uses", 0) if DEFS.has(id) else 0
+
+
+## Zırhın azalttığı hasar payı (0: zırh değil).
+static func armor_value(id: int) -> float:
+	return DEFS[id].get("armor", 0.0) if DEFS.has(id) else 0.0
 
 
 static func attack_bonus(id: int) -> int:

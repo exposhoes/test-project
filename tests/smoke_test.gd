@@ -408,6 +408,12 @@ func _initialize() -> void:
 	_check(not player.has_bed(), "yatak kırılınca doğma noktası silinmeli")
 	for i in 5:
 		await process_frame
+	# Zırh: çantada olması hasarı azaltır ve hak harcar.
+	inv.add(Items.IRON_ARMOR)
+	var armor_slot := inv.best_armor_slot()
+	_check(armor_slot >= 0 and player.armored_damage(5) == 3 and inv.uses_at(armor_slot) == Items.max_uses(Items.IRON_ARMOR) - 1, "demir zırh hasarı %40 azaltmalı")
+	inv.add(Items.RUBY_ARMOR)
+	_check(inv.item_at(inv.best_armor_slot()) == Items.RUBY_ARMOR and player.armored_damage(5) == 2, "en iyi zırh kullanılmalı")
 	# Sandık: eşya konur, alınır, kırılınca içindekiler yere saçılır.
 	var chest_cell := Vector3i(player.global_position.floor()) + Vector3i(-2, 0, 0)
 	world.set_block(chest_cell, Blocks.CHEST)

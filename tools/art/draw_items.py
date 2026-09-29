@@ -326,6 +326,24 @@ def stick():
     return ic.image()
 
 
+def armor(m, trim):
+    def fn():
+        ic = Icon()
+        # Göğüslük: omuzlar, gövde, boyun oyuğu; ortada süs şeridi.
+        body = [(6, 7), (12, 7), (14, 10), (18, 10), (20, 7), (26, 7), (27, 14), (23, 15), (23, 27), (9, 27), (9, 15), (5, 14)]
+        ic.poly(body, m[2])
+        ic.poly([(6, 7), (12, 7), (13, 9), (9, 15), (5, 14)], m[3])
+        ic.poly([(20, 7), (26, 7), (27, 14), (23, 15), (19, 9)], m[1])
+        for y in range(11, 27):
+            ic.put(15, y, trim[2])
+            ic.put(16, y, trim[3])
+        for x in range(10, 23):
+            ic.put(x, 26, m[0])
+        ic.put(11, 17, m[4]); ic.put(11, 18, m[4]); ic.put(12, 17, m[4])
+        return ic.image()
+    return fn
+
+
 TEX = {
     "item_apple": apple, "item_stick": stick, "item_coal": coal,
     "item_iron": ingot(IRON), "item_gold": ingot(GOLD),
@@ -336,6 +354,7 @@ TEX = {
     "item_axe_wood": axe(WOOD), "item_axe_stone": axe(STONE), "item_axe_iron": axe(IRON),
     "item_sword_wood": sword(WOOD, WOOD), "item_sword_stone": sword(STONE),
     "item_sword_iron": sword(IRON), "item_sword_ruby": sword(RUBY, GOLD),
+    "item_armor_iron": armor(IRON, IRON), "item_armor_ruby": armor(RUBY, GOLD),
 }
 
 if __name__ == "__main__":

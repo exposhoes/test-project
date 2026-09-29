@@ -313,6 +313,7 @@ func try_tame() -> bool:
 func hurt(amount: int, from: Vector3) -> void:
 	if survival.dead:
 		return
+	amount = armored_damage(amount)
 	survival.take_damage(amount)
 	Sfx.play("hurt")
 	var away := global_position - from
@@ -461,6 +462,19 @@ func _try_spawn() -> void:
 	velocity = Vector3.ZERO
 	_fall_peak = global_position.y
 	_spawned = true
+
+
+## Çantadaki en iyi zırh hasarı azaltır ve bir hak harcar; biterse kırılır.
+func armored_damage(amount: int) -> int:
+	var slot := inventory.best_armor_slot()
+	if slot < 0 or amount <= 0:
+		return amount
+	var id := inventory.item_at(slot)
+	var reduced := roundi(amount * (1.0 - Items.armor_value(id)))
+	if inventory.wear(slot):
+		Sfx.play("tool_break")
+		_toast("%s kırıldı!" % Items.display_name(id))
+	return reduced
 
 
 ## Yatak hâlâ yerinde mi ve yeryüzünde miyiz.

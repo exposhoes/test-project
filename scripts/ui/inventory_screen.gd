@@ -57,10 +57,12 @@ func _layout() -> void:
 	var x0 := origin.x + 9 * (SLOT + GAP) + 30
 	var col_w := (size.x - x0 - 30 - GAP) / 2.0
 	var rows := ceili(Items.RECIPES.size() / 2.0)
+	# Tarif sayısı arttıkça satırlar ekrana sığacak kadar incelir.
+	var row_h := minf(ROW_H, (size.y - origin.y - 8) / rows - GAP)
 	for r in recipes().size():
 		var col := r / rows
 		var row := r % rows
-		_recipe_rects.append(Rect2(Vector2(x0 + col * (col_w + GAP), origin.y + row * (ROW_H + GAP)), Vector2(col_w, ROW_H)))
+		_recipe_rects.append(Rect2(Vector2(x0 + col * (col_w + GAP), origin.y + row * (row_h + GAP)), Vector2(col_w, row_h)))
 	_chest_rects.clear()
 	if chest:
 		for i in chest.slots.size():
@@ -113,10 +115,12 @@ func _draw() -> void:
 		var rect := _recipe_rects[r]
 		var ok := _can_craft(recipe)
 		draw_rect(rect, Color(0.3, 0.55, 0.3, 0.45) if ok else Color(1, 1, 1, 0.07))
-		var icon_rect := Rect2(rect.position + Vector2(8, 6), Vector2(40, 40))
+		var icon_side := minf(40.0, rect.size.y - 8)
+		var icon_rect := Rect2(rect.position + Vector2(8, (rect.size.y - icon_side) / 2.0), Vector2(icon_side, icon_side))
 		_draw_item(icon_rect, recipe["out"], recipe["count"], font)
 		var alpha := 1.0 if ok else 0.5
-		draw_string(font, rect.position + Vector2(58, 22), Items.display_name(recipe["out"]), HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 18, Color(1, 1, 1, alpha))
+		var line2 := rect.size.y - 8
+		draw_string(font, rect.position + Vector2(58, line2 * 0.45), Items.display_name(recipe["out"]), HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 18, Color(1, 1, 1, alpha))
 		var parts := PackedStringArray()
 		for id in recipe["in"]:
 			parts.append("%d %s" % [recipe["in"][id], Items.display_name(id)])
@@ -125,7 +129,7 @@ func _draw() -> void:
 			needs += "  (masa)"
 		elif tab == 1:
 			needs += " + yakıt"
-		draw_string(font, rect.position + Vector2(58, 42), needs, HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 13, Color(1, 1, 1, alpha * 0.8))
+		draw_string(font, rect.position + Vector2(58, line2 * 0.9), needs, HORIZONTAL_ALIGNMENT_LEFT, rect.size.x - 64, 13, Color(1, 1, 1, alpha * 0.8))
 
 
 ## Sandık açıkken: solda çanta, sağda sandık. Dokunulan yığın karşı tarafa geçer.

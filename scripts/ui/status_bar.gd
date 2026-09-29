@@ -12,6 +12,8 @@ const HEART := ["_##_##_", "#######", "#######", "_#####_", "__###__", "___#___"
 const DRUMSTICK := ["___##__", "__####_", "_#####_", "_####__", "#_#____", "##_____"]
 
 var survival: Survival
+## Verilirse çantadaki en iyi zırh kalplerin üstünde küçük ikon ve aşınma çubuğuyla gösterilir.
+var inventory: Inventory
 
 var _heart_tex: Texture2D
 var _food_tex: Texture2D
@@ -25,6 +27,8 @@ func _ready() -> void:
 	if ResourceLoader.exists(UI_DIR + "ui_drumstick.png"):
 		_food_tex = load(UI_DIR + "ui_drumstick.png")
 	survival.changed.connect(queue_redraw)
+	if inventory:
+		inventory.changed.connect(queue_redraw)
 
 
 func _draw() -> void:
@@ -34,6 +38,14 @@ func _draw() -> void:
 		var food_pos := Vector2(size.x - (i + 1) * (ICON + GAP), 0)
 		_draw_icon(heart_pos, _heart_tex, HEART, Color("e0282e"), survival.health - i * 2)
 		_draw_icon(food_pos, _food_tex, DRUMSTICK, Color("c07a3a"), survival.hunger - i * 2)
+	var slot := inventory.best_armor_slot() if inventory else -1
+	if slot >= 0:
+		var id := inventory.item_at(slot)
+		var r := Rect2(Vector2(0, -ICON * 1.4 - 4), Vector2(ICON * 1.4, ICON * 1.4))
+		draw_texture_rect(Items.item_icon(id), r, false)
+		var frac := float(inventory.uses_at(slot)) / Items.max_uses(id)
+		draw_rect(Rect2(r.end.x + 4, r.position.y + r.size.y / 2.0 - 3, 60, 6), Color(0, 0, 0, 0.5))
+		draw_rect(Rect2(r.end.x + 4, r.position.y + r.size.y / 2.0 - 3, 60 * frac, 6), Hud.wear_color(frac))
 
 
 ## fill: 2 dolu, 1 yarım, 0 ve altı boş.

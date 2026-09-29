@@ -83,6 +83,7 @@ func _ready() -> void:
 	root.add_child(_name_label)
 
 	_status.survival = player.survival
+	_status.inventory = player.inventory
 	root.add_child(_status)
 	_status.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_status.grow_horizontal = Control.GROW_DIRECTION_BOTH

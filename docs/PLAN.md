@@ -68,6 +68,8 @@ tests/                      başsız duman testi, ekran görüntüsü
    sabaha atlanır. Ölünce yatakta doğulur (yatak kırılmışsa başlangıçta). Yalnızca yeryüzünde çalışır.
 5c. **Sandık (yapıldı):** masada 8 tahta, 27 yuva. Sandığa Koy: solda çanta, sağda sandık; dokunulan yığın
    karşı tarafa geçer. Kırılınca içindekiler yere saçılır; içerik boyut başına kayıtta saklanır.
+5d. **Zırh (yapıldı):** masada Demir Zırh (8 demir, hasarı %40 azaltır, 200 vuruş) ve Yakut Zırh (6 yakut + 2 altın,
+   %60, 500 vuruş). Çantada olması yeter; en iyisi kullanılır, kalplerin üstünde ikon ve aşınma çubuğu görünür.
 7. **Performans (kısmen):** chunk mesh üretimi tablolarla ~3 kat hızlı (33 → 11 ms/chunk) ve arka plan iş parçacıklarında (WorkerThreadPool, en çok 3 iş); blok kırma/koyma anında mesh'lenir. Kalan: greedy meshing.
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
    ve "Kaydet ve Ana Menü". Ayarlar (ana menüde ve duraklatmada): bakış hızı 0,5x-2x,
