@@ -60,7 +60,7 @@ func play(id: String) -> void:
 	set_time(ep.get("time", 0.3))
 	var first: Dictionary = ep["steps"][0]
 	var set_id: String = ep["set"]
-	_move_camera(FilmSets.point(set_id + "." + ("kam_bahce" if set_id == "okul" else "kam_dis")), FilmSets.point(first.get("at", "ev.yatak")), 0)
+	_move_camera(FilmSets.point(set_id + "." + _establishing_cam(set_id)), FilmSets.point(first.get("at", "ev.yatak")), 0)
 	# Setin chunk'ları hazır olmadan başlama; bu sırada kayıt için geri say.
 	for n in [3, 2, 1]:
 		_show_title("Kayıt için hazırlan\n%d" % n)
@@ -77,6 +77,18 @@ func play(id: String) -> void:
 	playing = false
 	set_portrait(false)
 	_show_menu(ep.get("format", "short"))
+
+
+## Setin açılış kamerası: kam_dis / kam_bahce / kam_genel, yoksa ilk kam_ noktası.
+func _establishing_cam(set_id: String) -> String:
+	var pts: Dictionary = FilmSets.POINTS[set_id]
+	for k in ["kam_dis", "kam_bahce", "kam_genel"]:
+		if pts.has(k):
+			return k
+	for k: String in pts:
+		if k.begins_with("kam_"):
+			return k
+	return pts.keys()[0]
 
 
 func _run(s: Dictionary) -> void:
