@@ -36,6 +36,7 @@ enum {
 	FACTORY_PORTAL,
 	PLAYROOM_WALL,
 	LANTERN,
+	BED,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -74,6 +75,7 @@ const DEFS := {
 	FACTORY_PORTAL: {"name": "Fabrika Kapısı", "top": "planks", "side": "factory_portal", "bottom": "planks"},
 	PLAYROOM_WALL: {"name": "Oyun Odası Duvarı", "all": "playroom_wall"},
 	LANTERN: {"name": "Fener", "all": "lantern", "light": true},
+	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -113,6 +115,8 @@ const PLACEHOLDER_COLORS := {
 	"factory_portal": Color("e85a8a"),
 	"playroom_wall": Color("a9d6f0"),
 	"lantern": Color("ffd35a"),
+	"bed_top": Color("c8323c"),
+	"bed_side": Color("8a5a32"),
 }
 
 

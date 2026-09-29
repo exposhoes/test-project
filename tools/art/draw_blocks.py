@@ -514,6 +514,45 @@ def lantern(rng):
     return img
 
 
+def bed_top(rng):
+    # Kırmızı yorgan, üstte beyaz yastık, ahşap kenar.
+    img = new(hx("c8323c"))
+    px = img.load()
+    red, dark, light = hx("c8323c"), hx("962028"), hx("e05a62")
+    wood, wood_d = hx("8a5a32"), hx("5e3c1e")
+    for y in range(32):
+        for x in range(32):
+            if x < 2 or x > 29 or y < 2 or y > 29:
+                px[x, y] = wood_d if (x in (0, 31) or y in (0, 31)) else wood
+            elif y < 11:
+                px[x, y] = hx("f2efe6") if 4 <= x <= 27 and 4 <= y <= 9 else hx("d8d2c4")
+            else:
+                c = red
+                if (x + y) % 8 == 0:
+                    c = light
+                elif y == 11 or (x - 2) % 9 == 0:
+                    c = dark
+                px[x, y] = c
+    return img
+
+
+def bed_side(rng):
+    # Ahşap ayaklar üstünde yorgan kenarı; blok tam küp olduğu için boşluklar koyu ahşap.
+    img = new(hx("4a2f18"))
+    px = img.load()
+    for y in range(32):
+        for x in range(32):
+            if y < 6:
+                continue
+            if y < 18:
+                px[x, y] = hx("962028") if y in (6, 17) else (hx("e05a62") if (x + y) % 8 == 0 else hx("c8323c"))
+            elif y < 24:
+                px[x, y] = hx("5e3c1e") if y in (18, 23) else hx("8a5a32")
+            elif x < 5 or x > 26:
+                px[x, y] = hx("5e3c1e") if x in (0, 4, 27, 31) else hx("8a5a32")
+    return img
+
+
 TEX = {
     "grass_side": grass_side, "grass_top": grass_top, "dirt": dirt, "stone": stone,
     "cobblestone": cobblestone, "sand": sand, "gravel": gravel, "log_side": log_side,
@@ -531,6 +570,7 @@ TEX = {
     "furnace_side": furnace_side, "furnace_top": furnace_top, "halls_portal": halls_portal,
     "ceiling_tile": ceiling_tile, "ceiling_light": ceiling_light, "factory_portal": factory_portal,
     "playroom_wall": playroom_wall, "lantern": lantern,
+    "bed_top": bed_top, "bed_side": bed_side,
 }
 
 if __name__ == "__main__":

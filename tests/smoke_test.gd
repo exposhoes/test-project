@@ -394,6 +394,20 @@ func _initialize() -> void:
 	_check(player.hud._pause_menu.title == "Duraklatıldı", "Geri ile duraklatma menüsüne dönülmeli")
 	player.hud.close_pause()
 	_check(not paused, "devam edince oyun sürmeli")
+	# Yatak: gece sabaha atlatır, ölünce yatakta doğulur.
+	var bed_cell := Vector3i(player.global_position.floor()) + Vector3i(2, 0, 0)
+	world.set_block(bed_cell, Blocks.BED)
+	for m in get_nodes_in_group("mobs"):
+		m.free()
+	main.time_of_day = 0.9
+	_check(player.use_bed(bed_cell) and main.time_of_day == 0.26, "gece yatakta uyuyunca sabah olmalı")
+	_check(not player.use_bed(bed_cell) and player.has_bed(), "gündüz yatak yalnızca doğma noktası kaydetmeli")
+	player.respawn()
+	_check(player.saved_position.is_equal_approx(Vector3(bed_cell) + Vector3(0.5, 1, 0.5)), "ölünce yatakta doğulmalı")
+	world.set_block(bed_cell, Blocks.AIR)
+	_check(not player.has_bed(), "yatak kırılınca doğma noktası silinmeli")
+	for i in 5:
+		await process_frame
 	var menu: Node = load("res://scenes/menu.tscn").instantiate()
 	root.add_child(menu)
 	await process_frame

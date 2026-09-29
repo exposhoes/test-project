@@ -64,6 +64,8 @@ tests/                      başsız duman testi, ekran görüntüsü
    "Oyuncak Fabrikası" (yapıldı, Poppy/Banban/Rainbow esinli): masada 4 tahta + 2 yakutla Fabrika Kapısı;
    yüksek tavanlı renkli salonlar, kapı boşluklu duvarlar, oyuncak blok yığınları, duvarlarda yakut/kristal.
    Orada Çivit, Yosun, Kıvılcım, Bando, Pembe Leylek, Fermuar, Mışıl, Kutucuk ve dost Düğme dolaşır.
+5b. **Yatak (yapıldı):** masada 6 tahta. Yatağa Koy: doğma noktası kaydedilir; gece ve 8 blokta düşman yoksa
+   sabaha atlanır. Ölünce yatakta doğulur (yatak kırılmışsa başlangıçta). Yalnızca yeryüzünde çalışır.
 7. **Performans (kısmen):** chunk mesh üretimi tablolarla ~3 kat hızlı (33 → 11 ms/chunk) ve arka plan iş parçacıklarında (WorkerThreadPool, en çok 3 iş); blok kırma/koyma anında mesh'lenir. Kalan: greedy meshing.
 8. **Menü (yapıldı):** ana menü (Devam Et / Yeni Dünya, arkada dönen yaratık vitrini), oyun içinde II ile duraklatma
    ve "Kaydet ve Ana Menü". Ayarlar (ana menüde ve duraklatmada): bakış hızı 0,5x-2x,

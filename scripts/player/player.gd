@@ -44,6 +44,9 @@ var _break_cell := Vector3i.MAX
 var _break_progress := 0.0
 ## Kayıttan yüklenen konum; boşsa dünyanın başlangıç noktasında doğar.
 var saved_position := Vector3.INF
+## Yeryüzünde son yatılan yatağın üstü; ölünce orada doğulur (yatak kırılmışsa başlangıçta).
+var bed_position := Vector3.INF
+const BED_SAFE_RANGE := 8.0
 
 
 func _ready() -> void:
@@ -218,6 +221,9 @@ func use_selected() -> void:
 	if not _target.is_empty() and Dimension.is_portal(world.get_block(_target["hit"])):
 		used_portal.emit(world.get_block(_target["hit"]))
 		return
+	if not _target.is_empty() and world.get_block(_target["hit"]) == Blocks.BED:
+		use_bed(_target["hit"])
+		return
 	var slot := hud.selected_slot() if hud else 0
 	var id := inventory.item_at(slot)
 	if id == Blocks.AIR:
@@ -364,7 +370,7 @@ func teleport_nearby(rng_seed := -1) -> bool:
 
 func respawn() -> void:
 	_gas_timer = 0.0
-	saved_position = Vector3.INF
+	saved_position = bed_position if has_bed() else Vector3.INF
 	survival.reset()
 	_knockback = Vector3.ZERO
 	_spawned = false
@@ -445,6 +451,37 @@ func _try_spawn() -> void:
 	velocity = Vector3.ZERO
 	_fall_peak = global_position.y
 	_spawned = true
+
+
+## Yatak hâlâ yerinde mi ve yeryüzünde miyiz.
+func has_bed() -> bool:
+	if bed_position == Vector3.INF or world == null or world.dimension != Dimension.OVERWORLD:
+		return false
+	return world.get_block(Vector3i((bed_position - Vector3(0.5, 1.0, 0.5)).round())) == Blocks.BED
+
+
+## Yatağa Koy: doğma noktasını kaydeder; gece ve yakında düşman yoksa sabaha atlar.
+func use_bed(cell: Vector3i) -> bool:
+	var main := get_parent()
+	if world.dimension != Dimension.OVERWORLD:
+		_toast("Yatak burada çalışmaz")
+		return false
+	bed_position = Vector3(cell) + Vector3(0.5, 1.0, 0.5)
+	if not (main and main.has_method("is_night") and main.is_night()):
+		_toast("Doğma noktası kaydedildi. Uyumak için gece olmalı.")
+		return false
+	for m in get_tree().get_nodes_in_group("mobs"):
+		if m._is_aggressive() and m.global_position.distance_to(global_position) < BED_SAFE_RANGE:
+			_toast("Yakında düşman var, uyuyamazsın!")
+			return false
+	main.time_of_day = 0.26
+	_toast("Günaydın!")
+	return true
+
+
+func _toast(text: String) -> void:
+	if hud:
+		hud.toast(text)
 
 
 func is_spawned() -> bool:

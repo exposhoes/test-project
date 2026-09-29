@@ -30,6 +30,7 @@ static func save(path: String, main: Node) -> bool:
 			"hunger": Survival.MAX_HUNGER if dead else player.survival.hunger,
 			"inventory": player.inventory.slots,
 			"fuel": player.inventory.fuel,
+			"bed": player.bed_position,
 		},
 		"allies": _allies(main),
 	}
@@ -90,6 +91,7 @@ static func apply_player(data: Dictionary, player: Player) -> void:
 	var p: Dictionary = data["player"]
 	if p["position"] != Vector3.INF:
 		player.saved_position = p["position"]
+	player.bed_position = p.get("bed", Vector3.INF)
 	player.rotation.y = p["yaw"]
 	player._pitch = p["pitch"]
 	player.camera.rotation.x = p["pitch"]
