@@ -68,7 +68,7 @@ const POINTS := {
 		"tezgah_arka": Vector3(5.5, 0, 2.2),
 		"raf": Vector3(1.6, 0, 5.0),
 		"dondurma": Vector3(9.3, 0, 5.0),
-		"kam_ic": Vector3(8.5, 2.4, 7.6),
+		"kam_ic": Vector3(9.0, 2.3, 3.8),
 		"kam_tezgah": Vector3(3.0, 2.0, 6.8),
 		"kam_dis": Vector3(9.0, 4.0, 16.0),
 	},
@@ -80,7 +80,7 @@ const POINTS := {
 		"agac": Vector3(3.0, 0, 11.0),
 		"giris": Vector3(8.0, 0, 16.0),
 		"kam_genel": Vector3(8.0, 5.0, 20.0),
-		"kam_ortu": Vector3(13.0, 2.2, 13.0),
+		"kam_ortu": Vector3(8.2, 2.0, 7.0),
 		"kam_bank": Vector3(5.5, 1.8, 9.5),
 	},
 }
