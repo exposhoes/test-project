@@ -80,7 +80,7 @@ static func _prepare_tables(atlas: BlockAtlas) -> void:
 			_transparent[id] = 1 if (id == Blocks.AIR or (Blocks.DEFS.has(id) and Blocks.is_transparent(id))) else 0
 		_model_height.resize(256)
 		for id in 256:
-			_model_height[id] = BedModel.HEIGHT if Blocks.has_model(id) else 0.0
+			_model_height[id] = float(Blocks.DEFS[id].get("model_height", 1.0)) if Blocks.has_model(id) else 0.0
 	if _uv_atlas != atlas:
 		_uv_atlas = atlas
 		_uv_cache.resize(256 * 6 * 4)

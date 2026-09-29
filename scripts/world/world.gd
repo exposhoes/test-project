@@ -137,20 +137,27 @@ func _remove_light(pos: Vector3i) -> void:
 		_lights.erase(pos)
 
 
-## Konumdaki model bloğunun (yatak) 3D modelini kurar, günceller ya da kaldırır.
+## Konumdaki model bloğunun (yatak, kitaplık) 3D modelini kurar, günceller ya da kaldırır.
 func _refresh_model(pos: Vector3i) -> void:
 	if _models.has(pos):
 		_models[pos].queue_free()
 		_models.erase(pos)
-	if get_block(pos) != Blocks.BED:
-		return
-	var lay := BedModel.layout(pos, get_block)
-	if lay.is_empty():
-		return
-	var node := BedModel.create(lay["dir"], lay["length"])
-	node.position = Vector3(pos) + Vector3(0.5, 0, 0.5)
-	add_child(node)
-	_models[pos] = node
+	var id := get_block(pos)
+	var node: Node3D = null
+	if id == Blocks.BED:
+		var lay := BedModel.layout(pos, get_block)
+		if not lay.is_empty():
+			node = BedModel.create(lay["dir"], lay["length"])
+			node.position = Vector3(pos) + Vector3(0.5, 0, 0.5)
+	elif id == Blocks.BOOKSHELF:
+		node = BookshelfModel.create(pos, func(p: Vector3i) -> bool: return Blocks.is_transparent(get_block(p)))
+		node.position = Vector3(pos)
+	if node:
+		add_child(node)
+		_models[pos] = node
+
+
+const MODEL_BLOCKS := [Blocks.BED, Blocks.BOOKSHELF]
 
 
 ## Chunk ilk kez mesh'lenirken içindeki model bloklarını kurar.
@@ -158,10 +165,11 @@ func _spawn_models(c: Vector2i) -> void:
 	var chunk: Chunk = _chunks.get(c)
 	if chunk == null:
 		return
-	var i := chunk.blocks.find(Blocks.BED)
-	while i != -1:
-		_refresh_model(chunk.origin() + Chunk.position_of(i))
-		i = chunk.blocks.find(Blocks.BED, i + 1)
+	for id: int in MODEL_BLOCKS:
+		var i := chunk.blocks.find(id)
+		while i != -1:
+			_refresh_model(chunk.origin() + Chunk.position_of(i))
+			i = chunk.blocks.find(id, i + 1)
 
 
 func is_meshed_at(pos: Vector3) -> bool:
