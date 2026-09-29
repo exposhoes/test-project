@@ -17,6 +17,8 @@ var actors := {}
 var playing := false
 ## Testler için: true olursa bekleme süreleri kısalır.
 var fast := false
+## Eşyalara takılmadan yol bulunamayan yürüyüş sayısı (testler 0 bekler).
+var route_failures := 0
 
 var _sun := DirectionalLight3D.new()
 var _env := Environment.new()
@@ -118,10 +120,14 @@ func _run(s: Dictionary) -> void:
 	elif s.has("walk"):
 		var a := _actor(s["walk"])
 		var speed := 0.0 if fast else 2.2
+		var path := (world.generator as FilmSets).route(a.position, FilmSets.point(s["to"]))
+		if path.is_empty():
+			route_failures += 1
+			path = [FilmSets.point(s["to"])]
 		if s.get("wait", true):
-			await a.walk_to(FilmSets.point(s["to"]), speed)
+			await _walk_path(a, path, speed)
 		else:
-			a.walk_to(FilmSets.point(s["to"]), speed)
+			_walk_path(a, path, speed)
 	elif s.has("lie"):
 		_actor(s["lie"]).set_lying(s["value"])
 	elif s.has("turn"):
@@ -349,3 +355,8 @@ func _hide_dialogue() -> void:
 func _set_bars(on: bool) -> void:
 	for b in _bars:
 		b.visible = on
+
+
+func _walk_path(a: Actor, path: Array, speed: float) -> void:
+	for p: Vector3 in path:
+		await a.walk_to(p, speed)

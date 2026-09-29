@@ -22,7 +22,7 @@ const POINTS := {
 		"yatak_yani": Vector3(2.8, 0, 2.0),
 		"mutfak": Vector3(6.5, 0, 2.6),
 		"ocak": Vector3(7.5, 0, 1.4),
-		"masa": Vector3(5.0, 0, 3.2),
+		"masa": Vector3(5.5, 0, 4.4),
 		"canta": Vector3(2.2, 0, 5.0),
 		"kapi_ici": Vector3(4.5, 0, 5.8),
 		"kapi_disi": Vector3(4.5, 0, 9.0),
@@ -39,8 +39,8 @@ const POINTS := {
 		"tahta": Vector3(7.5, 0, 1.6),
 		"sira_1": Vector3(4.5, 0, 5.0),
 		"sira_2": Vector3(10.5, 0, 5.0),
-		"sira_3": Vector3(4.5, 0, 7.5),
-		"sira_4": Vector3(10.5, 0, 7.5),
+		"sira_3": Vector3(4.5, 0, 8.5),
+		"sira_4": Vector3(10.5, 0, 8.5),
 		"bahce": Vector3(7.5, 0, 16.0),
 		"kaydirak": Vector3(14.0, 0, 17.0),
 		"top_alani": Vector3(3.0, 0, 18.0),
@@ -75,7 +75,7 @@ const POINTS := {
 	},
 	"park": {
 		"bank": Vector3(4.5, 0, 6.0),
-		"bank_yani": Vector3(6.5, 0, 6.0),
+		"bank_yani": Vector3(7.5, 0, 6.0),
 		"ortu": Vector3(10.0, 0, 9.0),
 		"ortu_yani": Vector3(11.5, 0, 10.5),
 		"agac": Vector3(3.0, 0, 11.0),
@@ -348,3 +348,69 @@ func _build_field(o: Vector3i) -> void:
 		_fill(o, Vector3i(gx, 2, 5), Vector3i(gx, 2, 9), Blocks.LOG)
 	for x in range(9, 16):
 		_put(o + Vector3i(x, 0, 17), Blocks.PLANKS)
+
+
+## Karakter bu hücrede durabilir mi (ayak ve baş hizası boş mu)?
+func is_free(cell: Vector3i) -> bool:
+	return _blocks.get(cell, Blocks.AIR) == Blocks.AIR and _blocks.get(cell + Vector3i.UP, Blocks.AIR) == Blocks.AIR
+
+
+## Eşyaların etrafından dolaşan yürüme yolu (ızgarada genişlik öncelikli arama).
+## Ara noktaları döner; son nokta hedefin kendisidir. Yol yoksa boş dizi döner.
+func route(from: Vector3, to: Vector3) -> Array[Vector3]:
+	var y := floori(from.y + 0.01)
+	var start := Vector2i(floori(from.x), floori(from.z))
+	var goal := Vector2i(floori(to.x), floori(to.z))
+	var result: Array[Vector3] = []
+	if start == goal or _clear_line(from, to, y):
+		result.append(to)
+		return result
+	var prev := {start: start}
+	var queue: Array[Vector2i] = [start]
+	var dirs := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+	while not queue.is_empty() and not prev.has(goal):
+		var c: Vector2i = queue.pop_front()
+		for d: Vector2i in dirs:
+			var n := c + d
+			if prev.has(n) or (n - start).length_squared() > 40 * 40:
+				continue
+			if n != goal and not is_free(Vector3i(n.x, y, n.y)):
+				continue
+			prev[n] = c
+			queue.append(n)
+	if not prev.has(goal):
+		return result
+	var cells: Array[Vector2i] = []
+	var c2 := goal
+	while c2 != start:
+		cells.push_front(c2)
+		c2 = prev[c2]
+	# Düz görünen kısımları atla: bir önceki noktadan açıkça görünen en uzak hücreye git.
+	var here := from
+	var i := 0
+	while i < cells.size():
+		var j := cells.size() - 1
+		while j > i:
+			var p := Vector3(cells[j].x + 0.5, from.y, cells[j].y + 0.5)
+			if _clear_line(here, p, y):
+				break
+			j -= 1
+		var wp := Vector3(cells[j].x + 0.5, from.y, cells[j].y + 0.5)
+		if j == cells.size() - 1:
+			break
+		result.append(wp)
+		here = wp
+		i = j + 1
+	result.append(to)
+	return result
+
+
+func _clear_line(a: Vector3, b: Vector3, y: int) -> bool:
+	var steps := int(ceil(Vector2(b.x - a.x, b.z - a.z).length() * 4.0)) + 1
+	for k in range(1, steps + 1):
+		var q := a.lerp(b, float(k) / steps)
+		# Karakter gövdesi ~0.3 genişlikte: kenarları da yokla.
+		for off in [Vector2(0.25, 0.25), Vector2(-0.25, 0.25), Vector2(0.25, -0.25), Vector2(-0.25, -0.25)]:
+			if not is_free(Vector3i(floori(q.x + off.x), y, floori(q.z + off.y))):
+				return false
+	return true
