@@ -36,6 +36,7 @@ var quests := Quests.new()
 ## Yenilen boss'lar (kimlik -> true, kayıtta saklanır) ve şu an sahnedeki boss.
 var boss_defeated := {}
 var boss: Mob
+var _loot_rng := RandomNumberGenerator.new()
 const BOSS_BAR_RANGE := 32.0
 
 
@@ -163,6 +164,7 @@ func _try_spawn_mob() -> void:
 	var mob := Mob.create(ids[randi() % ids.size()])
 	mob.target = player
 	add_child(mob)
+	mob.died.connect(_on_mob_died.bind(mob))
 	mob.global_position = Vector3(x + 0.5, y + 0.1, z + 0.5)
 	_mobs.append(mob)
 
@@ -249,6 +251,15 @@ func spawn_boss(at: Vector3, id := "patron") -> Mob:
 	boss.global_position = Vector3(spot.x, maxi(y, 0) + 0.1, spot.z)
 	boss.died.connect(_on_boss_died.bind(boss))
 	return boss
+
+
+## Yenilen yaratık yaşadığı yere göre eşya bırakır (evcil dostlar bırakmaz).
+func _on_mob_died(mob: Mob) -> void:
+	if mob.tamed:
+		return
+	var loot := MobData.roll_loot(mob.mob_id, _loot_rng)
+	for id in loot:
+		ItemDrop.spawn(self, mob.global_position + Vector3(0, 0.5, 0), id, loot[id])
 
 
 func _on_boss_died(b: Mob) -> void:

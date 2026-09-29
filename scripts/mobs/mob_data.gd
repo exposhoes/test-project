@@ -362,6 +362,27 @@ const MOBS := {
 }
 
 
+## Yenilen yaratığın bırakabileceği eşyalar, yaşadığı yere göre: [eşya, olasılık, en az, en çok].
+## Boss'ların kendi "loot" sözlüğü vardır.
+const HABITAT_LOOT := {
+	Habitat.OVERWORLD: [[Items.COAL, 0.5, 1, 2], [Items.RAW_IRON, 0.25, 1, 1], [Items.APPLE, 0.2, 1, 1]],
+	Habitat.YELLOW_HALLS: [[Items.RAW_GOLD, 0.4, 1, 2], [Items.CRYSTAL, 0.08, 1, 1]],
+	Habitat.TOY_FACTORY: [[Items.RUBY, 0.3, 1, 1], [Items.RAW_GOLD, 0.3, 1, 2], [Items.CRYSTAL, 0.1, 1, 1]],
+}
+
+
+## rng ile bu yaratığın ganimetini seçer: {eşya: adet}.
+static func roll_loot(id: String, rng: RandomNumberGenerator) -> Dictionary:
+	var m: Dictionary = MOBS[id]
+	if m.has("loot"):
+		return m["loot"]
+	var out := {}
+	for entry: Array in HABITAT_LOOT.get(m["habitat"], []):
+		if rng.randf() < entry[1]:
+			out[entry[0]] = rng.randi_range(entry[2], entry[3])
+	return out
+
+
 static func ids_for(habitat: int, night: bool) -> PackedStringArray:
 	var ids := PackedStringArray()
 	for id in MOBS:

@@ -421,6 +421,13 @@ func _initialize() -> void:
 	main._update_boss()
 	_check(main.boss_defeated.has("patron") and main.quests.done.has("boss") and get_nodes_in_group("item_drops").size() >= 3 and not main.hud._boss_bar.visible,
 		"boss yenilince ganimet, görev ve çubuk kapanmalı")
+	# Ganimet: yaşadığı yere göre, boss'ta sabit.
+	var lrng := RandomNumberGenerator.new()
+	lrng.seed = 7
+	var got := {}
+	for i in 50:
+		got.merge(MobData.roll_loot("civit", lrng), true)
+	_check(got.has(Items.RUBY) and MobData.roll_loot("patron", lrng).has(Items.CRYSTAL), "yaratıklar yaşadığı yere göre ganimet bırakmalı")
 	# Yiyecek: çilek çalısı 2 çilek bırakır, elma fırında pişer.
 	_check(Items.drop_for_block(Blocks.BERRY_BUSH) == Items.BERRIES and Items.food_value(Items.BERRIES) > 0, "çalı çilek bırakmalı")
 	var baked := Items.SMELTING.filter(func(r: Dictionary) -> bool: return r["out"] == Items.BAKED_APPLE)
