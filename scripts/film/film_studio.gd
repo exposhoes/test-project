@@ -42,7 +42,7 @@ func _ready() -> void:
 	_setup_environment()
 	add_child(world)
 	add_child(voice)
-	world.render_distance = 3
+	world.render_distance = 4
 	world.generator = FilmSets.new()
 	camera.fov = 62.0
 	camera.far = 200.0

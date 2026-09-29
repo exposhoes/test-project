@@ -132,5 +132,11 @@ func _placeholder(texture_name: String) -> Image:
 				var bloom := Vector2(x % 8, y).distance_to(Vector2(4, 10)) < 2.5
 				var petal: Color = [Color("ff5a8a"), Color("ffd23f"), Color("ffffff"), Color("b07aff")][(x / 8) % 4]
 				c = petal if bloom else (base if stem or y > 26 else Color.TRANSPARENT)
+			elif texture_name == "road_line" and x >= 3 and x < 29 and y >= 10 and y < 22:
+				c = Color("f2f2e8")
+			elif texture_name == "sidewalk" and (x % 16 == 0 or y % 16 == 0):
+				c = base.darkened(0.25)
+			elif texture_name == "concrete" and y % 16 == 15:
+				c = base.darkened(0.2)
 			img.set_pixel(x, y, c)
 	return img

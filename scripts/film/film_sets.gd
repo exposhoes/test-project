@@ -15,6 +15,10 @@ const SETS := {
 	"park": Vector3i(40, GROUND + 1, -36),
 	"saha": Vector3i(-40, GROUND + 1, -36),
 }
+## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
+const CITY_MIN := Vector2i(-64, -56)
+const CITY_MAX := Vector2i(100, 52)
+
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
 	"ev": {
@@ -98,15 +102,23 @@ const POINTS := {
 }
 
 var _blocks := {}  # Vector3i -> blok id
+var _by_chunk := {}  # Vector2i (chunk) -> [[Vector3i, id], ...]; chunk üretimi hızlı olsun
 
 
 func _init() -> void:
+	_build_city()
 	_build_house(SETS["ev"])
 	_build_school(SETS["okul"])
 	_build_hospital(SETS["hastane"])
 	_build_shop(SETS["bakkal"])
 	_build_park(SETS["park"])
 	_build_field(SETS["saha"])
+	_connect_sets()
+	for pos: Vector3i in _blocks:
+		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
+		if not _by_chunk.has(key):
+			_by_chunk[key] = []
+		_by_chunk[key].append([pos, _blocks[pos]])
 
 
 ## Set noktasının dünya konumu: "ev.yatak" ya da doğrudan Vector3.
@@ -148,11 +160,10 @@ func generate(chunk: Chunk) -> void:
 							var lz := z + dz
 							if lx >= 0 and lx < Chunk.SIZE and lz >= 0 and lz < Chunk.SIZE and (dx != 0 or dz != 0 or dy == 5):
 								chunk.set_local(lx, GROUND + 1 + dy, lz, Blocks.LEAVES)
-	for pos: Vector3i in _blocks:
-		var lx := pos.x - base.x
-		var lz := pos.z - base.z
-		if lx >= 0 and lx < Chunk.SIZE and lz >= 0 and lz < Chunk.SIZE:
-			chunk.set_local(lx, pos.y, lz, _blocks[pos])
+	var key := Vector2i(floori(base.x / float(Chunk.SIZE)), floori(base.z / float(Chunk.SIZE)))
+	for entry: Array in _by_chunk.get(key, []):
+		var pos: Vector3i = entry[0]
+		chunk.set_local(pos.x - base.x, pos.y, pos.z - base.z, entry[1])
 
 
 func _tree_spot(g: Vector2i) -> bool:
@@ -161,7 +172,7 @@ func _tree_spot(g: Vector2i) -> bool:
 	if lx < 3 or lx > 12 or lz < 3 or lz > 12:
 		return false
 	# Setlerin ve önlerindeki yolun çevresi boş kalsın.
-	if g.x > -48 and g.x < 72 and g.y > -48 and g.y < 32:
+	if g.x > CITY_MIN.x - 8 and g.x < CITY_MAX.x + 8 and g.y > CITY_MIN.y - 8 and g.y < CITY_MAX.y + 8:
 		return false
 	return (hash(g) % 23) == 0
 
@@ -459,3 +470,180 @@ func _clear_line(a: Vector3, b: Vector3, y: int) -> bool:
 			if not is_free(Vector3i(floori(q.x + off.x), y, floori(q.z + off.y))):
 				return false
 	return true
+
+
+# --- Şehir: setler gerçek bir mahallenin içinde dursun (yollar, kaldırımlar, apartmanlar, dükkânlar). ---
+
+const AVENUES_Z := [25, -16]   # doğu-batı caddeleri (4 şeritlik asfaltın ilk z'si)
+const STREETS_X := [-15, 28, 76]  # kuzey-güney sokakları (asfaltın ilk x'i)
+const WALLS := [Blocks.BRICKS, Blocks.PLASTER, Blocks.CONCRETE, Blocks.SNOW, Blocks.YELLOW_WALLPAPER, Blocks.BRICKS]
+const CAR_COLORS := [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_BLUE, Blocks.TOY_BRICK_YELLOW, Blocks.SNOW]
+const Y0 := GROUND + 1
+
+
+func _build_city() -> void:
+	var o := Vector3i(0, Y0, 0)
+	# Kaldırımlar önce, asfalt üstüne; kavşaklarda asfalt kazanır.
+	for az: int in AVENUES_Z:
+		_fill(o, Vector3i(CITY_MIN.x, -1, az - 2), Vector3i(CITY_MAX.x, -1, az + 5), Blocks.SIDEWALK)
+	for sx: int in STREETS_X:
+		_fill(o, Vector3i(sx - 2, -1, CITY_MIN.y), Vector3i(sx + 5, -1, CITY_MAX.y), Blocks.SIDEWALK)
+	for az: int in AVENUES_Z:
+		_fill(o, Vector3i(CITY_MIN.x, -1, az), Vector3i(CITY_MAX.x, -1, az + 3), Blocks.ASPHALT)
+		for x in range(CITY_MIN.x, CITY_MAX.x + 1):
+			if posmod(x, 4) < 2 and not _near_street(x):
+				_put(o + Vector3i(x, -1, az + 2), Blocks.ROAD_LINE)
+	for sx: int in STREETS_X:
+		_fill(o, Vector3i(sx, -1, CITY_MIN.y), Vector3i(sx + 3, -1, CITY_MAX.y), Blocks.ASPHALT)
+		for z in range(CITY_MIN.y, CITY_MAX.y + 1):
+			if posmod(z, 4) < 2 and not _near_avenue(z):
+				_put(o + Vector3i(sx + 2, -1, z), Blocks.ROAD_LINE)
+	# Sokak lambaları ve kaldırım ağaçları.
+	for az: int in AVENUES_Z:
+		for x in range(CITY_MIN.x + 4, CITY_MAX.x, 12):
+			if not _near_street(x):
+				_lamp(o + Vector3i(x, 0, az - 2))
+				_lamp(o + Vector3i(x + 6, 0, az + 5))
+		for x in range(CITY_MIN.x + 10, CITY_MAX.x, 12):
+			if not _near_street(x):
+				_tree(o + Vector3i(x, 0, az + 5))
+	for sx: int in STREETS_X:
+		for z in range(CITY_MIN.y + 4, CITY_MAX.y, 12):
+			if not _near_avenue(z):
+				_lamp(o + Vector3i(sx - 2, 0, z))
+				_tree(o + Vector3i(sx + 5, 0, z + 6))
+	# Park etmiş arabalar.
+	var i := 0
+	for az: int in AVENUES_Z:
+		for x in range(CITY_MIN.x + 7, CITY_MAX.x - 4, 17):
+			if not _near_street(x) and not _near_street(x + 3):
+				_car(o + Vector3i(x, 0, az + (0 if i % 2 == 0 else 2)), CAR_COLORS[i % CAR_COLORS.size()], true)
+			i += 1
+	for sx: int in STREETS_X:
+		for z in range(CITY_MIN.y + 9, CITY_MAX.y - 4, 19):
+			if not _near_avenue(z) and not _near_avenue(z + 3):
+				_car(o + Vector3i(sx + (0 if i % 2 == 0 else 2), 0, z), CAR_COLORS[i % CAR_COLORS.size()], false)
+			i += 1
+	# Kuzey sırası: caddeye bakan apartmanlar ve altı dükkânlı binalar.
+	_row(Vector2i(-62, 32), Vector2i(-20, 32), -1)
+	_row(Vector2i(-8, 32), Vector2i(24, 32), -1)
+	_row(Vector2i(35, 32), Vector2i(72, 32), -1)
+	_row(Vector2i(83, 32), Vector2i(98, 32), -1)
+	# Güney sırası.
+	_row(Vector2i(-62, -40), Vector2i(-20, -40), 1)
+	_row(Vector2i(-8, -40), Vector2i(24, -40), 1)
+	_row(Vector2i(35, -40), Vector2i(72, -40), 1)
+	_row(Vector2i(83, -40), Vector2i(98, -40), 1)
+	# Setlerin aralarındaki boş parseller.
+	_building(Vector3i(14, Y0, -8), Vector2i(10, 10), 4, 0, true, -1)
+	_building(Vector3i(14, Y0, 6), Vector2i(10, 12), 2, 1, true, 1)
+	_building(Vector3i(35, Y0, -8), Vector2i(10, 10), 5, 2, false, -1)
+	_building(Vector3i(35, Y0, 6), Vector2i(10, 12), 3, 3, true, 1)
+	_building(Vector3i(67, Y0, -8), Vector2i(7, 26), 4, 4, false, 1)
+	_building(Vector3i(-59, Y0, -8), Vector2i(14, 26), 5, 5, false, 1)
+	_building(Vector3i(-8, Y0, -8), Vector2i(4, 10), 2, 0, true, -1)
+	_building(Vector3i(-25, Y0, -8), Vector2i(6, 10), 3, 1, true, -1)
+	_building(Vector3i(14, Y0, -36), Vector2i(10, 14), 4, 2, true, 1)
+	_building(Vector3i(59, Y0, -36), Vector2i(14, 14), 5, 3, false, 1)
+	_building(Vector3i(-59, Y0, -36), Vector2i(14, 14), 3, 4, true, 1)
+	_building(Vector3i(-8, Y0, -36), Vector2i(4, 14), 2, 5, true, 1)
+	_building(Vector3i(83, Y0, -8), Vector2i(12, 26), 6, 0, false, -1)
+
+
+func _connect_sets() -> void:
+	# Setlerin bahçe yolları caddelere bağlansın.
+	var o := Vector3i(0, Y0, 0)
+	_fill(o, Vector3i(4, -1, 17), Vector3i(4, -1, 22), Blocks.GRAVEL)
+	_fill(o, Vector3i(55, -1, 20), Vector3i(56, -1, 22), Blocks.GRAVEL)
+	_fill(o, Vector3i(-34, -1, 15), Vector3i(-34, -1, 22), Blocks.GRAVEL)
+	_fill(o, Vector3i(5, -1, -22), Vector3i(5, -1, -19), Blocks.GRAVEL)
+
+
+func _near_street(x: int) -> bool:
+	for sx: int in STREETS_X:
+		if x >= sx - 3 and x <= sx + 6:
+			return true
+	return false
+
+
+func _near_avenue(z: int) -> bool:
+	for az: int in AVENUES_Z:
+		if z >= az - 3 and z <= az + 6:
+			return true
+	return false
+
+
+## Bir sıra bina: from.x'ten to.x'e, cephesi caddeye (face: -1 kuzey sırası güneye bakar, 1 güney sırası kuzeye).
+func _row(from: Vector2i, to: Vector2i, face: int) -> void:
+	var x := from.x
+	var k := hash(from) % 7
+	while x + 8 <= to.x:
+		var w := 8 + (k % 3) * 2
+		if x + w > to.x:
+			w = to.x - x
+		var depth := 10
+		var z := from.y if face == -1 else from.y - depth + 1
+		_building(Vector3i(x, Y0, z), Vector2i(w, depth), 3 + (k * 5) % 4, k, k % 2 == 0, face)
+		x += w + 2
+		k += 1
+
+
+## Apartman: her kat 4 blok; pencereler, düz çatı ve korkuluk. shop=true ise zemin kat camlı dükkân ve tente.
+## face: kapının olduğu cephe (-1: düşük z tarafı, 1: yüksek z tarafı).
+func _building(c: Vector3i, size: Vector2i, floors: int, style: int, shop: bool, face: int) -> void:
+	var wall: int = WALLS[posmod(style, WALLS.size())]
+	var h := floors * 4
+	var o := Vector3i.ZERO
+	var a := c
+	var b := c + Vector3i(size.x - 1, h - 1, size.y - 1)
+	_fill(o, Vector3i(a.x, a.y - 1, a.z), Vector3i(b.x, a.y - 1, b.z), Blocks.CONCRETE)
+	_walls(o, a, b, wall)
+	for f in floors:
+		var fy := a.y + f * 4
+		if f > 0:
+			_fill(o, Vector3i(a.x + 1, fy - 1, a.z + 1), Vector3i(b.x - 1, fy - 1, b.z - 1), Blocks.PLANKS)
+		# Pencereler (her iki blokta bir, iki blok yüksek).
+		for x in range(a.x + 1, b.x, 2):
+			_fill(o, Vector3i(x, fy + 1, a.z), Vector3i(x, fy + 2, a.z), Blocks.GLASS)
+			_fill(o, Vector3i(x, fy + 1, b.z), Vector3i(x, fy + 2, b.z), Blocks.GLASS)
+		for z in range(a.z + 1, b.z, 2):
+			_fill(o, Vector3i(a.x, fy + 1, z), Vector3i(a.x, fy + 2, z), Blocks.GLASS)
+			_fill(o, Vector3i(b.x, fy + 1, z), Vector3i(b.x, fy + 2, z), Blocks.GLASS)
+		# Kat arası kuşak.
+		_walls(o, Vector3i(a.x, fy + 3, a.z), Vector3i(b.x, fy + 3, b.z), Blocks.CONCRETE if wall != Blocks.CONCRETE else Blocks.STONE)
+	# Çatı ve korkuluk, çatıda su deposu.
+	_fill(o, Vector3i(a.x, b.y + 1, a.z), Vector3i(b.x, b.y + 1, b.z), Blocks.CONCRETE)
+	_walls(o, Vector3i(a.x, b.y + 2, a.z), Vector3i(b.x, b.y + 2, b.z), Blocks.STONE)
+	_put(Vector3i(a.x + 2, b.y + 2, a.z + 2), Blocks.FURNACE)
+	var fz := a.z if face == -1 else b.z
+	var out := -1 if face == -1 else 1
+	var mid := a.x + size.x / 2
+	if shop:
+		# Camlı vitrin, çizgili tente, içi ışıklı.
+		_fill(o, Vector3i(a.x + 1, a.y, fz), Vector3i(b.x - 1, a.y + 2, fz), Blocks.GLASS)
+		var awning: int = [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_BLUE, Blocks.TOY_BRICK_YELLOW][posmod(style, 3)]
+		for x in range(a.x, b.x + 1):
+			_put(Vector3i(x, a.y + 3, fz + out), awning if x % 2 == 0 else Blocks.SNOW)
+		_put(Vector3i(mid, a.y + 2, fz - out), Blocks.CEILING_LIGHT)
+		_fill(o, Vector3i(a.x + 1, a.y, fz - out * (size.y - 2)), Vector3i(b.x - 1, a.y + 1, fz - out * (size.y - 2)), Blocks.BOOKSHELF)
+	_fill(o, Vector3i(mid, a.y, fz), Vector3i(mid, a.y + 1, fz), Blocks.AIR)
+	_put(Vector3i(mid, a.y + 2, fz + out), Blocks.LANTERN)
+
+
+func _lamp(p: Vector3i) -> void:
+	_fill(Vector3i.ZERO, p, p + Vector3i(0, 3, 0), Blocks.STONE)
+	_put(p + Vector3i(0, 4, 0), Blocks.LANTERN)
+
+
+func _tree(p: Vector3i) -> void:
+	_fill(Vector3i.ZERO, p, p + Vector3i(0, 3, 0), Blocks.LOG)
+	_fill(Vector3i.ZERO, p + Vector3i(-1, 3, -1), p + Vector3i(1, 5, 1), Blocks.LEAVES)
+	_put(p + Vector3i(0, 3, 0), Blocks.LOG)
+
+
+## Basit blok araba: renkli gövde, camlı kabin, koyu tekerlek izi. along_x: yol doğu-batı.
+func _car(p: Vector3i, color: int, along_x: bool) -> void:
+	var l := Vector3i(3, 0, 1) if along_x else Vector3i(1, 0, 3)
+	_fill(Vector3i.ZERO, p, p + l, color)
+	var cab := p + (Vector3i(1, 1, 0) if along_x else Vector3i(0, 1, 1))
+	_fill(Vector3i.ZERO, cab, cab + (Vector3i(1, 0, 1) if along_x else Vector3i(1, 0, 1)), Blocks.GLASS)

@@ -45,6 +45,10 @@ enum {
 	RUG,
 	DARK_PLANKS,
 	FLOWERS,
+	ASPHALT,
+	ROAD_LINE,
+	SIDEWALK,
+	CONCRETE,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -92,6 +96,10 @@ const DEFS := {
 	RUG: {"name": "Halı", "all": "rug"},
 	DARK_PLANKS: {"name": "Koyu Tahta", "all": "dark_planks"},
 	FLOWERS: {"name": "Çiçek", "all": "flowers", "transparent": true},
+	ASPHALT: {"name": "Asfalt", "all": "asphalt"},
+	ROAD_LINE: {"name": "Yol Çizgisi", "all": "road_line"},
+	SIDEWALK: {"name": "Kaldırım", "all": "sidewalk"},
+	CONCRETE: {"name": "Beton", "all": "concrete"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -142,6 +150,10 @@ const PLACEHOLDER_COLORS := {
 	"rug": Color("b3262e"),
 	"dark_planks": Color("5a3b22"),
 	"flowers": Color("3f8a2e"),
+	"asphalt": Color("3a3c40"),
+	"road_line": Color("3a3c40"),
+	"sidewalk": Color("b9b5ad"),
+	"concrete": Color("9ea3a8"),
 }
 
 
