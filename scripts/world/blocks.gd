@@ -39,6 +39,12 @@ enum {
 	BED,
 	CHEST,
 	BERRY_BUSH,
+	PLASTER,
+	ROOF_TILE,
+	BOOKSHELF,
+	RUG,
+	DARK_PLANKS,
+	FLOWERS,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -80,6 +86,12 @@ const DEFS := {
 	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks"},
 	BERRY_BUSH: {"name": "Çilek Çalısı", "all": "berry_bush", "transparent": true},
 	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks"},
+	PLASTER: {"name": "Sıva Duvar", "all": "plaster"},
+	ROOF_TILE: {"name": "Kiremit", "all": "roof_tile"},
+	BOOKSHELF: {"name": "Kitaplık", "top": "planks", "side": "bookshelf", "bottom": "planks"},
+	RUG: {"name": "Halı", "all": "rug"},
+	DARK_PLANKS: {"name": "Koyu Tahta", "all": "dark_planks"},
+	FLOWERS: {"name": "Çiçek", "all": "flowers", "transparent": true},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
@@ -124,6 +136,12 @@ const PLACEHOLDER_COLORS := {
 	"chest_top": Color("a8733e"),
 	"berry_bush": Color("3f7a2a"),
 	"chest_side": Color("a8733e"),
+	"plaster": Color("efe8d8"),
+	"roof_tile": Color("b8452e"),
+	"bookshelf": Color("6b4a2a"),
+	"rug": Color("b3262e"),
+	"dark_planks": Color("5a3b22"),
+	"flowers": Color("3f8a2e"),
 }
 
 

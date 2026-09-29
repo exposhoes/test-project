@@ -36,3 +36,12 @@ Pixel art front-facing square face of a friendly young doctor for a blocky voxel
 
 F10. bakkal_face.png
 Pixel art front-facing square face of a cheerful elderly neighborhood shopkeeper for a blocky voxel game, peach skin, short grey hair, thick grey mustache, twinkling kind eyes, big smile, flat colors, crisp hard pixel edges, fills the whole square, 64x64
+
+## Yeni set blokları (32x32 piksel, dosya adı assets/textures/blocks/<ad>.png)
+
+- **plaster.png**: `32x32 pixel art Minecraft-style seamless block texture, warm off-white plaster wall with subtle rough speckles, flat lighting, no border`
+- **roof_tile.png**: `32x32 pixel art Minecraft-style seamless block texture, overlapping terracotta red clay roof tiles in staggered rows, flat lighting`
+- **bookshelf.png**: `32x32 pixel art Minecraft-style block texture, wooden bookshelf front with two shelves of colorful book spines, flat lighting`
+- **rug.png**: `32x32 pixel art Minecraft-style seamless block texture, red Turkish carpet with golden border and diamond pattern, top view, flat lighting`
+- **dark_planks.png**: `32x32 pixel art Minecraft-style seamless block texture, dark walnut wooden floor planks, horizontal boards, flat lighting`
+- **flowers.png**: `32x32 pixel art Minecraft-style sprite on transparent background, small cluster of pink, yellow, white and purple flowers with green stems`

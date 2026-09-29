@@ -111,5 +111,26 @@ func _placeholder(texture_name: String) -> Image:
 				c = base.darkened(0.12)
 			elif texture_name.begins_with("toy_brick") and Vector2(x % 16, y % 16).distance_to(Vector2(8, 8)) < 4.5:
 				c = base.lightened(0.2)
+			elif texture_name == "roof_tile":
+				# Üst üste binen kiremit sıraları.
+				var row := y / 6
+				c = base.darkened(0.35) if y % 6 == 5 or (x + row * 4) % 8 == 0 else base.lightened(0.08 * (y % 6) / 5.0)
+			elif texture_name == "bookshelf":
+				var shelf := y % 16 < 2 or x < 2 or x >= TILE - 2
+				var book_colors: Array[Color] = [Color("c0392b"), Color("2e86c1"), Color("27ae60"), Color("f1c40f"), Color("8e44ad"), Color("e67e22")]
+				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.1) if shelf else book_colors[(x / 3 + (y / 16) * 2) % book_colors.size()].darkened(0.1 if x % 3 == 0 else 0.0)
+			elif texture_name == "rug":
+				var border := x < 3 or y < 3 or x >= TILE - 3 or y >= TILE - 3
+				var diamond: bool = absi(x - TILE / 2) + absi(y - TILE / 2) in [8, 9]
+				c = Color("e0b040") if border or diamond else base.darkened(rng.randf_range(0.0, 0.08))
+			elif texture_name == "dark_planks" and y % 8 == 0:
+				c = base.darkened(0.35)
+			elif texture_name == "plaster":
+				c = base.darkened(rng.randf_range(0.0, 0.06))
+			elif texture_name == "flowers":
+				var stem := x % 8 == 4 and y > 12
+				var bloom := Vector2(x % 8, y).distance_to(Vector2(4, 10)) < 2.5
+				var petal: Color = [Color("ff5a8a"), Color("ffd23f"), Color("ffffff"), Color("b07aff")][(x / 8) % 4]
+				c = petal if bloom else (base if stem or y > 26 else Color.TRANSPARENT)
 			img.set_pixel(x, y, c)
 	return img
