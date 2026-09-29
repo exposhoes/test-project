@@ -103,6 +103,31 @@ const LIST := [
 			{"title": "Yalan söyleyen yakalanır!", "t": 2.5},
 		],
 	},
+	{
+		"id": "odev", "name": "Bölüm 4: Ödevi Köpek Yedi", "set": "okul", "time": 0.35,
+		"steps": [
+			{"place": "ogretmen", "at": "okul.tahta", "look": "okul.sinif_kapi"},
+			{"place": "ali", "at": "okul.sira_1", "look": "okul.tahta"},
+			{"place": "zeynep", "at": "okul.sira_2", "look": "okul.tahta"},
+			{"place": "emir", "at": "okul.sira_3", "look": "okul.tahta"},
+			{"cam": "okul.kam_sinif", "look": "okul.tahta", "t": 0},
+			{"title": "EmirCRAFT\nBölüm 4: Ödevi Köpek Yedi", "t": 2.5},
+			{"say": "ogretmen", "text": "Günaydın çocuklar! Ödevlerinizi toplayalım."},
+			{"say": "zeynep", "text": "Buyurun öğretmenim, iki sayfa yazdım!"},
+			{"say": "ogretmen", "text": "Aferin Zeynep! Ali, senin ödevin?"},
+			{"say": "ali", "text": "Öğretmenim... Ödevimi köpeğim yedi!"},
+			{"say": "ogretmen", "text": "Ali, senin köpeğin yok ki."},
+			{"say": "ali", "text": "Eee... Komşunun köpeği! Çok acıkmıştı!"},
+			{"cam": "okul.kam_tahta", "look": "okul.sira_3", "t": 1.0},
+			{"say": "ogretmen", "text": "Peki Emir, senin ödevin nerede?"},
+			{"say": "emir", "text": "Benimki burada öğretmenim! Ama biraz... ıslak."},
+			{"say": "ogretmen", "text": "Islak mı? Ne oldu ona?"},
+			{"say": "emir", "text": "Ali'nin komşusunun köpeği onu da yalamış!"},
+			{"say": "zeynep", "text": "Hahaha! O köpek bütün sınıfın ödevini yiyecek!"},
+			{"say": "ogretmen", "text": "Tamam, tamam! Yarın ödevler kuru ve eksiksiz gelsin!"},
+			{"title": "Ödevini zamanında yap,\nköpeğe fırsat verme!", "t": 3.0},
+		],
+	},
 ]
 
 
