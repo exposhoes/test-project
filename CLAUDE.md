@@ -44,6 +44,7 @@ design/, production/          şablonun tasarım/üretim belgeleri
 ```
 godot --headless --path . --script res://tests/smoke_test.gd
 godot --headless --path . --script res://tests/save_test.gd
+godot --headless --path . --script res://tests/film_test.gd
 ```
 Yeni `class_name` eklediysen önce `godot --headless --path . --import` çalıştır.
 

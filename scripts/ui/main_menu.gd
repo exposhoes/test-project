@@ -2,6 +2,7 @@ extends Node3D
 ## Ana menü: arkada dönen kamerayla birkaç yaratık, önde Devam Et / Yeni Dünya.
 
 const GAME_SCENE := "res://scenes/main.tscn"
+const FILM_SCENE := "res://scenes/film.tscn"
 const SHOWCASE := ["tokmak", "lavabo", "ekran", "mercek", "basbekci", "tuylupasa", "bosluk"]
 
 var _panel := MenuPanel.new()
@@ -42,6 +43,8 @@ func _refresh() -> void:
 		if has_save:
 			buttons.append({"label": "Devam Et", "action": _continue})
 		buttons.append({"label": "Yeni Dünya", "action": _ask_new_world if has_save else _new_world})
+		buttons.append({"label": "Film Stüdyosu", "action": func() -> void:
+			get_tree().change_scene_to_file(FILM_SCENE)})
 		buttons.append({"label": "Ayarlar", "action": func() -> void:
 			_settings = true
 			_refresh()})
