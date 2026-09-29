@@ -368,6 +368,32 @@ const LIST := [
 			{"title": "Senin hafta sonun nasıl geçiyor?", "t": 2.5},
 		],
 	},
+	{
+		"id": "sobe", "name": "Bölüm 9: Sobe!", "set": "okul", "time": 0.42,
+		"steps": [
+			{"place": "emir", "at": Vector3(55.0, 11, 1.8), "look": "okul.sinif_kapi"},
+			{"place": "ogretmen", "at": Vector3(54.5, 11, 2.8), "look": "okul.sinif_kapi"},
+			{"place": "ali", "at": "okul.bahce", "look": "okul.sinif_kapi"},
+			{"place": "zeynep", "at": "okul.top_alani", "look": "okul.bahce"},
+			{"cam": "okul.kam_bahce", "look": "okul.bahce", "t": 0},
+			{"title": "Sobe! (Teneffüs 2)", "t": 1.3},
+			{"say": "ali", "text": "Zeynep'i buldum! Sıra Emir'de..."},
+			{"walk": "ali", "to": "okul.sinif_kapi"},
+			{"cam": "okul.kam_sinif", "look": "okul.tahta", "t": 0},
+			{"say": "emir", "text": "(Öğretmenin arkasındayım, beni asla bulamaz!)"},
+			{"walk": "ali", "to": "okul.sira_3"},
+			{"say": "ali", "text": "Emir? Buralarda mısın?"},
+			{"say": "ogretmen", "text": "Ali, burada kimse yok. Sadece ben varım."},
+			{"say": "ali", "text": "Peki öğretmenim, arkanızdaki kırmızı tişört kimin?"},
+			{"zoom": 0.6},
+			{"say": "emir", "text": "Eyvah! Tişörtüm beni ele verdi!"},
+			{"say": "ali", "text": "Önüm arkam sağım solum SOBE!"},
+			{"shake": 0.4},
+			{"say": "ogretmen", "text": "Hahaha! Bir dahaki sefere yeşil giy Emir!"},
+			{"say": "emir", "text": "Not aldım: Kamuflaj önemli!"},
+			{"title": "Sen en iyi nereye saklanırdın?\nYorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 
