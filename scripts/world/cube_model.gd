@@ -7,6 +7,10 @@ class_name CubeModel
 const DEFS := {
 	Blocks.BOOKSHELF: {"texture": "res://assets/textures/models/bookshelf.png", "size": 1.0, "front": "all"},
 	Blocks.CHEST: {"texture": "res://assets/textures/models/chest.png", "size": 0.88, "front": "one"},
+	Blocks.FURNACE: {"texture": "res://assets/textures/models/furnace.png", "size": 1.0, "front": "one"},
+	# Altı açık masa: siyah arka plan şeffaf ("cutout"), alt yüz yok, blok yüksekliğinin %80'i.
+	Blocks.CRAFTING_TABLE: {"texture": "res://assets/textures/models/crafting_table.png", "size": 1.0,
+		"front": "one", "cutout": true, "height": 0.8},
 }
 ## Yatay yan yönleri, bit sırası: +X, -X, +Z, -Z.
 ## Dokudaki kare boyutu ve çevresindeki dolgu (tools/art/pack_model_texture.py ile aynı).
@@ -37,6 +41,7 @@ static func create(id: int, pos: Vector3i, is_open: Callable) -> Node3D:
 	var mi := MeshInstance3D.new()
 	mi.name = "Model"
 	mi.mesh = _mesh(id, mask)
+	mi.scale.y = DEFS[id].get("height", 1.0)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	return mi
 
@@ -54,6 +59,10 @@ static func _mesh(id: int, mask: int) -> ArrayMesh:
 			m.albedo_color = Color("8a5a32")
 		m.roughness = 0.55
 		m.texture_repeat = false
+		if DEFS[id].get("cutout", false):
+			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+			m.alpha_scissor_threshold = 0.5
+			m.cull_mode = BaseMaterial3D.CULL_DISABLED
 		_materials[id] = m
 	var size: float = DEFS[id]["size"]
 	var st := SurfaceTool.new()
@@ -63,7 +72,8 @@ static func _mesh(id: int, mask: int) -> ArrayMesh:
 		var d: Vector3i = SIDES[i]
 		_face(st, Vector3(d), 0 if (mask >> i) & 1 == 1 else 1, size)
 	_face(st, Vector3.UP, 2, size)
-	_face(st, Vector3.DOWN, 1, size)
+	if not DEFS[id].get("cutout", false):
+		_face(st, Vector3.DOWN, 1, size)
 	var mesh := st.commit()
 	mesh.surface_set_material(0, _materials[id])
 	_meshes[key] = mesh

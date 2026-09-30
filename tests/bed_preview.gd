@@ -22,6 +22,12 @@ func _initialize() -> void:
 	if args.has("oda"):  # "oda": sandıkları da gören geniş açı
 		cam_pos = FilmSets.point("ev.yatak") + Vector3(3.2, 1.9, 4.6)
 		look = FilmSets.point("ev.yatak") + Vector3(0.6, 0, 0.6)
+	if args.has("firin"):  # "firin": mutfaktaki fırın (ev 7,0,0)
+		cam_pos = FilmSets.point("ev.yatak") + Vector3(4.0, 1.4, 1.6)
+		look = FilmSets.point("ev.yatak") + Vector3(5.5, 0.4, -1.5)
+	if args.has("masa"):  # "masa": salondaki çalışma masası (ev 5,0,3)
+		cam_pos = FilmSets.point("ev.yatak") + Vector3(1.6, 1.3, 3.6)
+		look = FilmSets.point("ev.yatak") + Vector3(4.0, 0.3, 1.4)
 	studio._move_camera(cam_pos, look, 0)
 	while not studio.world.is_meshed_at(FilmSets.point("ev.yatak")):
 		await process_frame
