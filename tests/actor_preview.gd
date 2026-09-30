@@ -17,7 +17,7 @@ func _initialize() -> void:
 		studio.world.add_child(a)
 		a.position = base + Vector3((i - 1) * 1.15, 0, 0)
 		a.rotation.y = [PI, -PI / 2.0, 0.0][i]
-	var cam := base + Vector3(0, 1.1, 2.5)
+	var cam := base + (Vector3(0, 1.3, 4.2) if args.has("uzak") else Vector3(0, 1.1, 2.5))
 	studio._move_camera(cam, base + Vector3(0, 0.95, 0), 0)
 	while not studio.world.is_meshed_at(base):
 		await process_frame

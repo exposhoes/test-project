@@ -125,6 +125,8 @@ static func create(id: String) -> Actor:
 
 func _ready() -> void:
 	add_child(_body)
+	if _build_glb():
+		return
 	if _build_skin():
 		return
 	for part in data["parts"]:
@@ -149,6 +151,42 @@ func _ready() -> void:
 	face.rotation.y = PI
 	face.position = data["face"][1] + Vector3(0, 0, -0.005)
 	_body.add_child(face)
+
+
+## Tripo'dan gelen iskeletli, animasyonlu model (res://assets/models/<kod>.glb) varsa o kullanılır:
+## ~1.8 birim boya ölçeklenir, -Z'ye bakar; "walk" yürürken, "idle" dururken oynar.
+var _anim: AnimationPlayer
+
+func _build_glb() -> bool:
+	var path := "res://assets/models/" + actor_id + ".glb"
+	if not ResourceLoader.exists(path):
+		return false
+	var model: Node3D = load(path).instantiate()
+	_body.add_child(model)
+	var box := AABB()
+	var first := true
+	for mi: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+		var b: AABB = mi.global_transform * mi.get_aabb() if mi.is_inside_tree() else mi.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	var k := float(data.get("height", 1.8)) / maxf(box.size.y, 0.001)
+	model.scale = Vector3.ONE * k
+	model.position = Vector3(-box.get_center().x * k, -box.position.y * k, -box.get_center().z * k)
+	model.rotation.y = float(data.get("glb_turn", PI))
+	var players := model.find_children("*", "AnimationPlayer", true, false)
+	if not players.is_empty():
+		_anim = players[0]
+		for n in ["walk", "idle"]:
+			if _anim.has_animation(n):
+				_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+		_play("idle")
+	_face_idle = null
+	return true
+
+
+func _play(name: String) -> void:
+	if _anim and _anim.has_animation(name) and _anim.current_animation != name:
+		_anim.play(name, 0.2)
 
 
 ## Mehmet'in Roblox tarzı görünüm sayfasından üretilen kaplama (<kod>_skin.png + .json) varsa
@@ -387,6 +425,9 @@ func face_towards(point: Vector3) -> void:
 
 
 func _process(delta: float) -> void:
+	if _anim:
+		_play("walk" if _moving else "idle")
+		return
 	if talking:
 		_talk_timer += delta
 		_face_mat.albedo_texture = _face_talk if int(_talk_timer * 8.0) % 2 == 0 else _face_idle
