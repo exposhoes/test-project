@@ -49,20 +49,7 @@
      0.9907407407407407,
      0.1574074074074074
     ]
-   },
-   "mesh": "ogretmen_head.bin",
-   "mesh_texture": "ogretmen_head.png",
-   "mouth": [
-    0.0,
-    -0.1934,
-    -0.223
-   ],
-   "eyes": [],
-   "skin": [
-    205,
-    173,
-    146
-   ]
+   }
   },
   {
    "name": "torso",

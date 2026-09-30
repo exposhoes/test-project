@@ -17,6 +17,8 @@ SRC = os.path.join(os.path.dirname(__file__), "sources")
 OUT = "assets/textures/actors/"
 S = 1.8 / 620.0
 RES = 50
+## Küp kafalı tarzda saçı ayrı 3D parça yap (False: saç küpün yüzlerine çizili kalır — daha temiz).
+HAIR_3D = False
 CELL, PAD = 512, 24
 
 # kod: (sayfa, önden kutu, yandan kutu, arkadan kutu, burun sağda mı)
@@ -198,8 +200,9 @@ def build(code, sheet, fbox, sbox, bbox, nose_right, scale=None, cube=None):
         dz = ((sbox[0] + sbox[2]) / 2) - ((sz0 + sz1) / 2)
         off_z = (-dz if nose_right else dz) * S
         info["parts"] = [p for p in info["parts"] if p["name"] != "hair"]
-        info["parts"].append({"name": "hair", "mesh_res": code + "_head.res", "size": [W, H, D],
-                              "pos": [round(head["pos"][0] + off_x, 4), round(head["pos"][1] + off_y, 4), round(head["pos"][2] + off_z, 4)]})
+        if HAIR_3D:
+            info["parts"].append({"name": "hair", "mesh_res": code + "_head.res", "size": [W, H, D],
+                                  "pos": [round(head["pos"][0] + off_x, 4), round(head["pos"][1] + off_y, 4), round(head["pos"][2] + off_z, 4)]})
         hs = head["size"]
         head.pop("mesh", None)
         head["mouth"] = [0.0, round(-0.30 * hs[1], 4), round(-hs[2] / 2 - 0.004, 4)]
