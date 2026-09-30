@@ -9,6 +9,9 @@ const DEFS := {
 	Blocks.CHEST: {"texture": "res://assets/textures/models/chest.png", "size": 0.88, "front": "one"},
 }
 ## Yatay yan yönleri, bit sırası: +X, -X, +Z, -Z.
+## Dokudaki kare boyutu ve çevresindeki dolgu (tools/art/pack_model_texture.py ile aynı).
+const CELL := 512.0
+const PAD := 32.0
 const SIDES := [Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1)]
 
 static var _materials := {}  # blok -> malzeme
@@ -50,6 +53,7 @@ static func _mesh(id: int, mask: int) -> ArrayMesh:
 		else:
 			m.albedo_color = Color("8a5a32")
 		m.roughness = 0.55
+		m.texture_repeat = false
 		_materials[id] = m
 	var size: float = DEFS[id]["size"]
 	var st := SurfaceTool.new()
@@ -72,13 +76,16 @@ static func _face(st: SurfaceTool, n: Vector3, region: int, size: float) -> void
 	var right := up.cross(n)  # dışarıdan bakınca sağ
 	var h := size * 0.5
 	var c := Vector3(0.5, h, 0.5) + n * h
-	var u0 := region / 3.0
-	var u1 := (region + 1) / 3.0
+	var w := CELL + 2.0 * PAD
+	var u0 := (region * w + PAD) / (3.0 * w)
+	var u1 := (region * w + PAD + CELL) / (3.0 * w)
+	var v0 := PAD / w
+	var v1 := (PAD + CELL) / w
 	var corners := [
-		[c - right * h + up * h, Vector2(u0, 0)],
-		[c + right * h + up * h, Vector2(u1, 0)],
-		[c + right * h - up * h, Vector2(u1, 1)],
-		[c - right * h - up * h, Vector2(u0, 1)],
+		[c - right * h + up * h, Vector2(u0, v0)],
+		[c + right * h + up * h, Vector2(u1, v0)],
+		[c + right * h - up * h, Vector2(u1, v1)],
+		[c - right * h - up * h, Vector2(u0, v1)],
 	]
 	for k: int in [0, 1, 2, 0, 2, 3]:
 		st.set_normal(n)
