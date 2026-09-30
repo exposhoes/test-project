@@ -4,10 +4,42 @@ Actor.gd bu dosyalar varsa renkli kutular yerine bunları kullanır.
 Çalıştır: python3 tools/art/build_actor.py"""
 import json, os, sys
 from PIL import Image, ImageFilter
+sys.path.insert(0, os.path.dirname(__file__))
+from pack_model_texture import cutout
 
 SRC = os.path.join(os.path.dirname(__file__), "sources")
 OUT = "assets/textures/actors/"
 CELL, PAD = 256, 16
+
+
+def cutout_bg(img, dark=28):
+    """Yalnızca kenardan bağlı siyah arka planı şeffaf yapar (gözbebekleri gibi iç koyuluklar kalır),
+    sonra kenarı 2 piksel içeri alıp şeffaf piksellerin rengini komşu renkle doldurur."""
+    img = img.convert("RGBA")
+    w, h = img.size
+    px = img.load()
+    seen = bytearray(w * h)
+    stack = [(x, y) for x in range(w) for y in (0, h - 1)] + [(x, y) for y in range(h) for x in (0, w - 1)]
+    while stack:
+        x, y = stack.pop()
+        if x < 0 or y < 0 or x >= w or y >= h or seen[y * w + x]:
+            continue
+        seen[y * w + x] = 1
+        r, g, b, _ = px[x, y]
+        if max(r, g, b) >= dark:
+            continue
+        px[x, y] = (r, g, b, 0)
+        stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    alpha = img.getchannel("A").filter(ImageFilter.MinFilter(5))
+    solid = img.copy()
+    solid.putalpha(alpha)
+    fill = None
+    for radius in (3, 10, 30):
+        blurred = solid.filter(ImageFilter.GaussianBlur(radius))
+        fill = blurred if fill is None else Image.alpha_composite(blurred, fill)
+    out = Image.alpha_composite(fill, solid).convert("RGB")
+    out.putalpha(alpha)
+    return out
 
 
 def fill_black(img, dark=28):
@@ -44,9 +76,14 @@ def build(code, sheet, parts, height=1.8):
             else:
                 box, mirror = spec, False
             x0, y0, x1, y1 = box
-            if x1 - x0 > 60 and y1 - y0 > 60:  # kutu kenarındaki parlamayı at
-                box = (x0 + 6, y0 + 6, x1 - 6, y1 - 6)
-            crop = fill_black(im.crop(box))
+            if p["name"] == "head" and f not in ("top", "bottom"):
+                # Kafa: siyah arka plan şeffaf, kafa saçın gerçek biçiminde görünür.
+                crop = cutout_bg(im.crop(box))
+            else:
+                if x1 - x0 > 60 and y1 - y0 > 60:  # yuvarlak kenardaki parlak şeridi at
+                    k = max(10, min(x1 - x0, y1 - y0) // 9)
+                    box = (x0 + k, y0 + k, x1 - k, y1 - k)
+                crop = fill_black(im.crop(box)).convert("RGBA")
             if mirror:
                 crop = crop.transpose(Image.FLIP_LEFT_RIGHT)
             if rot:
@@ -57,7 +94,7 @@ def build(code, sheet, parts, height=1.8):
     cols = 6
     rows = (len(cells) + cols - 1) // cols
     w = CELL + 2 * PAD
-    atlas = Image.new("RGB", (cols * w, rows * w))
+    atlas = Image.new("RGBA", (cols * w, rows * w))
     for i, c in enumerate(cells):
         x, y = (i % cols) * w, (i // cols) * w
         big = c.resize((w, w), Image.NEAREST)  # dolgu için kenarı uzat

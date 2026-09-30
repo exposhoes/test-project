@@ -159,6 +159,9 @@ func _build_skin() -> bool:
 	mat.albedo_texture = load(tex_path)
 	mat.roughness = 0.6
 	mat.texture_repeat = false
+	# Kafa yüzlerinde saçın dışı şeffaf (tools/art/build_actor.py).
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	mat.alpha_scissor_threshold = 0.5
 	var head: Dictionary = {}
 	for p: Dictionary in info["parts"]:
 		var size := Vector3(p["size"][0], p["size"][1], p["size"][2])
