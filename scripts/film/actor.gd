@@ -166,7 +166,8 @@ func _build_skin() -> bool:
 	for p: Dictionary in info["parts"]:
 		var size := Vector3(p["size"][0], p["size"][1], p["size"][2])
 		var mi := MeshInstance3D.new()
-		mi.mesh = _skin_box(size, p["uv"], mat)
+		# Kafa belirgin yuvarlak, gövde/kol/bacak hafif yuvarlak köşeli (Roblox plastik oyuncak görünümü).
+		mi.mesh = _skin_box(size, p["uv"], mat, 0.3 if p["name"] == "head" else 0.2)
 		mi.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
 		_body.add_child(mi)
 		if p["name"] == "head":
@@ -190,31 +191,44 @@ func _build_skin() -> bool:
 	return true
 
 
-## Yüzleri ayrı UV bölgesi olan kutu: ön -Z (model -Z'ye bakar), arka +Z, "left" -X, "right" +X.
-static func _skin_box(size: Vector3, uv: Dictionary, mat: Material) -> ArrayMesh:
+## Yüzleri ayrı UV bölgesi olan, köşeleri yuvarlatılmış kutu: ön -Z (model -Z'ye bakar), arka +Z,
+## "left" -X, "right" +X. round: köşe yuvarlaklığı (0 keskin kutu, 1'e yakın neredeyse küre).
+## Her yüz ızgaraya bölünür, köşe noktaları iç kutudan dışarı doğru yuvarlanır ve normaller
+## yumuşak olduğu için gölge kenarlarda kırılmaz.
+static func _skin_box(size: Vector3, uv: Dictionary, mat: Material, round := 0.2) -> ArrayMesh:
+	const N := 10
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var faces := {"front": Vector3.FORWARD, "back": Vector3.BACK, "left": Vector3.LEFT,
 		"right": Vector3.RIGHT, "top": Vector3.UP, "bottom": Vector3.DOWN}
 	var h := size / 2.0
+	var r := clampf(round, 0.0, 0.95)
+	var inner := Vector3.ONE * (1.0 - r)
 	for f: String in faces:
 		var n: Vector3 = faces[f]
 		var up := Vector3.UP if absf(n.y) < 0.5 else (Vector3.FORWARD if n.y > 0 else Vector3.BACK)
 		var right := up.cross(n)
-		var c := n * h
-		var ex := (right * h).length()
-		var ey := (up * h).length()
-		var r: Array = uv[f]
-		var corners := [
-			[c - right * ex + up * ey, Vector2(r[0], r[1])],
-			[c + right * ex + up * ey, Vector2(r[2], r[1])],
-			[c + right * ex - up * ey, Vector2(r[2], r[3])],
-			[c - right * ex - up * ey, Vector2(r[0], r[3])],
-		]
-		for k: int in [0, 1, 2, 0, 2, 3]:
-			st.set_normal(n)
-			st.set_uv(corners[k][1])
-			st.add_vertex(corners[k][0])
+		var rect: Array = uv[f]
+		var verts := []
+		for j in N + 1:
+			for i in N + 1:
+				var a := float(i) / N * 2.0 - 1.0
+				var b := float(j) / N * 2.0 - 1.0
+				var p := n + right * a - up * b  # birim küp yüzeyi
+				var c := p.clamp(-inner, inner)
+				var d := p - c
+				var nn := d.normalized() if d.length() > 0.0001 else n
+				var q := c + nn * r
+				var normal := (nn / h).normalized()  # ölçeklenmiş kutuda doğru yön
+				var uvp := Vector2(lerpf(rect[0], rect[2], float(i) / N), lerpf(rect[1], rect[3], float(j) / N))
+				verts.append([q * h, normal, uvp])
+		for j in N:
+			for i in N:
+				var k := j * (N + 1) + i
+				for idx: int in [k, k + 1, k + N + 2, k, k + N + 2, k + N + 1]:
+					st.set_normal(verts[idx][1])
+					st.set_uv(verts[idx][2])
+					st.add_vertex(verts[idx][0])
 	var mesh := st.commit()
 	mesh.surface_set_material(0, mat)
 	return mesh
