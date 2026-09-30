@@ -166,6 +166,13 @@ func _build_skin() -> bool:
 	for p: Dictionary in info["parts"]:
 		var size := Vector3(p["size"][0], p["size"][1], p["size"][2])
 		var mi := MeshInstance3D.new()
+		if p.has("mesh"):
+			# Görünüm sayfasının silüetlerinden oyulmuş gerçek kafa (tools/art/build_heads.py).
+			mi.mesh = _load_head(FACE_DIR + String(p["mesh"]), FACE_DIR + String(p["mesh_texture"]))
+			mi.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
+			_body.add_child(mi)
+			head = {"size": size, "pos": mi.position, "mouth": p.get("mouth", [])}
+			continue
 		# Kafa belirgin yuvarlak, gövde/kol/bacak hafif yuvarlak köşeli (Roblox plastik oyuncak görünümü).
 		mi.mesh = _skin_box(size, p["uv"], mat, 0.3 if p["name"] == "head" else 0.2)
 		mi.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
@@ -186,7 +193,8 @@ func _build_skin() -> bool:
 	mouth.rotation.y = PI
 	if not head.is_empty():
 		var hs: Vector3 = head["size"]
-		mouth.position = head["pos"] + Vector3(0, -hs.y * float(data.get("mouth_y", 0.36)), -hs.z / 2.0 - 0.004)
+		var m: Array = head.get("mouth", [])
+		mouth.position = head["pos"] + (Vector3(m[0], m[1], m[2]) if m.size() == 3 else Vector3(0, -hs.y * float(data.get("mouth_y", 0.36)), -hs.z / 2.0 - 0.004))
 	_body.add_child(mouth)
 	return true
 
@@ -230,6 +238,36 @@ static func _skin_box(size: Vector3, uv: Dictionary, mat: Material, round := 0.2
 					st.set_uv(verts[idx][2])
 					st.add_vertex(verts[idx][0])
 	var mesh := st.commit()
+	mesh.surface_set_material(0, mat)
+	return mesh
+
+
+## build_heads.py çıktısı: float32 köşe sayısı, sonra köşe başına konum, normal, uv (8 float).
+static func _load_head(bin_path: String, tex_path: String) -> ArrayMesh:
+	var data := FileAccess.get_file_as_bytes(bin_path).to_float32_array()
+	var n := int(data[0])
+	var pos := PackedVector3Array()
+	var nor := PackedVector3Array()
+	var uvs := PackedVector2Array()
+	pos.resize(n)
+	nor.resize(n)
+	uvs.resize(n)
+	for i in n:
+		var k := 1 + i * 8
+		pos[i] = Vector3(data[k], data[k + 1], data[k + 2])
+		nor[i] = Vector3(data[k + 3], data[k + 4], data[k + 5])
+		uvs[i] = Vector2(data[k + 6], data[k + 7])
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = pos
+	arrays[Mesh.ARRAY_NORMAL] = nor
+	arrays[Mesh.ARRAY_TEX_UV] = uvs
+	var mesh := ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = load(tex_path)
+	mat.roughness = 0.55
+	mat.texture_repeat = false
 	mesh.surface_set_material(0, mat)
 	return mesh
 
