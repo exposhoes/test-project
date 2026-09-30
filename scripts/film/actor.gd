@@ -166,9 +166,11 @@ func _build_skin() -> bool:
 	for p: Dictionary in info["parts"]:
 		var size := Vector3(p["size"][0], p["size"][1], p["size"][2])
 		var mi := MeshInstance3D.new()
-		if p.has("mesh"):
-			# Görünüm sayfasının silüetlerinden oyulmuş gerçek kafa (tools/art/build_heads.py).
-			mi.mesh = _load_head(FACE_DIR + String(p["mesh"]), FACE_DIR + String(p["mesh_texture"]))
+		var head_res := FACE_DIR + actor_id + "_head.res"
+		if p["name"] == "head" and ResourceLoader.exists(head_res):
+			# Görünüm sayfasının silüetlerinden oyulmuş gerçek kafa (tools/art/build_heads.py,
+			# tools/bake_heads.gd ile .res'e çevrilir; .res Android paketine otomatik girer).
+			mi.mesh = load(head_res)
 			mi.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
 			_body.add_child(mi)
 			head = {"size": size, "pos": mi.position, "mouth": p.get("mouth", [])}

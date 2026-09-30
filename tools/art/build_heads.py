@@ -5,7 +5,8 @@ marching cubes ile yüzeye çevrilir. Her üçgen yönüne göre (ön/yan/arka) 
 kaplanır. Çıktı: assets/textures/actors/<kod>_head.bin (float32: köşe sayısı, sonra her köşe
 için konum xyz, normal xyz, uv) ve <kod>_head.png; <kod>_skin.json içindeki "head" parçasına
 "mesh" ve "mouth" alanları eklenir. Actor.gd bu dosya varsa kafa kutusu yerine bunu kullanır.
-Çalıştır: python3 tools/art/build_heads.py  (build_actor.py'den SONRA)"""
+Çalıştır: python3 tools/art/build_heads.py  (build_actor.py'den SONRA), ardından
+godot --headless --path . --script res://tools/bake_heads.gd (.bin -> .res; oyun .res kullanır)."""
 import json, os, struct
 import numpy as np
 from PIL import Image, ImageFilter
