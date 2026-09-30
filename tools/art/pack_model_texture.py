@@ -7,6 +7,26 @@ from PIL import Image
 CELL, PAD = 512, 32
 
 
+def trim_edges(img: Image.Image, extra: int = 6, limit: int = 24) -> Image.Image:
+    """Kenardaki parlak (kenar parlaması) ya da siyah (arka plan) satır/sütunları kırpar, sonra
+    `extra` piksel daha içeri girer. Böylece bloğun kenarlarında beyaz/koyu çizgi kalmaz."""
+    img = img.convert("RGB")
+    w, h = img.size
+    px = img.load()
+
+    def bad(vals):
+        m = sum(sum(v) / 3 for v in vals) / len(vals)
+        return m > 175 or m < 35
+
+    l, t, r, b = 0, 0, w, h
+    for _ in range(limit):
+        if bad([px[l, y] for y in range(t, b)]): l += 1
+        if bad([px[r - 1, y] for y in range(t, b)]): r -= 1
+        if bad([px[x, t] for x in range(l, r)]): t += 1
+        if bad([px[x, b - 1] for x in range(l, r)]): b -= 1
+    return img.crop((l + extra, t + extra, r - extra, b - extra))
+
+
 def padded(img: Image.Image) -> Image.Image:
     img = img.convert("RGBA").resize((CELL, CELL), Image.LANCZOS)
     out = Image.new("RGBA", (CELL + 2 * PAD, CELL + 2 * PAD))
@@ -32,7 +52,7 @@ def cutout(img: Image.Image, dark: int = 28) -> Image.Image:
                 px[x, y] = (r, g, b, 0)
     # Kenardaki açık renkli kenar yumuşatma piksellerini at (beyaz hale bırakmasın).
     from PIL import ImageFilter
-    alpha = img.getchannel("A").filter(ImageFilter.MinFilter(5))
+    alpha = img.getchannel("A").filter(ImageFilter.MinFilter(9))
     # Şeffaf piksellerin rengini komşu ahşap rengiyle doldur (uzaktan koyu/açık sızma olmasın).
     solid = img.copy()
     solid.putalpha(alpha)

@@ -157,7 +157,7 @@ func _refresh_model(pos: Vector3i) -> void:
 		_models[pos] = node
 
 
-const MODEL_BLOCKS := [Blocks.BED, Blocks.BOOKSHELF, Blocks.CHEST, Blocks.CRAFTING_TABLE, Blocks.FURNACE]
+const MODEL_BLOCKS := [Blocks.BED, Blocks.BOOKSHELF, Blocks.CHEST, Blocks.CRAFTING_TABLE, Blocks.FURNACE, Blocks.LANTERN]
 
 
 ## Chunk ilk kez mesh'lenirken içindeki model bloklarını kurar.

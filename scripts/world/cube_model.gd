@@ -8,6 +8,9 @@ const DEFS := {
 	Blocks.BOOKSHELF: {"texture": "res://assets/textures/models/bookshelf.png", "size": 1.0, "front": "all"},
 	Blocks.CHEST: {"texture": "res://assets/textures/models/chest.png", "size": 0.88, "front": "one"},
 	Blocks.FURNACE: {"texture": "res://assets/textures/models/furnace.png", "size": 1.0, "front": "one"},
+	# Fener: her yandan görünür, küçük, yanan (hafif ışıma), altı kapalı.
+	Blocks.LANTERN: {"texture": "res://assets/textures/models/lantern.png", "size": 0.62, "front": "all",
+		"cutout": true, "bottom": true, "glow": 0.35, "hang": true},
 	# Altı açık masa: siyah arka plan şeffaf ("cutout"), alt yüz yok, blok yüksekliğinin %80'i.
 	Blocks.CRAFTING_TABLE: {"texture": "res://assets/textures/models/crafting_table.png", "size": 1.0,
 		"front": "one", "cutout": true, "height": 0.8},
@@ -38,12 +41,17 @@ static func create(id: int, pos: Vector3i, is_open: Callable) -> Node3D:
 				break
 	if mask == 0 and DEFS[id]["front"] == "one":
 		mask = 1 << 2  # her yan kapalıysa +Z
+	var root := Node3D.new()
+	root.name = "Model"
 	var mi := MeshInstance3D.new()
-	mi.name = "Model"
 	mi.mesh = _mesh(id, mask)
 	mi.scale.y = DEFS[id].get("height", 1.0)
+	# "hang": üstü doluysa (tavan) bloğun üstüne yaslanır, tavana asılı görünür.
+	if DEFS[id].get("hang", false) and not is_open.call(pos + Vector3i.UP):
+		mi.position.y = 1.0 - float(DEFS[id]["size"])
+	root.add_child(mi)
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	return mi
+	return root
 
 
 static func _mesh(id: int, mask: int) -> ArrayMesh:
@@ -63,6 +71,10 @@ static func _mesh(id: int, mask: int) -> ArrayMesh:
 			m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 			m.alpha_scissor_threshold = 0.5
 			m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		if DEFS[id].has("glow"):
+			m.emission_enabled = true
+			m.emission_texture = m.albedo_texture
+			m.emission_energy_multiplier = DEFS[id]["glow"]
 		_materials[id] = m
 	var size: float = DEFS[id]["size"]
 	var st := SurfaceTool.new()
@@ -72,8 +84,8 @@ static func _mesh(id: int, mask: int) -> ArrayMesh:
 		var d: Vector3i = SIDES[i]
 		_face(st, Vector3(d), 0 if (mask >> i) & 1 == 1 else 1, size)
 	_face(st, Vector3.UP, 2, size)
-	if not DEFS[id].get("cutout", false):
-		_face(st, Vector3.DOWN, 1, size)
+	if not DEFS[id].get("cutout", false) or DEFS[id].get("bottom", false):
+		_face(st, Vector3.DOWN, 2, size)
 	var mesh := st.commit()
 	mesh.surface_set_material(0, _materials[id])
 	_meshes[key] = mesh
