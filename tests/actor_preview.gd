@@ -21,8 +21,24 @@ func _initialize() -> void:
 	studio._move_camera(cam, base + Vector3(0, 0.95, 0), 0)
 	while not studio.world.is_meshed_at(base):
 		await process_frame
-	for i in 60:
+	for i in 50:
 		await process_frame
+	if args.has("yuru"):  # "yuru": yürüme anı (kol/bacak sallanır) ve gözler kapalı
+		for a in studio.world.get_children():
+			if a is Actor:
+				a._moving = true
+				a._walk_phase = 1.3
+				a._blink_timer = 0.11
+		for i in 3:
+			await process_frame
+		for a in studio.world.get_children():
+			if a is Actor:
+				a.set_process(false)
+				for lid in a._lids:
+					lid.visible = true  # göz kırpma anı
+	else:
+		for i in 10:
+			await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out)
 	print("saved ", out)

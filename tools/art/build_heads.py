@@ -21,7 +21,8 @@ CELL, PAD = 512, 24
 
 # kod: (sayfa, önden kutu, yandan kutu, arkadan kutu, burun sağda mı)
 HEADS = {
-    "emir": ("emir.png", (183, 91, 353, 266), (615, 91, 787, 266), (1033, 91, 1203, 266), False),
+    "emir": ("emir2.png", (238, 298, 622, 686), (1030, 303, 1370, 686), (1779, 298, 2163, 686), True, 1.8 / 1220.0,
+             {"front": (290, 399, 577, 686), "side": (1076, 399, 1364, 686)}),
     "ali": ("ali.png", (187, 106, 352, 280), (615, 104, 783, 280), (1037, 106, 1202, 280), False),
     "anne": ("anne.png", (183, 106, 358, 272), (612, 105, 788, 272), (1033, 106, 1208, 272), False),
     "zeynep": ("zeynep.png", (200, 98, 356, 306), (612, 98, 790, 306), (1016, 98, 1172, 306), False),
@@ -65,7 +66,11 @@ def mask_to(bg, shape_uv):
     return zoom(m, (shape_uv[0] / m.shape[0], shape_uv[1] / m.shape[1]), order=1) > 0.5
 
 
-def build(code, sheet, fbox, sbox, bbox, nose_right):
+def build(code, sheet, fbox, sbox, bbox, nose_right, scale=None, cube=None):
+    """cube: kafa küpünün önden/yandan piksel kutusu. Verilirse yalnızca küpün dışında kalan saç
+    oyulur ve "hair" parçası olarak eklenir; küpün kendisi build_actor.py'deki keskin "head" kutusudur."""
+    global S
+    S = scale or 1.8 / 620.0
     im = Image.open(os.path.join(SRC, sheet)).convert("RGB")
     views = {k: im.crop(b) for k, b in (("front", fbox), ("side", sbox), ("back", bbox))}
     bgs = {k: background(v) for k, v in views.items()}
@@ -85,8 +90,19 @@ def build(code, sheet, fbox, sbox, bbox, nose_right):
     back_x = Bk                     # arka görselde soldan sağa x artar
     side_z = Sd if not nose_right else Sd[:, ::-1]
     occ = (front_x.T[:, :, None] & back_x.T[:, :, None] & side_z[None, :, :]).astype(np.float32)
+    if cube:
+        # küp bölgesini (1 hücre içeriden) çıkar; saç küpün üstünde ve çevresinde kalır
+        fx0, fy0, fx1, fy1 = cube["front"]
+        sz0, _, sz1, _ = cube["side"]
+        gx = lambda px: (fbox[2] - px) / (fbox[2] - fbox[0]) * nx       # görsel sağı -X: indeks 0 = -X
+        gy = lambda py: (py - fbox[1]) / (fbox[3] - fbox[1]) * ny
+        gz = (lambda pz: (sbox[2] - pz) / (sbox[2] - sbox[0]) * nz) if nose_right else (lambda pz: (pz - sbox[0]) / (sbox[2] - sbox[0]) * nz)
+        i0, i1 = sorted((gx(fx0), gx(fx1)))
+        j0, j1 = gy(fy0), gy(fy1)
+        k0, k1 = sorted((gz(sz0), gz(sz1)))
+        occ[int(i0) + 1:int(np.ceil(i1)) - 1, int(j0) + 1:, int(k0) + 1:int(np.ceil(k1)) - 1] = 0
     occ = np.pad(occ, 2)
-    occ = gaussian_filter(occ, 1.6)
+    occ = gaussian_filter(occ, 1.2 if cube else 1.6)
     verts, faces, normals, _ = marching_cubes(occ, 0.5)
     verts -= 2
     # ızgara -> dünya (y ekseni ters: satır 0 en üst)
@@ -143,13 +159,63 @@ def build(code, sheet, fbox, sbox, bbox, nose_right):
     my = -0.36 * H
     near = P[(np.abs(P[:, 0]) < W * 0.08) & (np.abs(P[:, 1] - my) < H * 0.06)]
     mz = float(near[:, 2].min()) if len(near) else -D / 2
+    # gözler: ön görseldeki iki göz akı (parlak, yuvarlakça bölge) — göz kırpma kapakları için
+    from scipy.ndimage import label, find_objects
+    fa = np.asarray(views["front"]).astype(int)
+    hh, ww = fa.shape[:2]
+    white = (fa.min(axis=2) > 200) & ~bgs["front"]
+    lab, n = label(white)
+    cands = []
+    for idx, sl in enumerate(find_objects(lab), start=1):
+        ys, xs = sl
+        bh, bw = ys.stop - ys.start, xs.stop - xs.start
+        area = (lab[sl] == idx).sum()
+        cy_, cx_ = (ys.start + ys.stop) / 2 / hh, (xs.start + xs.stop) / 2 / ww
+        if not (0.25 < cy_ < 0.85 and 0.12 < cx_ < 0.88):
+            continue
+        if not (ww * 0.02 < bw < ww * 0.3 and hh * 0.03 < bh < hh * 0.3 and 0.4 < bw / bh < 2.5):
+            continue
+        cands.append((area, cx_, cy_, bw / ww, bh / hh))
+    cands.sort(reverse=True)
+    pair = sorted(cands[:2], key=lambda c: c[1]) if len(cands) >= 2 else []
+    eyes = []
+    for _, u, v, bu, bv in pair:
+        ex, ey = W / 2 - u * W, H / 2 - v * H
+        nearp = P[(np.abs(P[:, 0] - ex) < W * 0.06) & (np.abs(P[:, 1] - ey) < H * 0.06)]
+        ez = float(nearp[:, 2].min()) if len(nearp) else -D / 2
+        eyes.append([round(ex, 4), round(ey, 4), round(ez - 0.003, 4), round(bu * W * 1.25, 4), round(bv * H * 1.3, 4)])
+    cheek = fa[int(hh * 0.62):int(hh * 0.72), int(ww * 0.3):int(ww * 0.7)].reshape(-1, 3)
+    cheek = cheek[cheek.mean(axis=1) > 120]
+    skin = [int(c) for c in np.median(cheek, axis=0)] if len(cheek) else [240, 200, 160]
     js = OUT + code + "_skin.json"
     info = json.load(open(js))
+    if cube:
+        head = [p for p in info["parts"] if p["name"] == "head"][0]
+        fx0, fy0, fx1, fy1 = cube["front"]
+        sz0, _, sz1, _ = cube["side"]
+        off_x = -(((fbox[0] + fbox[2]) / 2) - ((fx0 + fx1) / 2)) * S
+        off_y = -(((fbox[1] + fbox[3]) / 2) - ((fy0 + fy1) / 2)) * S
+        dz = ((sbox[0] + sbox[2]) / 2) - ((sz0 + sz1) / 2)
+        off_z = (-dz if nose_right else dz) * S
+        info["parts"] = [p for p in info["parts"] if p["name"] != "hair"]
+        info["parts"].append({"name": "hair", "mesh_res": code + "_head.res", "size": [W, H, D],
+                              "pos": [round(head["pos"][0] + off_x, 4), round(head["pos"][1] + off_y, 4), round(head["pos"][2] + off_z, 4)]})
+        hs = head["size"]
+        head.pop("mesh", None)
+        head["mouth"] = [0.0, round(-0.30 * hs[1], 4), round(-hs[2] / 2 - 0.004, 4)]
+        head["eyes"] = [[round(e[0] + off_x, 4), round(e[1] + off_y, 4), round(-hs[2] / 2 - 0.003, 4), e[3], e[4]] for e in eyes]
+        head["skin"] = skin
+        info["sharp"] = True  # keskin kutulu tarz: köşeler yuvarlatılmaz
+        json.dump(info, open(js, "w"), indent=1)
+        print(code, len(arr) // 3, "üçgen (saç)")
+        return
     for part in info["parts"]:
         if part["name"] == "head":
             part["mesh"] = code + "_head.bin"
             part["mesh_texture"] = code + "_head.png"
             part["mouth"] = [0.0, round(my, 4), round(mz - 0.004, 4)]
+            part["eyes"] = []  # eski (yuvarlak kenarlı) görsellerde göz tespiti güvenilir değil
+            part["skin"] = skin
     json.dump(info, open(js, "w"), indent=1)
     print(code, len(arr) // 3, "üçgen")
 

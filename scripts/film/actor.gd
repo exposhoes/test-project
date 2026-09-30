@@ -105,6 +105,13 @@ var _face_idle: Texture2D
 var _face_talk: Texture2D
 var _talk_timer := 0.0
 var _walk_phase := 0.0
+## Kaplamalı modellerde omuz/kalça pivotları (yürürken sallanır) ve kafa düğümü.
+var _arms: Array[Node3D] = []
+var _legs: Array[Node3D] = []
+var _head_node: Node3D
+## Göz kırpma: göz üstüne ten renginde kapaklar; kısa süre görünür.
+var _lids: Array[MeshInstance3D] = []
+var _blink_timer := 2.0
 var _moving := false
 
 
@@ -167,20 +174,44 @@ func _build_skin() -> bool:
 		var size := Vector3(p["size"][0], p["size"][1], p["size"][2])
 		var mi := MeshInstance3D.new()
 		var head_res := FACE_DIR + actor_id + "_head.res"
-		if p["name"] == "head" and ResourceLoader.exists(head_res):
+		if p.has("mesh_res"):
+			# Küp kafanın üstündeki 3D saç (tools/art/build_heads.py, küp modu).
+			var hair := MeshInstance3D.new()
+			hair.mesh = load(FACE_DIR + String(p["mesh_res"]))
+			hair.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
+			_head_pivot().add_child(hair)
+			hair.position -= _head_pivot().position
+			continue
+		if p["name"] == "head" and p.has("mesh") and ResourceLoader.exists(head_res):
 			# Görünüm sayfasının silüetlerinden oyulmuş gerçek kafa (tools/art/build_heads.py,
 			# tools/bake_heads.gd ile .res'e çevrilir; .res Android paketine otomatik girer).
 			mi.mesh = load(head_res)
 			mi.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
 			_body.add_child(mi)
-			head = {"size": size, "pos": mi.position, "mouth": p.get("mouth", [])}
+			head = {"size": size, "pos": mi.position, "mouth": p.get("mouth", []), "eyes": p.get("eyes", []),
+				"skin": p.get("skin", [])}
+			continue
+		if p["name"] in ["arm", "leg"]:
+			# Omuzdan / kalçadan döner: pivot parçanın üst kenarında.
+			var pivot := Node3D.new()
+			pivot.position = Vector3(p["pos"][0], p["pos"][1] + size.y / 2.0, p["pos"][2])
+			_body.add_child(pivot)
+			mi.mesh = _skin_box(size, p["uv"], mat, 0.2 if not info.get("sharp", false) else 0.04)
+			mi.position = Vector3(0, -size.y / 2.0, 0)
+			pivot.add_child(mi)
+			(_arms if p["name"] == "arm" else _legs).append(pivot)
 			continue
 		# Kafa belirgin yuvarlak, gövde/kol/bacak hafif yuvarlak köşeli (Roblox plastik oyuncak görünümü).
-		mi.mesh = _skin_box(size, p["uv"], mat, 0.3 if p["name"] == "head" else 0.2)
+		var sharp: bool = info.get("sharp", false)
+		mi.mesh = _skin_box(size, p["uv"], mat, (0.04 if sharp else (0.3 if p["name"] == "head" else 0.2)))
+		if p["name"] == "head":
+			_head_pivot().position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
+			_head_node.add_child(mi)
+			head = {"size": size, "pos": _head_node.position, "mouth": p.get("mouth", []), "eyes": p.get("eyes", []),
+				"skin": p.get("skin", [])}
+			continue
 		mi.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
 		_body.add_child(mi)
-		if p["name"] == "head":
-			head = {"size": size, "pos": mi.position}
 	# Ağız: kafanın ön yüzünde, alt kısımda; boştayken görünmez.
 	_face_idle = _mouth_texture(false)
 	_face_talk = _mouth_texture(true)
@@ -197,8 +228,44 @@ func _build_skin() -> bool:
 		var hs: Vector3 = head["size"]
 		var m: Array = head.get("mouth", [])
 		mouth.position = head["pos"] + (Vector3(m[0], m[1], m[2]) if m.size() == 3 else Vector3(0, -hs.y * float(data.get("mouth_y", 0.36)), -hs.z / 2.0 - 0.004))
-	_body.add_child(mouth)
+	if _head_node and mouth.get_parent() == null:
+		mouth.position -= _head_node.position
+		_head_node.add_child(mouth)
+	elif mouth.get_parent() == null:
+		_body.add_child(mouth)
+	_add_lids(head)
 	return true
+
+
+## Kafa düğümü (küp kafa, saç, ağız ve göz kapakları bunun çocuğu; ileride kafa çevirme için).
+func _head_pivot() -> Node3D:
+	if _head_node == null:
+		_head_node = Node3D.new()
+		_body.add_child(_head_node)
+	return _head_node
+
+
+## Gözlerin üstüne ten rengi kapaklar (build_heads.py "eyes": x, y, z, en, boy ve "skin").
+func _add_lids(head: Dictionary) -> void:
+	var eyes: Array = head.get("eyes", [])
+	var skin: Array = head.get("skin", [])
+	if eyes.is_empty() or skin.size() < 3:
+		return
+	var lid_mat := StandardMaterial3D.new()
+	lid_mat.albedo_color = Color8(int(skin[0]), int(skin[1]), int(skin[2]))
+	var parent: Node3D = _head_node if _head_node else _body
+	var origin: Vector3 = Vector3.ZERO if _head_node else head["pos"]
+	for e: Array in eyes:
+		var lid := MeshInstance3D.new()
+		var q := QuadMesh.new()
+		q.size = Vector2(e[3], e[4])
+		q.material = lid_mat
+		lid.mesh = q
+		lid.rotation.y = PI
+		lid.position = origin + Vector3(e[0], e[1], e[2] - 0.001)
+		lid.visible = false
+		parent.add_child(lid)
+		_lids.append(lid)
 
 
 ## Yüzleri ayrı UV bölgesi olan, köşeleri yuvarlatılmış kutu: ön -Z (model -Z'ye bakar), arka +Z,
@@ -328,6 +395,20 @@ func _process(delta: float) -> void:
 	if _moving:
 		_walk_phase += delta * 12.0
 		_body.position.y = absf(sin(_walk_phase)) * 0.06
+	# Kol ve bacaklar yürürken zıt yönde sallanır, dururken yavaşça düzelir.
+	var swing := sin(_walk_phase) * 0.7 if _moving else 0.0
+	for i in _arms.size():
+		_arms[i].rotation.x = lerpf(_arms[i].rotation.x, swing * (1.0 if i % 2 == 0 else -1.0), minf(1.0, delta * 12.0))
+	for i in _legs.size():
+		_legs[i].rotation.x = lerpf(_legs[i].rotation.x, swing * (-1.0 if i % 2 == 0 else 1.0), minf(1.0, delta * 12.0))
+	# Göz kırpma: 2-5 saniyede bir, 0.12 saniye.
+	if not _lids.is_empty():
+		_blink_timer -= delta
+		var closed := _blink_timer < 0.12
+		for lid in _lids:
+			lid.visible = closed
+		if _blink_timer < 0.0:
+			_blink_timer = randf_range(2.0, 5.0)
 
 
 func _load_or_draw(talk: bool) -> Texture2D:

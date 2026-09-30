@@ -81,7 +81,7 @@ def build(code, sheet, parts, height=1.8):
                 crop = cutout_bg(im.crop(box))
             else:
                 if x1 - x0 > 60 and y1 - y0 > 60:  # yuvarlak kenardaki parlak şeridi at
-                    k = max(10, min(x1 - x0, y1 - y0) // 9)
+                    k = INSET if INSET else max(10, min(x1 - x0, y1 - y0) // 9)
                     box = (x0 + k, y0 + k, x1 - k, y1 - k)
                 crop = fill_black(im.crop(box)).convert("RGBA")
             if mirror:
@@ -110,6 +110,7 @@ def build(code, sheet, parts, height=1.8):
     print(code, atlas.size)
 
 
+INSET = None  # kenar kırpma (piksel); None: yuvarlak kenarlı görseller için orana göre
 S = 1.8 / 620.0   # piksel -> oyun birimi (görselde ayak ucu y=709)
 FOOT = 709
 
@@ -153,7 +154,6 @@ def boy(head, head_side, hair_top, torso_top, arm_top=281):
 
 
 B = 850
-build("emir", "emir.png", boy((183, 91, 353, 266), (615, 91, 787, 266), (1060, 100, 1180, 150), 262))
 build("ali", "ali.png", boy((187, 106, 352, 280), (615, 104, 783, 280), (1060, 115, 1180, 160), 282, 283))
 
 
@@ -289,3 +289,12 @@ def down(head, torso, arm_y, arm_l, arm_r, legs, side, back_dx, foot, nose_right
 build("bakkal", "bakkal.png", down((212, 114, 355, 250), (178, 250, 390, 560), (253, 475), (70, 178), (390, 495),
       (178, 284, 390, 560), {"head": (623, 114, 764, 250), "arm": (640, 253, 745, 475), "leg": (640, 562, 746, 690)},
       819, 690))
+
+
+# Emir (düz çizgi film tarzı, keskin kutular; 2400x1791 sayfa, burun sağda)
+S = 1.8 / 1220.0
+INSET = 9  # yalnızca siyah dış çizgiyi at
+# Kafa görseldeki gibi keskin bir küp (ten bloğu); saç build_heads.py ile ayrı 3D parça olur.
+build("emir", "emir2.png", down((290, 399, 577, 686), (254, 688, 611, 1103), (688, 1103), (78, 240), (625, 787),
+      (257, 433, 608, 1103), {"head": (1076, 399, 1364, 686), "arm": (1143, 700, 1291, 1100), "leg": (1145, 1106, 1291, 1512)},
+      1536, 1515, nose_right=True))
