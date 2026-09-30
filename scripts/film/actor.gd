@@ -118,6 +118,8 @@ static func create(id: String) -> Actor:
 
 func _ready() -> void:
 	add_child(_body)
+	if _build_skin():
+		return
 	for part in data["parts"]:
 		var mi := MeshInstance3D.new()
 		var mesh := BoxMesh.new()
@@ -140,6 +142,91 @@ func _ready() -> void:
 	face.rotation.y = PI
 	face.position = data["face"][1] + Vector3(0, 0, -0.005)
 	_body.add_child(face)
+
+
+## Mehmet'in Roblox tarzı görünüm sayfasından üretilen kaplama (<kod>_skin.png + .json) varsa
+## kafa, gövde, kollar ve bacaklar ondan kurulur (tools/art/build_actor.py). Konuşurken ağız
+## üstüne küçük bir koyu ağız açılır. Kaplama yoksa false döner, renkli kutular kullanılır.
+func _build_skin() -> bool:
+	var json_path := FACE_DIR + actor_id + "_skin.json"
+	var tex_path := FACE_DIR + actor_id + "_skin.png"
+	if not (FileAccess.file_exists(json_path) and ResourceLoader.exists(tex_path)):
+		return false
+	var info = JSON.parse_string(FileAccess.get_file_as_string(json_path))
+	if typeof(info) != TYPE_DICTIONARY:
+		return false
+	var mat := StandardMaterial3D.new()
+	mat.albedo_texture = load(tex_path)
+	mat.roughness = 0.6
+	mat.texture_repeat = false
+	var head: Dictionary = {}
+	for p: Dictionary in info["parts"]:
+		var size := Vector3(p["size"][0], p["size"][1], p["size"][2])
+		var mi := MeshInstance3D.new()
+		mi.mesh = _skin_box(size, p["uv"], mat)
+		mi.position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
+		_body.add_child(mi)
+		if p["name"] == "head":
+			head = {"size": size, "pos": mi.position}
+	# Ağız: kafanın ön yüzünde, alt kısımda; boştayken görünmez.
+	_face_idle = _mouth_texture(false)
+	_face_talk = _mouth_texture(true)
+	var mouth := MeshInstance3D.new()
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.1, 0.06)
+	_face_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	_face_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_face_mat.albedo_texture = _face_idle
+	quad.material = _face_mat
+	mouth.mesh = quad
+	mouth.rotation.y = PI
+	if not head.is_empty():
+		var hs: Vector3 = head["size"]
+		mouth.position = head["pos"] + Vector3(0, -hs.y * float(data.get("mouth_y", 0.36)), -hs.z / 2.0 - 0.004)
+	_body.add_child(mouth)
+	return true
+
+
+## Yüzleri ayrı UV bölgesi olan kutu: ön -Z (model -Z'ye bakar), arka +Z, "left" -X, "right" +X.
+static func _skin_box(size: Vector3, uv: Dictionary, mat: Material) -> ArrayMesh:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var faces := {"front": Vector3.FORWARD, "back": Vector3.BACK, "left": Vector3.LEFT,
+		"right": Vector3.RIGHT, "top": Vector3.UP, "bottom": Vector3.DOWN}
+	var h := size / 2.0
+	for f: String in faces:
+		var n: Vector3 = faces[f]
+		var up := Vector3.UP if absf(n.y) < 0.5 else (Vector3.FORWARD if n.y > 0 else Vector3.BACK)
+		var right := up.cross(n)
+		var c := n * h
+		var ex := (right * h).length()
+		var ey := (up * h).length()
+		var r: Array = uv[f]
+		var corners := [
+			[c - right * ex + up * ey, Vector2(r[0], r[1])],
+			[c + right * ex + up * ey, Vector2(r[2], r[1])],
+			[c + right * ex - up * ey, Vector2(r[2], r[3])],
+			[c - right * ex - up * ey, Vector2(r[0], r[3])],
+		]
+		for k: int in [0, 1, 2, 0, 2, 3]:
+			st.set_normal(n)
+			st.set_uv(corners[k][1])
+			st.add_vertex(corners[k][0])
+	var mesh := st.commit()
+	mesh.surface_set_material(0, mat)
+	return mesh
+
+
+static func _mouth_texture(open: bool) -> Texture2D:
+	var img := Image.create(20, 12, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	if open:
+		for y in 12:
+			for x in 20:
+				var d := pow((x - 9.5) / 9.5, 2) + pow((y - 5.5) / 5.5, 2)
+				if d <= 1.0:
+					img.set_pixel(x, y, Color("5a1e1e") if d > 0.35 or y < 7 else Color("c9575a"))
+	return ImageTexture.create_from_image(img)
 
 
 func display_name() -> String:
