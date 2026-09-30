@@ -35,13 +35,22 @@ def build(code, sheet, parts, height=1.8):
     for p in parts:
         uv = {}
         for f in faces_order:
-            box, mirror = p["faces"][f] if isinstance(p["faces"][f], tuple) and len(p["faces"][f]) == 2 and isinstance(p["faces"][f][1], bool) else (p["faces"][f], False)
+            spec = p["faces"][f]
+            rot = 0
+            if isinstance(spec, dict):
+                box, mirror, rot = spec["box"], spec.get("mirror", False), spec.get("rot", 0)
+            elif isinstance(spec, tuple) and len(spec) == 2 and isinstance(spec[1], bool):
+                box, mirror = spec
+            else:
+                box, mirror = spec, False
             x0, y0, x1, y1 = box
             if x1 - x0 > 60 and y1 - y0 > 60:  # kutu kenarındaki parlamayı at
                 box = (x0 + 6, y0 + 6, x1 - 6, y1 - 6)
             crop = fill_black(im.crop(box))
             if mirror:
                 crop = crop.transpose(Image.FLIP_LEFT_RIGHT)
+            if rot:
+                crop = crop.rotate(rot, expand=True)
             uv[f] = len(cells)
             cells.append(crop.resize((CELL, CELL), Image.LANCZOS))
         meta.append({"name": p["name"], "size": p["size"], "pos": p["pos"], "cells": uv})
@@ -138,3 +147,108 @@ for side, (fx0, fx1) in ((1, (172, 270)), (-1, (272, 370))):
     anne.append({"name": "shoe", "size": dim(fx0, 666, fx1, 709, 110), "pos": [round(side * 0.143, 3), cy(666, 709), 0],
                  "faces": {f: (fx0 + 10, 676, fx1 - 10, 700) for f in ("front", "back", "left", "right", "top", "bottom")}})
 build("anne", "anne.png", anne)
+
+
+def tpose(head, torso, arm_y, arm_l, arm_r, legs, side, back_dx, foot, nose_right=False, sleeve=None):
+    """Kollar yana açık (T-pozu) sayfa: kol şeritleri döndürülüp aşağı sarkan kola kaplanır.
+    head/torso: önden kutu; arm_y: kol üst-alt; arm_l/arm_r: sol/sağ kol x aralığı (omuz gövde
+    tarafında); legs: (x0, orta, x1, üst); side: yandan {"head","torso","leg","hand"} kutuları;
+    back_dx: arkadan görünümün önden kayması (arkadan bakınca sol-sağ yer değiştirir)."""
+    global FOOT
+    FOOT = foot
+    hx0, hy0, hx1, hy1 = head
+    tx0, ty0, tx1, ty1 = torso
+    sleeve = sleeve or (tx0 + 40, ty0 + 60, tx0 + 80, ty0 + 100)
+    left_x0, right_x1 = arm_l[0], arm_r[1]
+
+    def back(box):  # önden kutunun arkadan görünümdeki karşılığı (aynalı konum)
+        x0, y0, x1, y1 = box
+        return (left_x0 + right_x1 - x1 + back_dx, y0, left_x0 + right_x1 - x0 + back_dx, y1)
+
+    hs = (side["head"], not nose_right) if False else side["head"]
+    head_l, head_r = (side["head"], (side["head"], True)) if not nose_right else ((side["head"], True), side["head"])
+    parts = [
+        {"name": "head", "size": dim(*head, side["head"][2] - side["head"][0]), "pos": [0, cy(hy0, hy1), 0],
+         "faces": {"front": head, "back": back(head), "left": head_l, "right": head_r,
+                   "top": (back(head)[0] + 30, hy0 + 8, back(head)[2] - 30, hy0 + 50),
+                   "bottom": ((hx0 + hx1) // 2 - 25, hy1 - 14, (hx0 + hx1) // 2 + 25, hy1 - 2)}},
+        {"name": "torso", "size": dim(*torso, side["torso"][2] - side["torso"][0]), "pos": [0, cy(ty0, ty1), 0],
+         "faces": {"front": torso, "back": back(torso), "left": side["torso"], "right": side["torso"],
+                   "top": sleeve, "bottom": sleeve}},
+    ]
+    ay0, ay1 = arm_y
+    for sgn, (x0, x1), rot in ((1, arm_l, 90), (-1, arm_r, -90)):
+        length, th = x1 - x0, ay1 - ay0
+        w = [round(th * S, 3), round(length * S, 3), round(th * S, 3)]
+        box = (x0, ay0, x1, ay1)
+        parts.append({"name": "arm", "size": w,
+                      "pos": [round(sgn * ((tx1 - tx0) * S / 2 + w[0] / 2), 3), cy(ty0, ty0 + length), 0],
+                      "faces": {"front": {"box": box, "rot": rot}, "back": {"box": back(box), "rot": -rot},
+                                "left": {"box": box, "rot": rot}, "right": {"box": box, "rot": rot},
+                                "top": sleeve, "bottom": side["hand"]}})
+    lx0, lxm, lx1, ly0 = legs
+    for sgn, (x0, x1) in ((1, (lx0, lxm)), (-1, (lxm, lx1))):
+        w = dim(x0, ly0, x1, foot, side["leg"][2] - side["leg"][0])
+        mx = (x0 + x1) // 2
+        parts.append({"name": "leg", "size": w, "pos": [round(sgn * w[0] / 2, 3), cy(ly0, foot), 0],
+                      "faces": {"front": (x0, ly0, x1, foot), "back": back((x0, ly0, x1, foot)),
+                                "left": side["leg"], "right": (side["leg"], True),
+                                "top": (mx - 20, ly0 + 8, mx + 20, ly0 + 40), "bottom": (mx - 20, foot - 30, mx + 20, foot - 6)}})
+    return parts
+
+
+KID_SIDE = {"torso": (649, 392, 739, 466), "leg": (654, 472, 735, 692), "hand": (664, 322, 722, 376)}
+build("zeynep", "zeynep.png", tpose((200, 98, 356, 306), (190, 312, 364, 470), (314, 382), (23, 190), (364, 532),
+      (196, 278, 360, 472), dict(KID_SIDE, head=(612, 98, 790, 306)), 822 - 5, 692))
+build("ogretmen", "ogretmen.png", tpose((200, 121, 356, 306), (190, 312, 364, 470), (314, 382), (23, 190), (364, 532),
+      (196, 278, 360, 472), dict(KID_SIDE, head=(614, 121, 790, 306)), 822 - 5, 692))
+build("doktor", "doktor.png", tpose((222, 100, 362, 256), (190, 258, 398, 555), (268, 348), (23, 190), (398, 564),
+      (206, 292, 380, 556), {"head": (614, 100, 762, 256), "torso": (636, 360, 755, 550), "leg": (653, 558, 735, 700),
+      "hand": (666, 278, 724, 342)}, 790, 702, nose_right=True, sleeve=(240, 470, 280, 520)))
+
+
+def down(head, torso, arm_y, arm_l, arm_r, legs, side, back_dx, foot, nose_right=False):
+    """Kollar aşağıda duran sayfa (Emir/Anne düzeni) için genel parça listesi."""
+    global FOOT
+    FOOT = foot
+    hx0, hy0, hx1, hy1 = head
+    tx0, ty0, tx1, ty1 = torso
+    left_x0, right_x1 = arm_l[0], arm_r[1]
+
+    def back(box):
+        x0, y0, x1, y1 = box
+        return (left_x0 + right_x1 - x1 + back_dx, y0, left_x0 + right_x1 - x0 + back_dx, y1)
+
+    head_l, head_r = (side["head"], (side["head"], True)) if not nose_right else ((side["head"], True), side["head"])
+    arm_side = side["arm"]
+    parts = [
+        {"name": "head", "size": dim(*head, side["head"][2] - side["head"][0]), "pos": [0, cy(hy0, hy1), 0],
+         "faces": {"front": head, "back": back(head), "left": head_l, "right": head_r,
+                   "top": (back(head)[0] + 30, hy0 + 8, back(head)[2] - 30, hy0 + 40),
+                   "bottom": ((hx0 + hx1) // 2 - 25, hy1 - 14, (hx0 + hx1) // 2 + 25, hy1 - 2)}},
+        {"name": "torso", "size": dim(*torso, arm_side[2] - arm_side[0]), "pos": [0, cy(ty0, ty1), 0],
+         "faces": {"front": torso, "back": back(torso), "left": arm_side, "right": (arm_side, True),
+                   "top": (arm_l[0] + 20, arm_y[0] + 20, arm_l[1] - 20, arm_y[0] + 60),
+                   "bottom": (legs[0] + 20, legs[3] + 6, legs[1] - 20, legs[3] + 30)}},
+    ]
+    ay0, ay1 = arm_y
+    for sgn, (x0, x1) in ((1, arm_l), (-1, arm_r)):
+        w = dim(x0, ay0, x1, ay1, arm_side[2] - arm_side[0])
+        box = (x0, ay0, x1, ay1)
+        parts.append({"name": "arm", "size": w, "pos": [round(sgn * ((tx1 - tx0) * S / 2 + w[0] / 2), 3), cy(ay0, ay1), 0],
+                      "faces": {"front": box, "back": back(box), "left": arm_side, "right": (arm_side, True),
+                                "top": (x0 + 20, ay0 + 20, x1 - 20, ay0 + 60), "bottom": (x0 + 20, ay1 - 20, x1 - 20, ay1 - 4)}})
+    lx0, lxm, lx1, ly0 = legs
+    for sgn, (x0, x1) in ((1, (lx0, lxm)), (-1, (lxm, lx1))):
+        w = dim(x0, ly0, x1, foot, side["leg"][2] - side["leg"][0])
+        mx = (x0 + x1) // 2
+        parts.append({"name": "leg", "size": w, "pos": [round(sgn * w[0] / 2, 3), cy(ly0, foot), 0],
+                      "faces": {"front": (x0, ly0, x1, foot), "back": back((x0, ly0, x1, foot)),
+                                "left": side["leg"], "right": (side["leg"], True),
+                                "top": (mx - 20, ly0 + 8, mx + 20, ly0 + 40), "bottom": (mx - 20, foot - 30, mx + 20, foot - 6)}})
+    return parts
+
+
+build("bakkal", "bakkal.png", down((212, 114, 355, 250), (178, 250, 390, 560), (253, 475), (70, 178), (390, 495),
+      (178, 284, 390, 560), {"head": (623, 114, 764, 250), "arm": (640, 253, 745, 475), "leg": (640, 562, 746, 690)},
+      819, 690))
