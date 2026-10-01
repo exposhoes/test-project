@@ -26,7 +26,8 @@ static func build(id: String, size: Vector2i) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Esya_" + id
 	var foot := Vector3(size.x, height(id), size.y)
-	var glb := _load_glb(id, foot)
+	var png := _load_png_box(id, foot)
+	var glb := png if png else _load_glb(id, foot)
 	if glb:
 		root.add_child(glb)
 	else:
@@ -41,7 +42,14 @@ static func build(id: String, size: Vector2i) -> Node3D:
 
 
 static func _place_small(root: Node3D, id: String, at: Vector3, box: Vector3, color: Color) -> void:
-	var n := _load_glb(id, box)
+	var n := _load_png_box(id, box)
+	if n:
+		n.position = Vector3(-box.x / 2, 0, -box.z / 2)
+		var h := Node3D.new()
+		h.add_child(n)
+		n = h
+	else:
+		n = _load_glb(id, box)
 	if n == null:
 		n = Node3D.new()
 		_box(n, box, Vector3(0, box.y / 2, 0), color)
@@ -154,7 +162,9 @@ static func build_decor(id: String) -> Node3D:
 	var size: Vector3 = DECOR_SIZE.get(id, Vector3.ONE * 0.5)
 	var root := Node3D.new()
 	root.name = "Sus_" + id
-	var glb := _load_glb(id, size)
+	var glb := _load_png_box(id, size)
+	if glb == null:
+		glb = _load_glb(id, size)
 	if glb:
 		glb.position = Vector3(-size.x / 2, 0, -size.z / 2)
 		root.add_child(glb)
@@ -177,3 +187,121 @@ static func build_decor(id: String) -> Node3D:
 		_:
 			_box(root, size, Vector3(0, size.y / 2, 0), WOOD)
 	return root
+
+
+## Mehmet'in eşya resmi: assets/textures/esya/<ad>.png — koyu arka plan üstünde soldan sağa
+## ÖN, YAN ve ÜST görünüş. Üç parça otomatik ayrılır, arka plan saydam yapılır ve
+## eşyanın kutusunun yüzlerine kaplanır (ön +Z, yanlar ±X, üst +Y; arka = ön).
+static var _png_cache := {}
+
+
+static func _load_png_box(id: String, foot: Vector3) -> Node3D:
+	var path := "res://assets/textures/esya/%s.png" % id
+	if not ResourceLoader.exists(path) and not FileAccess.file_exists(path):
+		return null
+	if not _png_cache.has(id):
+		var img: Image = null
+		var tex = load(path)
+		if tex is Texture2D:
+			img = (tex as Texture2D).get_image()
+		else:
+			img = Image.load_from_file(path)
+		if img == null:
+			return null
+		if img.is_compressed():
+			img.decompress()
+		img.convert(Image.FORMAT_RGBA8)
+		_png_cache[id] = _split_views(img)
+	var views: Array = _png_cache[id]
+	if views.size() < 3:
+		return null
+	var root := Node3D.new()
+	var x := foot.x
+	var y := foot.y
+	var z := foot.z
+	# ön (+Z) ve arka
+	_quad(root, views[0], Vector3(x / 2, y / 2, z), Vector3(x, y, 0), 0.0)
+	_quad(root, views[0], Vector3(x / 2, y / 2, 0), Vector3(x, y, 0), PI)
+	# yanlar
+	_quad(root, views[1], Vector3(x, y / 2, z / 2), Vector3(z, y, 0), PI / 2)
+	_quad(root, views[1], Vector3(0, y / 2, z / 2), Vector3(z, y, 0), -PI / 2)
+	# üst
+	var top := MeshInstance3D.new()
+	var pm := PlaneMesh.new()
+	pm.size = Vector2(x, z)
+	pm.material = _mat(views[2])
+	top.mesh = pm
+	top.position = Vector3(x / 2, y, z / 2)
+	root.add_child(top)
+	return root
+
+
+static func _quad(root: Node3D, tex: Texture2D, center: Vector3, size: Vector3, turn: float) -> void:
+	var mi := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = Vector2(size.x, size.y)
+	q.material = _mat(tex)
+	mi.mesh = q
+	mi.position = center
+	mi.rotation.y = turn
+	root.add_child(mi)
+
+
+static func _mat(tex: Texture2D) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = tex
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
+	m.alpha_scissor_threshold = 0.5
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	m.roughness = 0.9
+	return m
+
+
+## Arka plan rengi (sol üst köşe) dışındaki sütun gruplarını bulur; en geniş 3 grubu
+## soldan sağa ön/yan/üst olarak kırpıp saydam arka planlı dokuya çevirir.
+static func _split_views(img: Image) -> Array:
+	var w := img.get_width()
+	var h := img.get_height()
+	var bg := img.get_pixel(2, 2)
+	var is_bg := func(c: Color) -> bool:
+		return absf(c.r - bg.r) + absf(c.g - bg.g) + absf(c.b - bg.b) < 0.12 or c.a < 0.1
+	var cols: Array[bool] = []
+	for px in w:
+		var hit := false
+		for py in range(0, h, 2):
+			if not is_bg.call(img.get_pixel(px, py)):
+				hit = true
+				break
+		cols.append(hit)
+	var runs: Array = []
+	var start := -1
+	for px in w + 1:
+		var on := px < w and cols[px]
+		if on and start < 0:
+			start = px
+		elif not on and start >= 0:
+			if px - start > w / 40:
+				runs.append(Vector2i(start, px))
+			start = -1
+	runs.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return (a.y - a.x) > (b.y - b.x))
+	runs = runs.slice(0, 3)
+	runs.sort_custom(func(a: Vector2i, b: Vector2i) -> bool: return a.x < b.x)
+	var out: Array = []
+	for r: Vector2i in runs:
+		var top := h
+		var bottom := 0
+		for py in h:
+			for px in range(r.x, r.y, 2):
+				if not is_bg.call(img.get_pixel(px, py)):
+					top = mini(top, py)
+					bottom = maxi(bottom, py)
+					break
+		var part := img.get_region(Rect2i(r.x, top, r.y - r.x, bottom - top + 1))
+		for py in part.get_height():
+			for px in part.get_width():
+				if is_bg.call(part.get_pixel(px, py)):
+					part.set_pixel(px, py, Color(0, 0, 0, 0))
+		part.generate_mipmaps()
+		out.append(ImageTexture.create_from_image(part))
+	return out

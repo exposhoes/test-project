@@ -211,6 +211,8 @@ func _run(s: Dictionary) -> void:
 			await _walk_path(a, path, speed)
 		else:
 			_walk_path(a, path, speed)
+	elif s.has("gesture"):
+		_actor(s["gesture"]).gesture(s.get("kind", "evet"))
 	elif s.has("lie"):
 		_actor(s["lie"]).set_lying(s["value"])
 	elif s.has("turn"):
@@ -390,7 +392,10 @@ func _auto_sfx(text: String, a: Actor = null) -> void:
 		kind = "selam"
 	elif t.begins_with("tamam") or t.begins_with("olur") or t.begins_with("evet") or t.contains("yaşasın"):
 		kind = "evet"
-	if a and kind != "":
+	# Otomatik büyük jestler kapalı: Tripo hareketlerinde adım/eğilme var, sakin replikte
+	# yerinde yürüyor ya da kızıyor gibi duruyordu (Mehmet). Jest sadece senaryoda
+	# {"gesture": "<kişi>", "kind": "gul"} ile açıkça istenince oynar.
+	if a and kind != "" and a.data.get("auto_gesture", false):
 		a.gesture(kind)
 
 
