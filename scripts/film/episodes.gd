@@ -951,6 +951,29 @@ const LIST := [
 			{"title": "Sence Ali iyi bir kaleci mi? Yorumlara yaz!", "t": 2.5},
 		],
 	},
+	{
+		"id": "bulasik", "name": "Bölüm 27: Bulaşık Kimde?", "set": "ev", "time": 0.6,
+		"steps": [
+			{"place": "anne", "at": "ev.mutfak", "look": "ev.masa"},
+			{"place": "emir", "at": "ev.masa", "look": "ev.mutfak"},
+			{"place": "ali", "at": "ev.kapi_ici", "look": "ev.masa"},
+			{"cam": "ev.kam_oda", "look": "ev.masa", "t": 0},
+			{"say": "anne", "text": "Çocuklar, yemek bitti. Bulaşıkları kim yıkayacak?"},
+			{"title": "Bulaşık Kimde?", "t": 1.2},
+			{"say": "ali", "text": "Ben misafirim teyzeciğim! Misafir bulaşık yıkamaz!"},
+			{"say": "emir", "text": "Ama Ali, sen her gün bizdesin..."},
+			{"zoom": 0.6},
+			{"say": "ali", "text": "Iıı... Bugün özel misafirim! Doğum günüm gibi bir şey!"},
+			{"walk": "emir", "to": "ev.ocak"},
+			{"cam": "ev.kam_mutfak", "look": "ev.ocak", "t": 0},
+			{"say": "emir", "text": "Ben yıkarım anne. Hem sonra tatlı var, değil mi?"},
+			{"say": "anne", "text": "Evet, çikolatalı pasta! Ama sadece yardım edenlere."},
+			{"shake": 0.3},
+			{"walk": "ali", "to": "ev.mutfak"},
+			{"say": "ali", "text": "Teyzeciğim, ben aslında bulaşık şampiyonuyum! Kurulamayı bana bırakın!"},
+			{"title": "Sen evde yardım eder misin? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 
