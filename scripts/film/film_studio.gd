@@ -23,6 +23,8 @@ var _extras: Array[Actor] = []
 var voice := FilmVoice.new()
 var _episode_id := ""
 var _line := 0
+var _loading := false
+var _loading_at := Vector3.ZERO
 
 var _sun := DirectionalLight3D.new()
 var _env := Environment.new()
@@ -54,7 +56,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	world.update_center(camera.global_position)
+	# Yeni kamera noktası yüklenirken merkez oraya sabit kalsın; yoksa iki nokta arasında gidip gelir ve chunk hiç bitmez.
+	world.update_center(_loading_at if _loading else camera.global_position)
 
 
 ## Bölümü baştan sona oynatır (await ile beklenebilir).
@@ -118,9 +121,12 @@ func _run(s: Dictionary) -> void:
 	elif s.has("cam"):
 		# Başka sete geçerken oranın chunk'ları yüklenmeden kesme yapma.
 		var to := FilmSets.point(s["cam"])
+		_loading = true
+		_loading_at = to
 		world.update_center(to)
 		while not world.is_meshed_at(to):
 			await get_tree().process_frame
+		_loading = false
 		_move_camera(FilmSets.point(s["cam"]), FilmSets.point(s["look"]) + Vector3(0, LOOK_HEIGHT, 0), s.get("t", 0.0))
 		if s.get("t", 0.0) > 0:
 			await _wait(s["t"])

@@ -15,6 +15,7 @@ const SETS := {
 	"park": Vector3i(40, GROUND + 1, -36),
 	"saha": Vector3i(-40, GROUND + 1, -36),
 	"pazar": Vector3i(-8, GROUND + 1, 32),
+	"oyun": Vector3i(83, GROUND + 1, 32),
 }
 ## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
 const CITY_MIN := Vector2i(-64, -56)
@@ -109,6 +110,19 @@ const POINTS := {
 		"orta": Vector3(11.5, 0, 6.0),
 		"kam_genel": Vector3(16.0, 6.0, -6.0),
 		"kam_tezgah": Vector3(4.8, 2.3, -1.2),
+	},
+	"oyun": {
+		"giris": Vector3(8.0, 0, -1.5),
+		"orta": Vector3(8.0, 0, 4.5),
+		"kaydirak_alt": Vector3(2.5, 0, 2.5),
+		"kaydirak_yani": Vector3(4.8, 0, 3.5),
+		"salincak": Vector3(9.5, 0, 5.3),
+		"salincak_2": Vector3(11.0, 0, 5.3),
+		"kum": Vector3(12.0, 0, 4.5),
+		"bank_yani": Vector3(4.5, 0, 8.3),
+		"kam_genel": Vector3(13.5, 6.0, -4.5),
+		"kam_kaydirak": Vector3(6.0, 2.2, 0.5),
+		"kam_salincak": Vector3(15.0, 2.6, 5.5),
 	},
 }
 
@@ -539,7 +553,7 @@ func _build_city() -> void:
 	_row(Vector2i(-62, 32), Vector2i(-20, 32), -1)
 	_bazaar(SETS["pazar"])
 	_row(Vector2i(35, 32), Vector2i(72, 32), -1)
-	_row(Vector2i(83, 32), Vector2i(98, 32), -1)
+	_playground(SETS["oyun"])
 	# Güney sırası.
 	_row(Vector2i(-62, -40), Vector2i(-20, -40), 1)
 	_mosque(Vector3i(-6, Y0, -54))
@@ -697,6 +711,47 @@ func _mosque(c: Vector3i) -> void:
 
 
 ## Semt pazarı: taş zemin, iki sıra tenteli tezgâh, kasalar, meyve sebze, ortada çeşme.
+## Mahalle oyun alanı: kum zemin, kaydırak, salıncak, tahterevalli, kum havuzu, banklar.
+func _playground(c: Vector3i) -> void:
+	var o := Vector3i.ZERO
+	_fill(o, c + Vector3i(0, -1, 0), c + Vector3i(15, -1, 9), Blocks.SAND)
+	# Alçak çit (çalı), önde giriş boşluğu.
+	for x in range(0, 16):
+		if x < 7 or x > 9:
+			_put(c + Vector3i(x, 0, 0), Blocks.LEAVES)
+		_put(c + Vector3i(x, 0, 10), Blocks.LEAVES)
+	for z in range(0, 11):
+		_put(c + Vector3i(-1, 0, z), Blocks.LEAVES)
+		_put(c + Vector3i(16, 0, z), Blocks.LEAVES)
+	# Kaydırak: arkada merdiven, üstte platform, öne inen kırmızı oluk.
+	_fill(o, c + Vector3i(1, 0, 8), c + Vector3i(3, 0, 8), Blocks.TOY_BRICK_YELLOW)
+	_fill(o, c + Vector3i(1, 1, 7), c + Vector3i(3, 1, 7), Blocks.TOY_BRICK_YELLOW)
+	_fill(o, c + Vector3i(1, 2, 5), c + Vector3i(3, 2, 6), Blocks.TOY_BRICK_BLUE)
+	for p in [Vector3i(1, 0, 5), Vector3i(3, 0, 5), Vector3i(1, 0, 6), Vector3i(3, 0, 6)]:
+		_fill(o, c + p, c + p + Vector3i(0, 1, 0), Blocks.LOG)
+	_fill(o, c + Vector3i(1, 4, 5), c + Vector3i(3, 4, 6), Blocks.TOY_BRICK_RED)
+	_fill(o, c + Vector3i(2, 1, 4), c + Vector3i(2, 1, 4), Blocks.TOY_BRICK_RED)
+	_put(c + Vector3i(2, 0, 3), Blocks.TOY_BRICK_RED)
+	# Salıncak: iki direk, üst kiriş, iki oturak.
+	_fill(o, c + Vector3i(8, 0, 7), c + Vector3i(8, 3, 7), Blocks.LOG)
+	_fill(o, c + Vector3i(12, 0, 7), c + Vector3i(12, 3, 7), Blocks.LOG)
+	_fill(o, c + Vector3i(8, 4, 7), c + Vector3i(12, 4, 7), Blocks.LOG)
+	_put(c + Vector3i(9, 1, 7), Blocks.TOY_BRICK_BLUE)
+	_put(c + Vector3i(11, 1, 7), Blocks.TOY_BRICK_RED)
+	# Tahterevalli.
+	_put(c + Vector3i(9, 0, 2), Blocks.LOG)
+	_fill(o, c + Vector3i(7, 1, 2), c + Vector3i(11, 1, 2), Blocks.TOY_BRICK_YELLOW)
+	# Kum havuzu.
+	_walls(o, c + Vector3i(12, 0, 1), c + Vector3i(15, 0, 3), Blocks.PLANKS)
+	# Banklar ve çiçekler.
+	_fill(o, c + Vector3i(5, 0, 9), c + Vector3i(6, 0, 9), Blocks.DARK_PLANKS)
+	_fill(o, c + Vector3i(14, 0, 8), c + Vector3i(15, 0, 8), Blocks.DARK_PLANKS)
+	_put(c + Vector3i(0, 0, 9), Blocks.FLOWERS)
+	_put(c + Vector3i(15, 0, 6), Blocks.FLOWERS)
+	_lamp(c + Vector3i(0, 0, 1))
+	_lamp(c + Vector3i(15, 0, 9))
+
+
 func _bazaar(c: Vector3i) -> void:
 	var o := Vector3i.ZERO
 	_fill(o, c + Vector3i(0, -1, 0), c + Vector3i(32, -1, 12), Blocks.COBBLESTONE)
