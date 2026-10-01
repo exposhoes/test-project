@@ -19,3 +19,4 @@ videolar/
 
 # Video kaydı sırasında geçici ayar (tools/kayit.ps1)
 override.cfg
+__pycache__/

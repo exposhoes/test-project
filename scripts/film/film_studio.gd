@@ -69,7 +69,6 @@ func _ready() -> void:
 			recording = true
 			# Kayıtta keskin görüntü: kenar yumuşatma ve uzaktaki dokularda netlik (telefonda kapalı, yavaşlatmasın).
 			get_viewport().msaa_3d = Viewport.MSAA_4X
-			get_viewport().anisotropic_filtering_level = Viewport.ANISOTROPY_16X
 			await get_tree().process_frame
 			await play(arg.trim_prefix("--bolum="))
 			get_tree().quit()
