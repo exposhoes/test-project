@@ -18,6 +18,7 @@ var _away_t := 0.0
 var world := World.new()
 var camera := Camera3D.new()
 var actors := {}
+var _doors: Array[Node3D] = []
 var playing := false
 ## Testler için: true olursa bekleme süreleri kısalır.
 var fast := false
@@ -62,12 +63,12 @@ func _ready() -> void:
 		var n := FilmProps.build(pr[0], pr[2])
 		n.position = Vector3(pr[1])
 		add_child(n)
-	for fc: Array in sets.facades:
-		var n := FilmProps.build_facade(fc[0], fc[2])
-		if n:
-			n.position = fc[1]
-			n.rotation.y = fc[3]
-			add_child(n)
+	for dr: Array in sets.doors:
+		var n := FilmProps.build_door()
+		n.position = dr[0]
+		n.rotation.y = dr[1]
+		add_child(n)
+		_doors.append(n)
 	for d: Array in sets.decor:
 		var n := FilmProps.build_decor(d[0])
 		n.position = d[1]
@@ -92,6 +93,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_swing_doors(delta)
 	if not Actor.is_free.is_valid() and world and world.generator is FilmSets:
 		Actor.is_free = (world.generator as FilmSets).is_air
 	_watch_speaker(delta)
@@ -704,3 +706,15 @@ func _set_bars(on: bool) -> void:
 func _walk_path(a: Actor, path: Array, speed: float) -> void:
 	for p: Vector3 in path:
 		await a.walk_to(p, speed)
+
+
+## Bir oyuncu kapıya yaklaşınca kapı içeri doğru açılır, uzaklaşınca kapanır.
+func _swing_doors(delta: float) -> void:
+	for d in _doors:
+		var center := d.global_position + d.global_transform.basis.x * 0.5
+		var near := false
+		for a in actors.values():
+			if (a as Node3D).global_position.distance_to(center) < 1.8:
+				near = true
+		var hinge := d.get_child(0) as Node3D
+		hinge.rotation.y = move_toward(hinge.rotation.y, 1.7 if near else 0.0, delta * 3.0)

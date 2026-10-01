@@ -49,6 +49,14 @@ enum {
 	ROAD_LINE,
 	SIDEWALK,
 	CONCRETE,
+	FACADE_CREAM,
+	TRIM_WHITE,
+	WINDOW_TOP,
+	WINDOW_BOTTOM,
+	ROOF_TERRACOTTA,
+	STONE_BASE,
+	BALCONY_RAIL,
+	FENCE_WHITE,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -100,6 +108,14 @@ const DEFS := {
 	ROAD_LINE: {"name": "Yol Çizgisi", "all": "road_line"},
 	SIDEWALK: {"name": "Kaldırım", "all": "sidewalk"},
 	CONCRETE: {"name": "Beton", "all": "concrete"},
+	FACADE_CREAM: {"name": "Krem Sıva", "all": "facade_cream"},
+	TRIM_WHITE: {"name": "Beyaz Silme", "all": "trim_white"},
+	WINDOW_TOP: {"name": "Pencere (üst)", "top": "trim_white", "side": "window_top", "bottom": "trim_white", "transparent": true},
+	WINDOW_BOTTOM: {"name": "Pencere (alt)", "top": "trim_white", "side": "window_bottom", "bottom": "trim_white", "transparent": true},
+	ROOF_TERRACOTTA: {"name": "Kiremit Çatı", "all": "roof_terracotta"},
+	STONE_BASE: {"name": "Taş Kaide", "all": "stone_base"},
+	BALCONY_RAIL: {"name": "Balkon Korkuluğu", "top": "trim_white", "side": "balcony_rail", "bottom": "trim_white", "transparent": true},
+	FENCE_WHITE: {"name": "Beyaz Çit", "top": "fence_white", "side": "fence_white", "bottom": "fence_white", "transparent": true},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).

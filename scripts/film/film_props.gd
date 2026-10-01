@@ -514,49 +514,27 @@ static func _split_views(img: Image) -> Array:
 	return out
 
 
-## Bina ön cephesi: assets/textures/sehir/<ad>.png. Kenardaki koyu boşluk kırpılır;
-## görsel (en × boy) dikdörtgene, sol alt köşe (0,0,0) olacak biçimde kaplanır, ön yüz +Z.
-static func build_facade(id: String, size: Vector2) -> Node3D:
-	var path := "res://assets/textures/sehir/%s.png" % id
-	if not ResourceLoader.exists(path) and not FileAccess.file_exists(path):
-		return null
-	var img: Image
-	var tex = load(path)
-	img = (tex as Texture2D).get_image() if tex is Texture2D else Image.load_from_file(path)
-	if img == null:
-		return null
-	if img.is_compressed():
-		img.decompress()
-	img.convert(Image.FORMAT_RGBA8)
-	var used := img.get_used_rect()
-	var dark := func(c: Color) -> bool: return c.a < 0.1 or c.r + c.g + c.b < 0.12
-	var x0 := used.position.x
-	var x1 := used.end.x - 1
-	var y0 := used.position.y
-	var y1 := used.end.y - 1
-	var cy := (y0 + y1) / 2
-	var cx := (x0 + x1) / 2
-	while x0 < x1 and dark.call(img.get_pixel(x0, cy)):
-		x0 += 1
-	while x1 > x0 and dark.call(img.get_pixel(x1, cy)):
-		x1 -= 1
-	while y0 < y1 and dark.call(img.get_pixel(cx, y0)):
-		y0 += 1
-	while y1 > y0 and dark.call(img.get_pixel(cx, y1)):
-		y1 -= 1
-	var part := img.get_region(Rect2i(x0, y0, x1 - x0 + 1, y1 - y0 + 1))
-	part.generate_mipmaps()
+## Açılır ahşap giriş kapısı: menteşe sol alt köşede (0,0,0), kapı +X yönüne 1 blok uzanır.
+## Doku: assets/textures/esya/kapi_ahsap.png (kodla çizildi).
+static func build_door() -> Node3D:
 	var root := Node3D.new()
-	root.name = "Cephe_" + id
+	root.name = "Kapi"
+	var hinge := Node3D.new()
+	root.add_child(hinge)
 	var mi := MeshInstance3D.new()
-	var q := QuadMesh.new()
-	q.size = size
+	var bm := BoxMesh.new()
+	bm.size = Vector3(0.96, 2.92, 0.08)
 	var m := StandardMaterial3D.new()
-	m.albedo_texture = ImageTexture.create_from_image(part)
-	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
-	m.roughness = 0.9
-	q.material = m
-	mi.mesh = q
-	mi.position = Vector3(size.x / 2, size.y / 2, 0)
-	root.add_child(mi)
+	var path := "res://assets/textures/esya/kapi_ahsap.png"
+	if ResourceLoader.exists(path) or FileAccess.file_exists(path):
+		var tex = load(path)
+		m.albedo_texture = tex if tex is Texture2D else ImageTexture.create_from_image(Image.load_from_file(path))
+		m.uv1_scale = Vector3(3, 2, 1)  # BoxMesh UV: yüzler 3x2 ızgara; ön yüze tek doku
+	else:
+		m.albedo_color = Color("b8703a")
+	m.roughness = 0.8
+	bm.material = m
+	mi.mesh = bm
+	mi.position = Vector3(0.48, 1.46, 0)
+	hinge.add_child(mi)
 	return root
