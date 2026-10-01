@@ -432,6 +432,19 @@ func _build_field(o: Vector3i) -> void:
 
 
 ## Karakter bu hücrede durabilir mi (ayak ve baş hizası boş mu)?
+func is_air(cell: Vector3i) -> bool:
+	return _blocks.get(cell, Blocks.AIR) == Blocks.AIR and cell.y > GROUND
+
+
+## İki nokta arası bloklara çarpmadan görülebiliyor mu (kamera kadrajı için).
+func clear_sight(a: Vector3, b: Vector3) -> bool:
+	var n := int(ceil(a.distance_to(b) * 4.0))
+	for i in range(1, n):
+		if not is_air(Vector3i((a.lerp(b, float(i) / n)).floor())):
+			return false
+	return true
+
+
 func is_free(cell: Vector3i) -> bool:
 	return _blocks.get(cell, Blocks.AIR) == Blocks.AIR and _blocks.get(cell + Vector3i.UP, Blocks.AIR) == Blocks.AIR
 

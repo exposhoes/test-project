@@ -28,6 +28,7 @@ var _episode_id := ""
 var _line := 0
 var _loading := false
 var _fov_tween: Tween
+var _music := AudioStreamPlayer.new()
 var _loading_at := Vector3.ZERO
 
 var _sun := DirectionalLight3D.new()
@@ -49,6 +50,7 @@ func _ready() -> void:
 	_setup_environment()
 	add_child(world)
 	add_child(voice)
+	add_child(_music)
 	world.render_distance = 4
 	world.generator = FilmSets.new()
 	camera.fov = 62.0
@@ -94,12 +96,14 @@ func play(id: String) -> void:
 		await get_tree().process_frame
 	_loading = false
 	_set_bars(true)
+	play_music(ep.get("music", "neseli"))
 	_spawn_extras(set_id)
 	for step: Dictionary in ep["steps"]:
 		await _run(step)
 	_hide_dialogue()
 	_title.visible = false
 	_set_bars(false)
+	_music.stop()
 	playing = false
 	set_portrait(false)
 	_show_menu(ep.get("format", "short"))
@@ -118,7 +122,12 @@ func _establishing_cam(set_id: String) -> String:
 
 
 func _run(s: Dictionary) -> void:
-	if s.has("title"):
+	if s.has("sfx"):
+		play_sfx(s["sfx"])
+	elif s.has("music"):
+		play_music(s["music"])
+	elif s.has("title"):
+		play_sfx("baslik")
 		_hide_dialogue()
 		_show_title(s["title"])
 		await _wait(s.get("t", 2.0))
@@ -166,6 +175,7 @@ func _run(s: Dictionary) -> void:
 	elif s.has("wait"):
 		await _wait(s["wait"])
 	elif s.has("zoom"):
+		play_sfx("bom")
 		# Komik anda hızlı yakınlaşma vuruşu (Shorts tarzı), sonra geri.
 		var tw := create_tween()
 		tw.tween_property(camera, "fov", 38.0, 0.12)
@@ -174,6 +184,7 @@ func _run(s: Dictionary) -> void:
 		if not fast:
 			await tw.finished
 	elif s.has("shake"):
+		play_sfx("saskin")
 		var base := camera.position
 		var tw := create_tween()
 		for i in int(maxf(1.0, s["shake"] * 20.0)):
@@ -192,6 +203,7 @@ func _say(id: String, text: String) -> void:
 	_box.visible = true
 	a.talking = true
 	_line += 1
+	_frame_speaker(a)
 	_auto_zoom(text)
 	var voiced := voice.speak(id, text, _episode_id, _line)
 	var total := text.length()
@@ -212,6 +224,56 @@ func _say(id: String, text: String) -> void:
 	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t if not voiced else 0.15)
 
 
+## Konuşan karşı yüzünü kadrajda göstersin: görünmüyorsa ya da sırtı dönükse,
+## yüzünün önünde boş ve görüşü açık bir yere kamerayı keser.
+func _frame_speaker(a: Actor) -> void:
+	if fast:
+		return
+	var head := a.position + Vector3(0, 1.45, 0)
+	var facing := Vector3(-sin(a.rotation.y), 0, -cos(a.rotation.y))
+	var lying := a._body.rotation.x != 0.0
+	if _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
+		return
+	var sets: FilmSets = world.generator
+	for lift in [0.25, 0.9]:
+		for dist in [2.4, 1.9, 3.2, 1.5, 1.2]:
+			for ang in [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]:
+				var pos: Vector3 = head + facing.rotated(Vector3.UP, ang) * dist + Vector3(0, lift, 0)
+				if sets.is_air(Vector3i(pos.floor())) and _shows(pos, head, a, false):
+					_move_camera(pos, head - Vector3(0, 0.15, 0), 0)
+					return
+
+
+func _faces(facing: Vector3, head: Vector3, cam: Vector3) -> bool:
+	var d := cam - head
+	return facing.dot(Vector3(d.x, 0, d.z).normalized()) > 0.25
+
+
+## Kameradan konuşanın başı görünüyor mu: bloklar ve diğer oyuncular önünü kapatmıyor,
+## (mevcut kamerada) baş kadrajın orta kısmında ve çok uzakta değil.
+func _shows(cam: Vector3, head: Vector3, who: Actor, check_frame := true) -> bool:
+	var sets: FilmSets = world.generator
+	if cam.distance_to(head) > 9.0 or not sets.clear_sight(cam, head):
+		return false
+	for other: Actor in actors.values():
+		if other == who or not other.visible:
+			continue
+		for hgt in [0.9, 1.5]:
+			var c: Vector3 = other.position + Vector3(0, hgt, 0)
+			var seg := head - cam
+			var k := clampf((c - cam).dot(seg) / seg.length_squared(), 0.0, 1.0)
+			if k < 0.95 and (cam + seg * k).distance_to(c) < 0.5:
+				return false
+	if check_frame:
+		if camera.is_position_behind(head):
+			return false
+		var sp := camera.unproject_position(head)
+		var vs := get_viewport().get_visible_rect().size
+		if sp.x < vs.x * 0.15 or sp.x > vs.x * 0.85 or sp.y < vs.y * 0.08 or sp.y > vs.y * 0.7:
+			return false
+	return true
+
+
 ## Shorts tarzı kamera: her replikte yavaş yakınlaşma, ünlemli replikte hızlı "vurma" zoom'u.
 func _auto_zoom(text: String) -> void:
 	if fast:
@@ -224,6 +286,45 @@ func _auto_zoom(text: String) -> void:
 		_fov_tween.tween_property(camera, "fov", BASE_FOV - 8.0, 1.2)
 	else:
 		_fov_tween.tween_property(camera, "fov", maxf(BASE_FOV - 10.0, camera.fov - 3.0), 2.5)
+
+
+## assets/audio/<klasör>/<ad>.ogg|mp3|wav; dosya yoksa null (sessizce atlanır).
+static func _audio(folder: String, name: String) -> AudioStream:
+	for ext in ["ogg", "mp3", "wav"]:
+		var path := "res://assets/audio/%s/%s.%s" % [folder, name, ext]
+		if ResourceLoader.exists(path):
+			return load(path)
+	return null
+
+
+## Efekt çalar ("bom", "baslik", "saskin", "gulme"...). Dosya yoksa bir şey olmaz.
+func play_sfx(name: String) -> void:
+	if fast:
+		return
+	var st := _audio("sfx", name)
+	if st == null:
+		return
+	var p := AudioStreamPlayer.new()
+	p.stream = st
+	p.volume_db = -4.0
+	add_child(p)
+	p.finished.connect(p.queue_free)
+	p.play()
+
+
+## Arka plan müziği ("neseli", "gerilim", "duygusal"); "" müziği durdurur.
+func play_music(name: String) -> void:
+	var st := _audio("music", name) if name != "" and not fast else null
+	if st == null:
+		_music.stop()
+		return
+	if _music.stream == st and _music.playing:
+		return
+	if "loop" in st:
+		st.loop = true
+	_music.stream = st
+	_music.volume_db = -16.0
+	_music.play()
 
 
 func _wait(sec: float) -> void:
@@ -424,6 +525,8 @@ func set_portrait(on: bool) -> void:
 	_box.offset_top = -330 if on else -210
 	_box.offset_bottom = -90 if on else -64
 	_title.add_theme_font_size_override("font_size", 44 if on else 64)
+	_text_label.add_theme_font_size_override("font_size", 46 if on else 34)
+	_name_label.add_theme_font_size_override("font_size", 38 if on else 30)
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if on else TextServer.AUTOWRAP_OFF
 
 
