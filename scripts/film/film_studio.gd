@@ -13,6 +13,7 @@ const LOOK_HEIGHT := 1.3
 const BASE_FOV := 62.0
 var _speaker: Actor
 var _watch_t := 0.0
+var _away_t := 0.0
 
 var world := World.new()
 var camera := Camera3D.new()
@@ -237,15 +238,20 @@ func _watch_speaker(delta: float) -> void:
 		return
 	if _cam_tween and _cam_tween.is_running():
 		return
-	var head := _speaker.position + Vector3(0, 1.3, 0)
-	_look = _look.lerp(head, minf(1.0, delta * 4.0))
+	var aim := _speaker.position + Vector3(0, 1.3, 0)
+	_look = _look.lerp(aim, minf(1.0, delta * 4.0))
 	if camera.global_position.distance_to(_look) > 0.01:
 		camera.look_at(_look)
 	_watch_t += delta
 	if _watch_t < 0.25:
 		return
 	_watch_t = 0.0
-	if not _shows(camera.global_position, _speaker.position + Vector3(0, 1.45, 0), _speaker):
+	var head := _speaker.position + Vector3(0, 1.45, 0)
+	var facing := Vector3(-sin(_speaker.rotation.y), 0, -cos(_speaker.rotation.y))
+	var away := not _speaker._moving and _speaker._body.rotation.x == 0.0 and not _faces(facing, head, camera.global_position)
+	_away_t = _away_t + 0.25 if away else 0.0
+	if _away_t >= 0.75 or not _shows(camera.global_position, head, _speaker):
+		_away_t = 0.0
 		var fov := camera.fov
 		_frame_speaker(_speaker, true)
 		camera.fov = fov
@@ -265,6 +271,8 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	for lift in [0.25, 0.9]:
 		for dist in [2.4, 1.9, 3.2, 1.5, 1.2]:
 			for ang in [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]:
+				if a._moving and dist < 1.9:
+					continue  # yürüyenin yoluna kamera koyma, içinden geçer
 				var pos: Vector3 = head + facing.rotated(Vector3.UP, ang) * dist + Vector3(0, lift, 0)
 				if sets.is_air(Vector3i(pos.floor())) and _shows(pos, head, a, false):
 					_move_camera(pos, head - Vector3(0, 0.15, 0), 0)
