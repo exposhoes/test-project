@@ -531,7 +531,8 @@ func _build_city() -> void:
 	_row(Vector2i(83, 32), Vector2i(98, 32), -1)
 	# Güney sırası.
 	_row(Vector2i(-62, -40), Vector2i(-20, -40), 1)
-	_row(Vector2i(-8, -40), Vector2i(24, -40), 1)
+	_mosque(Vector3i(-6, Y0, -54))
+	_row(Vector2i(14, -40), Vector2i(24, -40), 1)
 	_row(Vector2i(35, -40), Vector2i(72, -40), 1)
 	_row(Vector2i(83, -40), Vector2i(98, -40), 1)
 	# Setlerin aralarındaki boş parseller.
@@ -647,3 +648,38 @@ func _car(p: Vector3i, color: int, along_x: bool) -> void:
 	_fill(Vector3i.ZERO, p, p + l, color)
 	var cab := p + (Vector3i(1, 1, 0) if along_x else Vector3i(0, 1, 1))
 	_fill(Vector3i.ZERO, cab, cab + (Vector3i(1, 0, 1) if along_x else Vector3i(1, 0, 1)), Blocks.GLASS)
+
+
+## Mahalle camisi: taş gövde, basamaklı kubbe, iki minare, avlu ve şadırvan.
+func _mosque(c: Vector3i) -> void:
+	var o := Vector3i.ZERO
+	# Avlu (caddeye doğru, kuzeyde).
+	_fill(o, c + Vector3i(-2, -1, 14), c + Vector3i(17, -1, 15), Blocks.SIDEWALK)
+	_put(c + Vector3i(7, 0, 14), Blocks.GLASS)
+	_put(c + Vector3i(8, 0, 14), Blocks.GLASS)
+	# Gövde.
+	_fill(o, c + Vector3i(0, -1, 0), c + Vector3i(15, -1, 13), Blocks.CONCRETE)
+	_walls(o, c, c + Vector3i(15, 6, 13), Blocks.SNOW)
+	for x in range(2, 14, 3):
+		_fill(o, c + Vector3i(x, 2, 13), c + Vector3i(x, 4, 13), Blocks.GLASS)
+	for z in range(2, 12, 3):
+		_fill(o, c + Vector3i(0, 2, z), c + Vector3i(0, 4, z), Blocks.GLASS)
+		_fill(o, c + Vector3i(15, 2, z), c + Vector3i(15, 4, z), Blocks.GLASS)
+	_fill(o, c + Vector3i(7, 0, 13), c + Vector3i(8, 3, 13), Blocks.AIR)
+	_fill(o, c + Vector3i(0, 7, 0), c + Vector3i(15, 7, 13), Blocks.CONCRETE)
+	_fill(o, c + Vector3i(1, -1, 1), c + Vector3i(14, -1, 12), Blocks.RUG)
+	# Basamaklı kubbe (merkez 7.5, 6.5).
+	var r := 6.0
+	for dy in 7:
+		var rr := sqrt(maxf(0.0, r * r - float(dy * dy)))
+		for z in range(0, 14):
+			for x in range(0, 16):
+				if Vector2(x - 7.5, z - 6.5).length() <= rr:
+					_put(c + Vector3i(x, 8 + dy, z), Blocks.CONCRETE if dy < 6 else Blocks.TOY_BRICK_YELLOW)
+	_put(c + Vector3i(7, 15, 6), Blocks.TOY_BRICK_YELLOW)
+	# İki ince minare ve şerefeleri.
+	for mx in [-2, 17]:
+		var b := c + Vector3i(mx, 0, 13)
+		_fill(o, b, b + Vector3i(0, 20, 0), Blocks.SNOW)
+		_fill(o, b + Vector3i(-1, 14, -1), b + Vector3i(1, 14, 1), Blocks.STONE)
+		_fill(o, b + Vector3i(0, 21, 0), b + Vector3i(0, 22, 0), Blocks.TOY_BRICK_YELLOW)
