@@ -830,6 +830,30 @@ const LIST := [
 			{"title": "Sen salıncakta sıra bekler misin? Yorumlara yaz!", "t": 2.5},
 		],
 	},
+	{
+		"id": "odev", "name": "Bölüm 22: Ödevimi Kedi Yedi", "set": "okul", "time": 0.3,
+		"steps": [
+			{"place": "ogretmen", "at": "okul.tahta", "look": "okul.sira_1"},
+			{"place": "emir", "at": "okul.sira_1", "look": "okul.tahta"},
+			{"place": "ali", "at": "okul.sira_2", "look": "okul.tahta"},
+			{"cam": "okul.kam_sinif", "look": "okul.tahta", "t": 0},
+			{"say": "ogretmen", "text": "Çocuklar, ödevlerinizi masaya koyun!"},
+			{"title": "Ödevimi Kedi Yedi", "t": 1.2},
+			{"say": "emir", "text": "Buyurun öğretmenim, hepsini yaptım!"},
+			{"turn": "ogretmen", "to": "okul.sira_2"},
+			{"say": "ogretmen", "text": "Ali, senin ödevin nerede?"},
+			{"zoom": 0.6},
+			{"say": "ali", "text": "Öğretmenim... Ödevimi kedi yedi!"},
+			{"say": "ogretmen", "text": "Ali, sizin kediniz yok ki."},
+			{"say": "ali", "text": "Komşunun kedisi! Pencereden girdi, ödevi yedi, gitti!"},
+			{"shake": 0.3},
+			{"cam": "okul.kam_tahta", "look": "okul.sira_2", "t": 0},
+			{"say": "emir", "text": "Ali... Çantandan bir kedi kuyruğu sarkıyor."},
+			{"say": "ali", "text": "Iıı... O kedi ödevin kalanını yemeye geldi!"},
+			{"say": "ogretmen", "text": "Peki Ali. Kediye de bir ödev veriyorum: yarına iki sayfa!"},
+			{"title": "Sen hiç ödev bahanesi uydurdun mu? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 
