@@ -1,14 +1,14 @@
 {
   "_aciklama": "ElevenLabs Voice Library'den her karakter için bir ses seç, Voice ID'sini buraya yaz. Boş bırakılan karakter Microsoft sesiyle kalır. API anahtarı buraya DEĞİL, bilgisayarda ELEVENLABS_API_KEY ortam değişkenine yazılır.",
   "model": "eleven_multilingual_v2",
-  "_secimler": "emir: Teddy Twinkle (sevimli çizgi film erkek çocuğu); ali: Valf (genç, oyuncu); zeynep: Caglayan (neşeli genç kız, Türkçe); komsu_cocuk: Mithi (çocuk); anne: Elif Akın (sıcak, sakin, doğal Türk kadını); ogretmen: Tomris (canlı, enerjik, İstanbul Türkçesi); doktor: Akif (sıcak, sakin Türk erkeği); bakkal: Umit Gunacti (kalın, sıcak Türk erkeği)",
+  "_secimler": "emir: Teddy Twinkle (sevimli çizgi film erkek çocuğu); ali: Valf (genç, oyuncu); zeynep: Caglayan (neşeli genç kız, Türkçe); komsu_cocuk: Mithi (çocuk); anne: Elif Akın (sıcak, sakin, doğal Türk kadını); ogretmen: Mahmut Hoca (54 yaşında erkek, olgun ve net öğretmen sesi); doktor: Akif (sıcak, sakin Türk erkeği); bakkal: Umit Gunacti (kalın, sıcak Türk erkeği)",
   "sesler": {
     "emir": "XjGYkUkzth8BPs29fmcV",
     "ali": "loY1uopAz31XyhAEhNSa",
     "komsu_cocuk": "MIl0Flub6Sc9KSkX2A42",
     "zeynep": "sJ0xHHPzz1LOio4QNlB0",
     "anne": "NH9bimvGxCDlyOWKzhrl",
-    "ogretmen": "bqaNYmxFgK1TN7CL95PZ",
+    "ogretmen": "xHqOjnu0AbcqNgTDQJu6",
     "doktor": "skNtUvQlHhqETjfzZF1H",
     "bakkal": "OUMjwyTVLkTqFhscEshG"
   },
