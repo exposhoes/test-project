@@ -526,7 +526,7 @@ func _build_city() -> void:
 			i += 1
 	# Kuzey sırası: caddeye bakan apartmanlar ve altı dükkânlı binalar.
 	_row(Vector2i(-62, 32), Vector2i(-20, 32), -1)
-	_row(Vector2i(-8, 32), Vector2i(24, 32), -1)
+	_bazaar(Vector3i(-8, Y0, 32))
 	_row(Vector2i(35, 32), Vector2i(72, 32), -1)
 	_row(Vector2i(83, 32), Vector2i(98, 32), -1)
 	# Güney sırası.
@@ -683,3 +683,31 @@ func _mosque(c: Vector3i) -> void:
 		_fill(o, b, b + Vector3i(0, 20, 0), Blocks.SNOW)
 		_fill(o, b + Vector3i(-1, 14, -1), b + Vector3i(1, 14, 1), Blocks.STONE)
 		_fill(o, b + Vector3i(0, 21, 0), b + Vector3i(0, 22, 0), Blocks.TOY_BRICK_YELLOW)
+
+
+## Semt pazarı: taş zemin, iki sıra tenteli tezgâh, kasalar, meyve sebze, ortada çeşme.
+func _bazaar(c: Vector3i) -> void:
+	var o := Vector3i.ZERO
+	_fill(o, c + Vector3i(0, -1, 0), c + Vector3i(32, -1, 12), Blocks.COBBLESTONE)
+	var awnings := [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_BLUE, Blocks.TOY_BRICK_YELLOW, Blocks.SNOW]
+	var goods := [Blocks.BERRY_BUSH, Blocks.FLOWERS, Blocks.LEAVES, Blocks.TOY_BRICK_YELLOW, Blocks.TOY_BRICK_RED]
+	var k := 0
+	for row_z in [2, 9]:
+		for x0 in range(1, 31, 6):
+			if x0 >= 13 and x0 <= 18:
+				continue
+			# Tezgâh: 4 blok uzun masa, üstünde mal, arkasında kasa, köşede direkler, üstte tente.
+			_fill(o, c + Vector3i(x0, 0, row_z), c + Vector3i(x0 + 3, 0, row_z), Blocks.PLANKS)
+			_fill(o, c + Vector3i(x0, 1, row_z), c + Vector3i(x0 + 3, 1, row_z), goods[k % goods.size()])
+			_put(c + Vector3i(x0 + 1, 0, row_z + (1 if row_z == 2 else -1)), Blocks.CHEST)
+			for px in [x0, x0 + 3]:
+				_fill(o, c + Vector3i(px, 0, row_z - 1), c + Vector3i(px, 2, row_z - 1), Blocks.LOG)
+				_fill(o, c + Vector3i(px, 0, row_z + 1), c + Vector3i(px, 2, row_z + 1), Blocks.LOG)
+			for ax in range(x0, x0 + 4):
+				_fill(o, c + Vector3i(ax, 3, row_z - 1), c + Vector3i(ax, 3, row_z + 1), awnings[k % awnings.size()] if ax % 2 == 0 else Blocks.SNOW)
+			k += 1
+	# Ortada çeşme.
+	_walls(o, c + Vector3i(14, 0, 4), c + Vector3i(18, 0, 8), Blocks.STONE)
+	_fill(o, c + Vector3i(15, -1, 5), c + Vector3i(17, -1, 7), Blocks.GLASS)
+	_fill(o, c + Vector3i(16, 0, 6), c + Vector3i(16, 2, 6), Blocks.STONE)
+	_put(c + Vector3i(16, 3, 6), Blocks.LANTERN)
