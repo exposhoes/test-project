@@ -20,3 +20,6 @@ videolar/
 # Video kaydı sırasında geçici ayar (tools/kayit.ps1)
 override.cfg
 __pycache__/
+
+# Eşya görsellerinin temizlenmeden önceki yedekleri (tools/art/esya_kenar_temizle.py)
+*.png.orijinal
