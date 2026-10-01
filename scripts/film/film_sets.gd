@@ -40,6 +40,26 @@ const POINTS := {
 		"kam_oda": Vector3(7.8, 2.6, 5.8),
 		"kam_dis": Vector3(10.0, 4.0, 15.0),
 		"kam_kapi": Vector3(6.5, 1.8, 11.5),
+		"salon": Vector3(15.0, 0, 3.5),
+		"salon_kapi": Vector3(10.5, 0, 4.5),
+		"koridor": Vector3(6.5, 0, -2.5),
+		"banyo": Vector3(2.5, 0, -6.5),
+		"camasir": Vector3(-5.0, 0, -6.5),
+		"garaj": Vector3(-3.5, 0, 3.0),
+		"merdiven": Vector3(9.5, 0, -6.5),
+		"bodrum": Vector3(8.5, -4, -5.5),
+		"yatak_odasi": Vector3(4.0, 5, 4.5),
+		"ust_kat": Vector3(4.5, 5, -6.0),
+		"teras": Vector3(14.5, 5, 4.5),
+		"yan_bahce": Vector3(21.0, 0, 6.0),
+		"kam_salon": Vector3(16.2, 2.4, 6.2),
+		"kam_banyo": Vector3(4.4, 2.4, -5.2),
+		"kam_garaj": Vector3(-2.4, 2.2, 6.2),
+		"kam_bodrum": Vector3(14.0, -2.3, -2.4),
+		"kam_yatak_odasi": Vector3(7.6, 7.2, 5.8),
+		"kam_teras": Vector3(15.6, 7.0, 6.4),
+		"kam_bahce": Vector3(23.5, 3.0, 14.0),
+		"kam_ev_genel": Vector3(20.0, 7.0, 20.0),
 	},
 	"okul": {
 		"sinif_kapi": Vector3(7.5, 0, 10.5),
@@ -254,34 +274,104 @@ func _walls(o: Vector3i, from: Vector3i, to: Vector3i, id: int) -> void:
 ## Emir'in köy evi: iç ölçü 9x7, kütük köşeler, taş temel, tahta duvar, pencereler, çatı.
 ## İçeride yatak (sol arka), mutfak (sağ arka: tezgâh + ocak), masa, çanta sandığı, fener.
 func _build_house(o: Vector3i) -> void:
-	_fill(o, Vector3i(-1, -1, -1), Vector3i(9, -1, 7), Blocks.COBBLESTONE)
+	# Plan (zemin kat, iç ölçüler): ön blok x 0..8 z 0..6 = Emir'in odası + mutfak/yemek (iki katlı,
+	# üstte anne-baba yatak odası); salon x 10..16 z 0..6 (tek kat, üstü teras); garaj x -8..-2 z 0..6;
+	# arka kanat x -8..16 z -9..-2 (iki katlı): koridor z -3..-2, çamaşır odası, banyo, merdiven holü;
+	# altında bodrum. Arsa x -10..25 z -11..22, çitle çevrili; doğuda yan bahçe.
+	var F := Blocks.FACADE_CREAM
+	var P := Blocks.PLASTER
+	_fill(o, Vector3i(-9, -1, -10), Vector3i(17, -1, 7), Blocks.COBBLESTONE)
 	_fill(o, Vector3i(0, -1, 0), Vector3i(8, -1, 6), Blocks.DARK_PLANKS)
-	# İki katlı gerçekçi ev: krem sıva duvar, taş kaide, beyaz köşe ve kat silmesi.
-	_walls(o, Vector3i(-1, 0, -1), Vector3i(9, 7, 7), Blocks.FACADE_CREAM)
-	_walls(o, Vector3i(-1, 0, -1), Vector3i(9, 0, 7), Blocks.STONE_BASE)
-	_walls(o, Vector3i(-1, 4, -1), Vector3i(9, 4, 7), Blocks.TRIM_WHITE)
-	for c in [Vector3i(-1, 0, -1), Vector3i(9, 0, -1), Vector3i(-1, 0, 7), Vector3i(9, 0, 7)]:
-		_fill(o, c + Vector3i(0, 1, 0), c + Vector3i(0, 7, 0), Blocks.TRIM_WHITE)
-	_fill(o, Vector3i(0, 4, 0), Vector3i(8, 4, 6), Blocks.PLANKS)  # alt katın tavanı / üst katın zemini
+	_fill(o, Vector3i(10, -1, 0), Vector3i(16, -1, 6), Blocks.PLANKS)
+	_fill(o, Vector3i(-8, -1, -9), Vector3i(16, -1, -2), Blocks.DARK_PLANKS)
+	_fill(o, Vector3i(-8, -1, 0), Vector3i(-2, -1, 6), Blocks.CONCRETE)
+	_fill(o, Vector3i(0, -1, -9), Vector3i(4, -1, -5), Blocks.TILE_BATH)
+	# Bodrum (merdivenden iner): taş duvar, beton zemin.
+	_walls(o, Vector3i(-1, -5, -10), Vector3i(17, -2, -1), Blocks.STONE_BASE)
+	_fill(o, Vector3i(0, -5, -9), Vector3i(16, -5, -2), Blocks.CONCRETE)
+	_fill(o, Vector3i(0, -4, -9), Vector3i(16, -2, -2), Blocks.AIR)
+	# Dış duvarlar: krem sıva, taş kaide, beyaz kat silmesi ve köşeler.
+	_walls(o, Vector3i(-1, 0, -1), Vector3i(9, 7, 7), F)
+	_walls(o, Vector3i(-9, 0, -10), Vector3i(17, 7, -1), F)
+	_walls(o, Vector3i(9, 0, -1), Vector3i(17, 3, 7), F)
+	_walls(o, Vector3i(-9, 0, -1), Vector3i(-1, 3, 7), F)
+	for box in [[Vector3i(-1, 0, -1), Vector3i(9, 0, 7)], [Vector3i(-9, 0, -10), Vector3i(17, 0, -1)], [Vector3i(9, 0, -1), Vector3i(17, 0, 7)], [Vector3i(-9, 0, -1), Vector3i(-1, 0, 7)]]:
+		_walls(o, box[0], box[1], Blocks.STONE_BASE)
+	for box in [[Vector3i(-1, 4, -1), Vector3i(9, 4, 7)], [Vector3i(-9, 4, -10), Vector3i(17, 4, -1)], [Vector3i(9, 4, -1), Vector3i(17, 4, 7)], [Vector3i(-9, 4, -1), Vector3i(-1, 4, 7)]]:
+		_walls(o, box[0], box[1], Blocks.TRIM_WHITE)
+	for c in [Vector3i(-1, 0, 7), Vector3i(9, 0, 7), Vector3i(17, 0, 7), Vector3i(-9, 0, 7), Vector3i(-9, 0, -10), Vector3i(17, 0, -10)]:
+		_fill(o, c + Vector3i(0, 1, 0), c + Vector3i(0, 3, 0), Blocks.TRIM_WHITE)
+	for c in [Vector3i(-1, 5, 7), Vector3i(9, 5, 7), Vector3i(-9, 5, -10), Vector3i(17, 5, -10), Vector3i(-9, 5, -1), Vector3i(17, 5, -1)]:
+		_fill(o, c, c + Vector3i(0, 2, 0), Blocks.TRIM_WHITE)
+	# Kat döşemeleri ve tavanlar; garaj düz beton çatı; salonun üstü ahşap teras.
+	_fill(o, Vector3i(0, 4, 0), Vector3i(8, 4, 6), Blocks.PLANKS)
+	_fill(o, Vector3i(-8, 4, -9), Vector3i(16, 4, -2), Blocks.PLANKS)
 	_fill(o, Vector3i(0, 8, 0), Vector3i(8, 8, 6), Blocks.PLANKS)
-	# Beşik kiremit çatı (saçaklı), yan alınlıklar sıva; baca.
-	for step in 5:
-		_fill(o, Vector3i(-2, 8 + step, -2 + step), Vector3i(10, 8 + step, 8 - step), Blocks.ROOF_TERRACOTTA)
-		if step < 4:
-			_fill(o, Vector3i(-1, 8 + step, -1 + step), Vector3i(-1, 8 + step, 7 - step), Blocks.FACADE_CREAM)
-			_fill(o, Vector3i(9, 8 + step, -1 + step), Vector3i(9, 8 + step, 7 - step), Blocks.FACADE_CREAM)
-	_fill(o, Vector3i(7, 9, 1), Vector3i(7, 13, 1), Blocks.BRICKS)
-	# Pencereler: beyaz çerçeveli, alt ve üst yarı (her kat, dört yön).
+	_fill(o, Vector3i(-8, 8, -9), Vector3i(16, 8, -2), Blocks.PLANKS)
+	_fill(o, Vector3i(-8, 4, 0), Vector3i(-2, 4, 6), Blocks.CONCRETE)
+	_fill(o, Vector3i(10, 4, 0), Vector3i(16, 4, 6), Blocks.PLANKS)
+	for z in range(-1, 8):
+		_put(o + Vector3i(17, 5, z), Blocks.BALCONY_RAIL)
+	for x in range(10, 17):
+		_put(o + Vector3i(x, 5, 7), Blocks.BALCONY_RAIL)
+	# İç duvarlar (sıva): koridor duvarı ve oda ayraçları.
+	_fill(o, Vector3i(-8, 0, -4), Vector3i(16, 3, -4), P)
+	_fill(o, Vector3i(-1, 0, -9), Vector3i(-1, 3, -5), P)
+	_fill(o, Vector3i(5, 0, -9), Vector3i(5, 3, -5), P)
+	# Kiremit çatılar: arka kanatta sırt x boyunca, ön blokta z boyunca (alınlık sokağa bakar).
+	for s in 6:
+		_fill(o, Vector3i(-10, 8 + s, -11 + s), Vector3i(18, 8 + s, 0 - s), Blocks.ROOF_TERRACOTTA)
+		if s < 5:
+			_fill(o, Vector3i(-9, 8 + s, -10 + s), Vector3i(-9, 8 + s, -1 - s), F)
+			_fill(o, Vector3i(17, 8 + s, -10 + s), Vector3i(17, 8 + s, -1 - s), F)
+	for s in 6:
+		_fill(o, Vector3i(-2 + s, 8 + s, -1), Vector3i(10 - s, 8 + s, 8), Blocks.ROOF_TERRACOTTA)
+		if s < 5:
+			_fill(o, Vector3i(s, 8 + s, 7), Vector3i(8 - s, 8 + s, 7), F)
+	_put(o + Vector3i(4, 9, 7), Blocks.WINDOW_BOTTOM)
+	_put(o + Vector3i(4, 10, 7), Blocks.WINDOW_TOP)
+	_fill(o, Vector3i(13, 9, -6), Vector3i(13, 15, -6), Blocks.BRICKS)
+	# Pencereler (alt/üst yarı).
+	var wins: Array = []
 	for x in [1, 2, 6, 7]:
-		for z in [-1, 7]:
-			for y in [1, 5]:
-				_put(o + Vector3i(x, y, z), Blocks.WINDOW_BOTTOM)
-				_put(o + Vector3i(x, y + 1, z), Blocks.WINDOW_TOP)
+		wins.append([Vector3i(x, 1, 7)])
+		wins.append([Vector3i(x, 5, 7)])
 	for z in [2, 3]:
-		for x in [-1, 9]:
-			for y in [1, 5]:
-				_put(o + Vector3i(x, y, z), Blocks.WINDOW_BOTTOM)
-				_put(o + Vector3i(x, y + 1, z), Blocks.WINDOW_TOP)
+		wins.append([Vector3i(-1, 5, z)])
+		wins.append([Vector3i(-9, 1, z)])
+	wins.append([Vector3i(9, 5, 1)])
+	for x in [-7, -6, 2, 3, 8, 9, 14, 15]:
+		wins.append([Vector3i(x, 1, -10)])
+		wins.append([Vector3i(x, 5, -10)])
+	for z in [-7, -6]:
+		for x in [-9, 17]:
+			wins.append([Vector3i(x, 1, z)])
+			wins.append([Vector3i(x, 5, z)])
+	for x in [11, 12, 14, 15]:
+		wins.append([Vector3i(x, 1, 7)])
+	for z in [1, 2, 4, 5]:
+		wins.append([Vector3i(17, 1, z)])
+	for w: Array in wins:
+		_put(o + w[0], Blocks.WINDOW_BOTTOM)
+		_put(o + w[0] + Vector3i(0, 1, 0), Blocks.WINDOW_TOP)
+	# Kapı aralıkları.
+	for d in [Vector3i(5, 0, -1), Vector3i(9, 0, 4), Vector3i(9, 0, 5), Vector3i(13, 0, -1), Vector3i(-5, 0, -1),
+			Vector3i(2, 0, -4), Vector3i(-5, 0, -4), Vector3i(9, 0, -4), Vector3i(10, 0, -4), Vector3i(-5, 0, -10)]:
+		_fill(o, d, d + Vector3i(0, 2, 0), Blocks.AIR)
+	for d in [Vector3i(5, 5, -1), Vector3i(9, 5, 3)]:
+		_fill(o, d, d + Vector3i(0, 1, 0), Blocks.AIR)
+	doors.append([Vector3(o) + Vector3(2, 0, -3.5), 0.0])  # banyo kapısı
+	# Garaj: geniş açık kapı, üstünde beyaz lento; içinde araba.
+	_fill(o, Vector3i(-7, 0, 7), Vector3i(-3, 2, 7), Blocks.AIR)
+	_fill(o, Vector3i(-7, 3, 7), Vector3i(-3, 3, 7), Blocks.TRIM_WHITE)
+	_car(o + Vector3i(-6, 0, 1), Blocks.TOY_BRICK_RED, false)
+	# Merdivenler: yukarı (x 7..11) ve bodruma (x 12..15), merdiven holünde.
+	for k in 5:
+		_fill(o, Vector3i(7 + k, 0, -9), Vector3i(7 + k, k, -8), Blocks.PLANKS)
+	_fill(o, Vector3i(7, 4, -9), Vector3i(10, 4, -8), Blocks.AIR)
+	for k in range(1, 5):
+		_fill(o, Vector3i(11 + k, -k, -9), Vector3i(11 + k, -1, -8), Blocks.AIR)
+		_fill(o, Vector3i(11 + k, -1 - k, -9), Vector3i(11 + k, -1 - k, -8), Blocks.PLANKS)
 	# Giriş: açılan ahşap kapı (film_studio), beyaz kapı söveleri; üstünde balkon.
 	_fill(o, Vector3i(4, 0, 7), Vector3i(4, 2, 7), Blocks.AIR)
 	_fill(o, Vector3i(3, 0, 7), Vector3i(3, 3, 7), Blocks.TRIM_WHITE)
@@ -293,10 +383,62 @@ func _build_house(o: Vector3i) -> void:
 		_put(o + Vector3i(x, 6, 7), Blocks.WINDOW_TOP)
 		_put(o + Vector3i(x, 4, 8), Blocks.TRIM_WHITE)
 		_put(o + Vector3i(x, 5, 8), Blocks.BALCONY_RAIL)
-	# Ön bahçe çiti (yol için açıklık).
-	for x in range(-2, 11):
-		if x != 4:
-			_put(o + Vector3i(x, 0, 14), Blocks.FENCE_WHITE)
+	# Salon: koltuk, sehpa, televizyon, halı.
+	_prop(o, "koltuk", Vector3i(11, 0, 0), Vector2i(3, 1))
+	_prop(o, "sehpa", Vector3i(11, 0, 2), Vector2i(3, 1))
+	_prop(o, "tv", Vector3i(11, 0, 6), Vector2i(3, 1))
+	_fill(o, Vector3i(10, -1, 1), Vector3i(14, -1, 4), Blocks.RUG)
+	_fill(o, Vector3i(16, 0, 0), Vector3i(16, 1, 1), Blocks.BOOKSHELF)
+	# Banyo: küvet, lavabo, klozet.
+	_prop(o, "kuvet", Vector3i(0, 0, -9), Vector2i(2, 1))
+	_prop(o, "lavabo", Vector3i(3, 0, -9), Vector2i(1, 1))
+	_prop(o, "klozet", Vector3i(4, 0, -9), Vector2i(1, 1))
+	# Çamaşır odası: çamaşır ve kurutma makinesi, raf; arka bahçe kapısı.
+	_prop(o, "camasir_makinesi", Vector3i(-8, 0, -9), Vector2i(1, 1))
+	_prop(o, "camasir_makinesi", Vector3i(-7, 0, -9), Vector2i(1, 1))
+	_fill(o, Vector3i(-3, 0, -9), Vector3i(-2, 1, -9), Blocks.BOOKSHELF)
+	# Üst kat: anne-babanın yatak odası (ön blok), oyun köşesi (arka kanat).
+	for x in [3, 4]:
+		_put(o + Vector3i(x, 5, 1), Blocks.BED)
+		_put(o + Vector3i(x, 5, 2), Blocks.BED)
+	_prop(o, "komodin", Vector3i(2, 5, 0), Vector2i(1, 1))
+	_prop(o, "komodin", Vector3i(5, 5, 0), Vector2i(1, 1))
+	_prop(o, "gardirop", Vector3i(0, 5, 4), Vector2i(1, 2))
+	_fill(o, Vector3i(1, 4, 3), Vector3i(6, 4, 5), Blocks.RUG)
+	_prop(o, "koltuk", Vector3i(-6, 5, -9), Vector2i(3, 1))
+	_fill(o, Vector3i(0, 5, -9), Vector3i(3, 6, -9), Blocks.BOOKSHELF)
+	# Teras: masa ve saksı çiçekler.
+	_prop(o, "yemek_masasi", Vector3i(13, 5, 3), Vector2i(1, 1))
+	for p in [Vector3i(10, 5, 6), Vector3i(16, 5, 6), Vector3i(16, 5, 0)]:
+		_put(o + p, Blocks.FLOWERS)
+	# Bodrum: sandıklar ve raflar.
+	_fill(o, Vector3i(0, -4, -9), Vector3i(2, -4, -9), Blocks.CHEST)
+	_fill(o, Vector3i(4, -4, -9), Vector3i(8, -3, -9), Blocks.BOOKSHELF)
+	_fill(o, Vector3i(0, -4, -3), Vector3i(1, -4, -2), Blocks.CHEST)
+	# Işıklar.
+	for l in [Vector3i(13, 3, 3), Vector3i(-1, 3, -3), Vector3i(9, 3, -3), Vector3i(2, 3, -7), Vector3i(-5, 3, -7),
+			Vector3i(-5, 3, 3), Vector3i(14, 3, -7), Vector3i(4, -2, -6), Vector3i(12, -2, -3), Vector3i(4, 7, 3),
+			Vector3i(-3, 7, -6), Vector3i(8, 7, -3)]:
+		_put(o + l, Blocks.LANTERN)
+	# Arsa: çit (yol ve garaj yolu açık), garaj yolu, yan bahçe (ağaçlar, çiçek tarhı, salıncak).
+	for x in range(-10, 26):
+		if x != 4 and (x < -7 or x > -3):
+			_put(o + Vector3i(x, 0, 22), Blocks.FENCE_WHITE)
+		if x != -5:
+			_put(o + Vector3i(x, 0, -11), Blocks.FENCE_WHITE)
+	for z in range(-11, 23):
+		_put(o + Vector3i(-10, 0, z), Blocks.FENCE_WHITE)
+		_put(o + Vector3i(25, 0, z), Blocks.FENCE_WHITE)
+	_fill(o, Vector3i(-7, -1, 8), Vector3i(-3, -1, 22), Blocks.CONCRETE)
+	for t in [Vector3i(21, 0, -7), Vector3i(23, 0, 3), Vector3i(20, 0, 17), Vector3i(-7, 0, 16)]:
+		_tree(o + t)
+	for z in range(0, 7):
+		_put(o + Vector3i(18, 0, z), Blocks.FLOWERS)
+	_fill(o, Vector3i(19, 0, 11), Vector3i(19, 3, 11), Blocks.LOG)
+	_fill(o, Vector3i(22, 0, 11), Vector3i(22, 3, 11), Blocks.LOG)
+	_fill(o, Vector3i(19, 4, 11), Vector3i(22, 4, 11), Blocks.PLANKS)
+	_prop(o, "sehpa", Vector3i(20, 0, 11), Vector2i(2, 1))
+	_prop(o, "yemek_masasi", Vector3i(21, 0, -2), Vector2i(1, 1))
 	# Emir'in odası: yatak, kitaplık, sandık.
 	_put(o + Vector3i(1, 0, 1), Blocks.BED)
 	_put(o + Vector3i(1, 0, 2), Blocks.BED)
@@ -491,7 +633,9 @@ func _build_field(o: Vector3i) -> void:
 
 ## Karakter bu hücrede durabilir mi (ayak ve baş hizası boş mu)?
 func is_air(cell: Vector3i) -> bool:
-	return _blocks.get(cell, Blocks.AIR) == Blocks.AIR and cell.y > GROUND and not _prop_cells.has(cell)
+	# Yerin altı da oyulmuşsa (bodrum) havadır.
+	var b: int = _blocks.get(cell, -1)
+	return (b == Blocks.AIR or (b == -1 and cell.y > GROUND)) and not _prop_cells.has(cell)
 
 
 ## İki nokta arası bloklara çarpmadan görülebiliyor mu (kamera kadrajı için).
@@ -632,13 +776,10 @@ func _build_city() -> void:
 	_row(Vector2i(35, -40), Vector2i(72, -40), 1)
 	_row(Vector2i(83, -40), Vector2i(98, -40), 1)
 	# Setlerin aralarındaki boş parseller.
-	_building(Vector3i(14, Y0, -8), Vector2i(10, 10), 4, 0, true, -1)
-	_building(Vector3i(14, Y0, 6), Vector2i(10, 12), 2, 1, true, 1)
 	_building(Vector3i(35, Y0, -8), Vector2i(10, 10), 5, 2, false, -1)
 	_building(Vector3i(35, Y0, 6), Vector2i(10, 12), 3, 3, true, 1)
 	_building(Vector3i(67, Y0, -8), Vector2i(7, 26), 4, 4, false, 1)
 	_building(Vector3i(-59, Y0, -8), Vector2i(14, 26), 5, 5, false, 1)
-	_building(Vector3i(-8, Y0, -8), Vector2i(4, 10), 2, 0, true, -1)
 	_building(Vector3i(-25, Y0, -8), Vector2i(6, 10), 3, 1, true, -1)
 	_building(Vector3i(14, Y0, -36), Vector2i(10, 14), 4, 2, true, 1)
 	_building(Vector3i(59, Y0, -36), Vector2i(14, 14), 5, 3, false, 1)

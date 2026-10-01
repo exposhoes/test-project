@@ -7,17 +7,18 @@ func _init() -> void:
 	root.add_child(studio)
 	await process_frame
 	var fails := 0
+	var sets: FilmSets = studio.world.generator
 	for set_id in FilmSets.POINTS:
 		for p in FilmSets.POINTS[set_id]:
 			var pos := FilmSets.point(set_id + "." + p)
-			if pos.y < FilmSets.GROUND:
+			# Bodrum gibi oyulmuş yer altı noktaları serbest.
+			if pos.y < FilmSets.GROUND and not sets.is_air(Vector3i(pos.floor())):
 				fails += 1
 				print("FAIL nokta yerin altında: ", set_id, ".", p)
 	# Karakterlerin durduğu noktalar eşyaların içinde olmasın (yerdeki noktalar; kameralar ve yatak üstü hariç).
-	var sets: FilmSets = studio.world.generator
 	for set_id in FilmSets.POINTS:
 		for p: String in FilmSets.POINTS[set_id]:
-			if p.begins_with("kam") or FilmSets.POINTS[set_id][p].y > 0.0:
+			if p.begins_with("kam") or FilmSets.POINTS[set_id][p].y > 0.0 and FilmSets.POINTS[set_id][p].y < 1.0:
 				continue
 			var pos := FilmSets.point(set_id + "." + p)
 			if not sets.is_free(Vector3i(floori(pos.x), floori(pos.y), floori(pos.z))):

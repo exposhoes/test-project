@@ -8,6 +8,7 @@ extends RefCounted
 const HEIGHTS := {
 	"gardirop": 2.0, "calisma_masasi": 0.8, "mutfak_tezgahi": 0.9, "ocak": 0.9,
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
+	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
 ## daha geniş tabanlarda x/z ölçeklenir.
@@ -25,7 +26,7 @@ static func height(id: String) -> float:
 ## 0: +Z, PI/2: +X, PI: -Z, -PI/2: -X. Setteki duvara göre odaya bakar.
 const FACING := {
 	"gardirop": PI / 2, "oyuncak_kutusu": PI / 2, "market_rafi": PI / 2,
-	"calisma_masasi": PI, "buzdolabi": -PI / 2,
+	"calisma_masasi": PI, "buzdolabi": -PI / 2, "tv": PI,
 }
 
 
@@ -246,6 +247,53 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				for k in n:
 					var hh := 0.2 + float((i * 7 + k * 3) % 3) * 0.06
 					_box(r, Vector3(0.24, hh, d * 0.55), Vector3(0.2 + k * 0.3, sy + 0.02 + hh / 2, d / 2 + 0.05), cols[(i * 3 + k) % cols.size()])
+		"koltuk":
+			var c := _tone(id, Color("8d939a"))
+			_box(r, Vector3(w - 0.1, 0.25, d - 0.2), Vector3(w / 2, 0.2, d / 2 + 0.05), c.darkened(0.15))  # oturak tabanı
+			_box(r, Vector3(w - 0.4, 0.15, d - 0.35), Vector3(w / 2, 0.4, d / 2 + 0.1), c.lightened(0.05))  # minder
+			_box(r, Vector3(w - 0.1, 0.55, 0.22), Vector3(w / 2, 0.55, 0.16), c)  # sırt
+			for sx in [0.1, w - 0.1]:
+				_box(r, Vector3(0.18, 0.55, d - 0.2), Vector3(sx, 0.35, d / 2 + 0.05), c.darkened(0.08))  # kolçak
+			for k in 2:
+				_box(r, Vector3(0.45, 0.35, 0.12), Vector3(w * (0.3 + 0.4 * k), 0.62, 0.32), c.lightened(0.15))  # yastık
+			for px in [0.15, w - 0.15]:
+				_box(r, Vector3(0.06, 0.08, 0.06), Vector3(px, 0.04, d - 0.2), Color("3a2a1e"))
+		"sehpa":
+			var c := _tone(id, WOOD)
+			_box(r, Vector3(w - 0.6, 0.05, d - 0.4), Vector3(w / 2, h - 0.025, d / 2), c)
+			for p in [Vector2(0.35, 0.25), Vector2(w - 0.35, 0.25), Vector2(0.35, d - 0.25), Vector2(w - 0.35, d - 0.25)]:
+				_box(r, Vector3(0.05, h - 0.05, 0.05), Vector3(p.x, (h - 0.05) / 2, p.y), c.darkened(0.25))
+			_box(r, Vector3(0.3, 0.08, 0.2), Vector3(w / 2 - 0.3, h + 0.04, d / 2), Color("e84a4a"))  # kitap
+			_box(r, Vector3(0.12, 0.15, 0.12), Vector3(w / 2 + 0.3, h + 0.075, d / 2), Color("f5f5f5"))  # fincan
+		"tv":
+			var c := _tone(id, WOOD)
+			_box(r, Vector3(w - 0.2, 0.5, d - 0.4), Vector3(w / 2, 0.25, d / 2 - 0.1), c)  # sehpa
+			for k in 2:
+				_box(r, Vector3(w / 2 - 0.25, 0.3, 0.02), Vector3(w * (0.27 + 0.46 * k), 0.25, d - 0.3), c.lightened(0.06))
+			_box(r, Vector3(0.3, 0.05, 0.2), Vector3(w / 2, 0.525, d / 2 - 0.1), Color("222222"))  # ayak
+			_box(r, Vector3(1.7, 0.95, 0.06), Vector3(w / 2, 1.0, d / 2 - 0.1), Color("1b1d20"))  # ekran
+			_box(r, Vector3(1.6, 0.85, 0.01), Vector3(w / 2, 1.0, d / 2 - 0.065), Color("2b4a6b"))
+		"kuvet":
+			_box(r, Vector3(w - 0.05, h, d - 0.1), Vector3(w / 2, h / 2, d / 2), Color("f7f7f7"))
+			_box(r, Vector3(w - 0.3, 0.02, d - 0.35), Vector3(w / 2, h - 0.08, d / 2), Color("8fd3f0"))  # su
+			_box(r, Vector3(0.05, 0.4, 0.05), Vector3(0.2, h + 0.2, 0.1), STEEL)  # musluk
+		"lavabo":
+			_box(r, Vector3(0.18, h - 0.15, 0.18), Vector3(w / 2, (h - 0.15) / 2, 0.3), Color("f2f2f2"))
+			_box(r, Vector3(0.6, 0.15, 0.45), Vector3(w / 2, h - 0.075, 0.3), Color("fafafa"))
+			_box(r, Vector3(0.4, 0.02, 0.28), Vector3(w / 2, h + 0.001, 0.3), Color("b9d7e3"))
+			_box(r, Vector3(0.04, 0.2, 0.04), Vector3(w / 2, h + 0.1, 0.1), STEEL)
+			_box(r, Vector3(0.55, 0.7, 0.03), Vector3(w / 2, 1.6, 0.03), Color("cfe7f2"))  # ayna
+			_box(r, Vector3(0.6, 0.75, 0.02), Vector3(w / 2, 1.6, 0.015), Color("d9d9d9"))
+		"klozet":
+			_box(r, Vector3(0.35, 0.4, 0.45), Vector3(w / 2, 0.2, 0.45), Color("f7f7f7"))
+			_box(r, Vector3(0.45, 0.06, 0.55), Vector3(w / 2, 0.43, 0.5), Color("ffffff"))  # kapak
+			_box(r, Vector3(0.45, 0.4, 0.18), Vector3(w / 2, 0.6, 0.12), Color("f2f2f2"))  # rezervuar
+			_box(r, Vector3(0.1, 0.03, 0.05), Vector3(w / 2, 0.82, 0.12), STEEL)
+		"camasir_makinesi":
+			_box(r, Vector3(w - 0.1, h, d - 0.15), Vector3(w / 2, h / 2, d / 2 - 0.05), Color("f4f4f4"))
+			_box(r, Vector3(0.5, 0.5, 0.03), Vector3(w / 2, h * 0.45, d - 0.12), Color("9aa3aa"))  # kapak çerçevesi
+			_box(r, Vector3(0.38, 0.38, 0.03), Vector3(w / 2, h * 0.45, d - 0.1), Color("2f3a45"))  # cam
+			_box(r, Vector3(w - 0.2, 0.12, 0.02), Vector3(w / 2, h - 0.1, d - 0.12), Color("d0d4d8"))
 		_:
 			_box(r, f, f / 2, WOOD)
 

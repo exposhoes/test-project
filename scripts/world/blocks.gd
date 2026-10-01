@@ -57,6 +57,7 @@ enum {
 	STONE_BASE,
 	BALCONY_RAIL,
 	FENCE_WHITE,
+	TILE_BATH,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -116,6 +117,7 @@ const DEFS := {
 	STONE_BASE: {"name": "Taş Kaide", "all": "stone_base"},
 	BALCONY_RAIL: {"name": "Balkon Korkuluğu", "top": "trim_white", "side": "balcony_rail", "bottom": "trim_white", "transparent": true},
 	FENCE_WHITE: {"name": "Beyaz Çit", "top": "fence_white", "side": "fence_white", "bottom": "fence_white", "transparent": true},
+	TILE_BATH: {"name": "Banyo Fayansı", "all": "tile_bath"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
