@@ -1,0 +1,8 @@
+Müzik ve efekt dosyaları (dosya yoksa oyun sessizce devam eder):
+
+assets/audio/music/<ad>.ogg|mp3|wav   - bölüm adımı {"music": "<ad>"}; varsayılan "neseli", "" durdurur
+  neseli, gerilim, duygusal
+assets/audio/sfx/<ad>.ogg|mp3|wav     - bölüm adımı {"sfx": "<ad>"}
+  Otomatik çalanlar: baslik (başlık), bom (zoom vuruşu), saskin (sarsıntı)
+  Diğerleri: vuup, gulme, ding, ayak, boing, pop, wahwah, alkis, gasp, kapi, zil, horoz, kedi, kopek,
+  dusme, sihir, kalp, top, duduk, ortam_sehir
