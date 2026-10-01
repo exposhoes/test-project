@@ -854,6 +854,30 @@ const LIST := [
 			{"title": "Sen hiç ödev bahanesi uydurdun mu? Yorumlara yaz!", "t": 2.5},
 		],
 	},
+	{
+		"id": "kaydirak", "name": "Bölüm 23: Ali Kaydıraktan Korkar mı?", "set": "oyun", "time": 0.45,
+		"steps": [
+			{"place": "ali", "at": "oyun.kaydirak_yani", "look": "oyun.kaydirak_alt"},
+			{"place": "emir", "at": "oyun.orta", "look": "oyun.kaydirak_yani"},
+			{"place": "komsu_cocuk", "at": "oyun.kaydirak_alt", "look": "oyun.orta"},
+			{"cam": "oyun.kam_genel", "look": "oyun.kaydirak_yani", "t": 0},
+			{"say": "ali", "text": "Ben mi korkmak? Bu kaydırak bana çok küçük!"},
+			{"title": "Ali Kaydıraktan Korkar mı?", "t": 1.2},
+			{"say": "emir", "text": "O zaman hadi kay, Ali!"},
+			{"cam": "oyun.kam_kaydirak", "look": "oyun.kaydirak_yani", "t": 0},
+			{"say": "ali", "text": "Şey... Önce ısınmam lazım. Profesyoneller hep ısınır."},
+			{"say": "komsu_cocuk", "text": "Ben üç yaşındayım ve on kere kaydım!"},
+			{"zoom": 0.6},
+			{"say": "ali", "text": "Iıı... Bugün kaydırak çok kaygan görünüyor."},
+			{"walk": "emir", "to": "oyun.kaydirak_alt"},
+			{"say": "emir", "text": "Ali, korkmak ayıp değil. Beraber kayalım mı?"},
+			{"shake": 0.3},
+			{"say": "ali", "text": "Beraber mi? Tamam! Ama ben önde, sen arkada tut beni!"},
+			{"cam": "oyun.kam_genel", "look": "oyun.kaydirak_alt", "t": 0},
+			{"say": "ali", "text": "Vay! Bir daha! Bir daha kayalım!"},
+			{"title": "Sen en çok hangi oyuncağı seversin? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 
