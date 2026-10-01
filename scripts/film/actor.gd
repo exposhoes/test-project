@@ -43,7 +43,7 @@ const ACTORS := {
 			[Vector3(0.54, 0.14, 0.54), Vector3(0, 1.72, 0.02), Color("111111")],
 		],
 		"face": [0.46, Vector3(0, 1.43, -0.25)], "hair": Color("111111"), "eyes": Color("2a1a10")},
-	"emir": {"name": "Emir", "color": Color("ffd23f"), "mouth_x": 0.02, "mouth_h": 0.125,
+	"emir": {"name": "Emir", "color": Color("ffd23f"), "mouth_x": 0.05, "mouth_h": 0.125,
 		"parts": [
 			[Vector3(0.22, 0.6, 0.24), Vector3(-0.13, 0.3, 0), Color("2f4f8f")],   # kot pantolon
 			[Vector3(0.22, 0.6, 0.24), Vector3(0.13, 0.3, 0), Color("2f4f8f")],
@@ -232,12 +232,19 @@ func _build_glb() -> bool:
 					plain = plain.left(-4)
 				if plain != String(n) and not lib.has_animation(plain):
 					lib.rename_animation(n, plain)
-		for n in ["walk", "idle"]:
-			if _anim.has_animation(n):
-				_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
-		_play("idle")
+		for n: StringName in _anim.get_animation_list():
+			var low := String(n).to_lower()
+			for loop_name in ["walk", "idle", "wait", "talk", "speech", "run"]:
+				if low.begins_with(loop_name):
+					_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+		_play(_find_anim(["idle", "wait"]))
 	_face_idle = null
-	_build_glb_mouth(model)
+	# Çizili ağzın üstüne konan koyu oval kafa döndükçe yanakta kayıyordu; kapalı. Konuşmayı
+	# modelin "Talk"/"speech" animasyonu ve kafa sallama taşır.
+	if data.get("mouth_overlay", false):
+		_build_glb_mouth(model)
+	else:
+		_init_head_bone(model)
 	return true
 
 
@@ -314,19 +321,63 @@ func head_position() -> Vector3:
 	return position + Vector3(0, 1.45, 0)
 
 
-func _animate_glb_talk(delta: float) -> void:
-	if _mouth == null:
+func _init_head_bone(model: Node3D) -> void:
+	var sks := model.find_children("*", "Skeleton3D", true, false)
+	if sks.is_empty():
 		return
-	_mouth.visible = talking
-	if not talking:
+	_skeleton = sks[0]
+	for i in _skeleton.get_bone_count():
+		if _skeleton.get_bone_name(i).ends_with("Head"):
+			_head_bone = i
+
+
+func _animate_glb_talk(delta: float) -> void:
+	if _skeleton == null or _head_bone == -1:
+		return
+	if _mouth:
+		_mouth.visible = talking
+	if not talking or _body.rotation.x != 0.0:
 		return
 	_talk_timer += delta
 	var open := 0.25 + 0.75 * absf(sin(_talk_timer * 11.0)) * (0.6 + 0.4 * sin(_talk_timer * 3.7))
-	_mouth.basis = _mouth_basis * Basis().scaled(Vector3(1.0, 0.1 + 0.3 * open, 0.2))
+	if _mouth:
+		_mouth.basis = _mouth_basis * Basis().scaled(Vector3(1.0, 0.1 + 0.3 * open, 0.2))
 	# Konuşurken kafa hafifçe sallansın (yüz ifadesi canlı dursun).
 	var pose := _skeleton.get_bone_pose_rotation(_head_bone)
 	var nod := Quaternion(Vector3.RIGHT, sin(_talk_timer * 5.0) * 0.06) * Quaternion(Vector3.UP, sin(_talk_timer * 2.3) * 0.05)
 	_skeleton.set_bone_pose_rotation(_head_bone, pose * nod)
+
+
+var _gesture_left := 0.0
+const GESTURES := {
+	"gul": ["laugh", "clap", "dance"],
+	"sok": ["scared", "afraid"],
+	"kiz": ["angry", "complain"],
+	"selam": ["greet", "wave"],
+	"agla": ["cry", "sob"],
+	"evet": ["agree", "clap"],
+}
+
+
+## Modelde varsa duyguya uygun bir hareketi bir kez oynatır (gülme, şok, kızma, selam, onay).
+## Adı verilen öneklerden biriyle başlayan ilk animasyon (büyük/küçük harf fark etmez).
+func _find_anim(prefixes: Array) -> String:
+	if _anim == null:
+		return ""
+	for prefix: String in prefixes:
+		for n: StringName in _anim.get_animation_list():
+			if String(n).to_lower().begins_with(prefix):
+				return String(n)
+	return ""
+
+
+func gesture(kind: String) -> void:
+	if _anim == null or _moving:
+		return
+	var n := _find_anim(GESTURES.get(kind, []))
+	if n != "":
+		_anim.play(n, 0.2)
+		_gesture_left = minf(_anim.get_animation(n).length, 2.5)
 
 
 func _play(name: String) -> void:
@@ -566,6 +617,9 @@ func walk_to(target: Vector3, speed := 2.2) -> void:
 		return
 	target = _stop_before_others(target)
 	_moving = true
+	# Bacaklar yerde kaymasın: yürüme animasyonunu gerçek hıza göre hızlandır/yavaşlat.
+	if _anim:
+		_anim.speed_scale = clampf(speed / float(data.get("walk_speed", 1.4)), 0.6, 2.5)
 	for p in _path_to(target):
 		var f := Vector3(p.x, position.y, p.z)
 		if f.distance_to(position) > 0.05:
@@ -574,6 +628,8 @@ func walk_to(target: Vector3, speed := 2.2) -> void:
 		tw.tween_property(self, "position", p, position.distance_to(p) / speed)
 		await tw.finished
 	_moving = false
+	if _anim:
+		_anim.speed_scale = 1.0
 	_body.position.y = 0.0
 
 
@@ -642,7 +698,15 @@ func face_towards(point: Vector3) -> void:
 
 func _process(delta: float) -> void:
 	if _anim:
-		_play("walk" if _moving else "idle")
+		if _moving:
+			_gesture_left = 0.0
+			_play(_find_anim(["walk"]))
+		elif _gesture_left > 0.0:
+			_gesture_left -= delta
+		elif talking and _find_anim(["talk", "speech"]) != "":
+			_play(_find_anim(["talk", "speech"]))
+		else:
+			_play(_find_anim(["idle", "wait"]))
 		_animate_glb_talk(delta)
 		return
 	if talking:

@@ -163,7 +163,7 @@ func _run(s: Dictionary) -> void:
 		await _say(s["say"], s["text"])
 	elif s.has("walk"):
 		var a := _actor(s["walk"])
-		var speed := 0.0 if fast else 3.2
+		var speed := 0.0 if fast else 2.2
 		var path := (world.generator as FilmSets).route(a.position, FilmSets.point(s["to"]))
 		if path.is_empty():
 			route_failures += 1
@@ -214,7 +214,7 @@ func _say(id: String, text: String) -> void:
 	_speaker = a
 	_frame_speaker(a)
 	_auto_zoom(text)
-	_auto_sfx(text)
+	_auto_sfx(text, a)
 	var voiced := voice.speak(id, text, _episode_id, _line)
 	var total := text.length()
 	var t := 0.0
@@ -332,12 +332,25 @@ func _shows(cam: Vector3, head: Vector3, who: Actor, check_frame := true) -> boo
 
 
 ## Komik ve şaşırtıcı anlara kendiliğinden efekt: kahkahada gülme, "?!" ya da "Eyvah"ta şok sesi.
-func _auto_sfx(text: String) -> void:
+func _auto_sfx(text: String, a: Actor = null) -> void:
 	var t := text.to_lower()
+	var kind := ""
 	if t.contains("haha") or t.contains("hihi") or t.contains("kıkır"):
 		play_sfx("gulme")
+		kind = "gul"
 	elif text.contains("?!") or t.begins_with("eyvah") or t.begins_with("ne?") or t.contains("olamaz"):
 		play_sfx("saskin")
+		kind = "sok"
+	elif t.contains("ağla") or t.contains("üzgün") or t.contains("hıçkır"):
+		kind = "agla"
+	elif t.contains("kızdım") or t.contains("yeter") or t.contains("hayır!"):
+		kind = "kiz"
+	elif t.begins_with("merhaba") or t.begins_with("günaydın") or t.contains("görüşürüz"):
+		kind = "selam"
+	elif t.begins_with("tamam") or t.begins_with("olur") or t.begins_with("evet") or t.contains("yaşasın"):
+		kind = "evet"
+	if a and kind != "":
+		a.gesture(kind)
 
 
 ## Shorts tarzı kamera: her replikte yavaş yakınlaşma, ünlemli replikte hızlı "vurma" zoom'u.
