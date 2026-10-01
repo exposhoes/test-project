@@ -352,12 +352,12 @@ func _animate_glb_talk(delta: float) -> void:
 var _gesture_left := 0.0
 const TALK_ANIMS := ["talk", "speech"]
 const GESTURES := {
-	"gul": ["laugh", "clap", "dance"],
+	"gul": ["laugh"],
 	"sok": ["scared", "afraid"],
 	"kiz": ["angry", "complain"],
 	"selam": ["greet", "wave"],
 	"agla": ["cry", "sob"],
-	"evet": ["agree", "clap"],
+	"evet": ["agree"],
 }
 
 
