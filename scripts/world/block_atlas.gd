@@ -3,7 +3,8 @@ extends RefCounted
 ## Tüm blok dokularını tek bir atlas görseline dizer.
 ## `res://assets/textures/blocks/<ad>.png` varsa onu kullanır, yoksa koddan geçici bir doku üretir.
 
-const TILE := 32
+## 128: Mehmet'in yüksek çözünürlüklü dokuları için; eski 32 piksellik dokular piksel bozulmadan büyütülür.
+const TILE := 128
 const COLUMNS := 8
 const TEXTURE_DIR := "res://assets/textures/blocks/"
 
@@ -50,19 +51,23 @@ func _load_tile(texture_name: String) -> Image:
 			if img.is_compressed():
 				img.decompress()
 			img.convert(Image.FORMAT_RGBA8)
-			img.resize(TILE, TILE, Image.INTERPOLATE_NEAREST)
+			var shrink := img.get_width() > TILE
+			img.resize(TILE, TILE, Image.INTERPOLATE_LANCZOS if shrink else Image.INTERPOLATE_NEAREST)
 			return img
-	return _placeholder(texture_name)
+	var ph := _placeholder(texture_name)
+	ph.resize(TILE, TILE, Image.INTERPOLATE_NEAREST)
+	return ph
 
 
 ## Görseller gelene kadar oyunun oynanabilir görünmesi için basit desenli doku.
 func _placeholder(texture_name: String) -> Image:
+	const PT := 32  # desenler 32 pikselde çizilir, sonra atlas boyutuna büyütülür
 	var base: Color = Blocks.PLACEHOLDER_COLORS.get(texture_name, Color.MAGENTA)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(texture_name)
-	var img := Image.create(TILE, TILE, false, Image.FORMAT_RGBA8)
-	for y in TILE:
-		for x in TILE:
+	var img := Image.create(PT, PT, false, Image.FORMAT_RGBA8)
+	for y in PT:
+		for x in PT:
 			var c := base.darkened(rng.randf_range(0.0, 0.18))
 			if texture_name.ends_with("_ore"):
 				c = Blocks.PLACEHOLDER_COLORS["stone"].darkened(rng.randf_range(0.0, 0.15))
@@ -73,11 +78,11 @@ func _placeholder(texture_name: String) -> Image:
 			elif texture_name == "leaves" and rng.randf() < 0.15:
 				c = Color.TRANSPARENT
 			elif texture_name == "glass":
-				var edge := x == 0 or y == 0 or x == TILE - 1 or y == TILE - 1
+				var edge := x == 0 or y == 0 or x == PT - 1 or y == PT - 1
 				c = base if edge else Color(1, 1, 1, 0)
 			elif texture_name == "log_top":
-				var d := Vector2(x, y).distance_to(Vector2(TILE / 2.0, TILE / 2.0))
-				c = Blocks.PLACEHOLDER_COLORS["log_side"] if d > TILE * 0.45 else (base.darkened(0.25) if int(d) % 4 == 0 else base)
+				var d := Vector2(x, y).distance_to(Vector2(PT / 2.0, PT / 2.0))
+				c = Blocks.PLACEHOLDER_COLORS["log_side"] if d > PT * 0.45 else (base.darkened(0.25) if int(d) % 4 == 0 else base)
 			elif texture_name in ["planks", "crafting_side"] and y % 8 == 0:
 				c = base.darkened(0.35)
 			elif texture_name == "bricks" and (y % 8 == 0 or (x + (y / 8) * 8) % 16 == 0):
@@ -85,28 +90,28 @@ func _placeholder(texture_name: String) -> Image:
 			elif texture_name == "furnace_side" and x >= 8 and x < 24 and y >= 14 and y < 28:
 				# Ağız: üstte karanlık, altta kor.
 				c = Color("1a1a1a") if y < 21 else Color("e8741c").lerp(Color("f7c948"), rng.randf())
-			elif texture_name.begins_with("furnace") and (x == 0 or y == 0 or x == TILE - 1 or y == TILE - 1):
+			elif texture_name.begins_with("furnace") and (x == 0 or y == 0 or x == PT - 1 or y == PT - 1):
 				c = base.darkened(0.4)
 			elif texture_name == "halls_portal":
 				# Ahşap çerçeveli, içi parlayan sarı kapı.
-				var frame := x < 4 or x >= TILE - 4 or y < 3
+				var frame := x < 4 or x >= PT - 4 or y < 3
 				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.2) if frame else base.lightened(0.15 + 0.25 * sin(y * 0.4 + x * 0.2))
 			elif texture_name == "factory_portal":
 				# Ahşap çerçeve, içinde dönen renkli şeritler.
-				var frame := x < 4 or x >= TILE - 4 or y < 3
+				var frame := x < 4 or x >= PT - 4 or y < 3
 				var band := int((x + y + 2 * sin(x * 0.5)) / 5.0) % 3
 				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.2) if frame else [base, Color("f2c230"), Color("2f6fd9")][band]
 			elif texture_name == "playroom_wall" and (Vector2(x % 16, y % 16).distance_to(Vector2(5, 6)) < 2.5 or (x + y * 3) % 23 == 0):
 				c = Color("fdf6c8")
 			elif texture_name == "lantern":
 				# Koyu demir çerçeve, ortada parlayan alev.
-				var edge := x < 3 or x >= TILE - 3 or y < 3 or y >= TILE - 3 or x == TILE / 2 or y == TILE / 2
-				var glow := 1.0 - Vector2(x, y).distance_to(Vector2(TILE / 2.0, TILE / 2.0)) / (TILE * 0.6)
+				var edge := x < 3 or x >= PT - 3 or y < 3 or y >= PT - 3 or x == PT / 2 or y == PT / 2
+				var glow := 1.0 - Vector2(x, y).distance_to(Vector2(PT / 2.0, PT / 2.0)) / (PT * 0.6)
 				c = Color("2a2522") if edge else base.lightened(glow * 0.6)
 			elif texture_name == "ceiling_tile" and (x % 16 == 0 or y % 16 == 0):
 				c = base.darkened(0.3)
 			elif texture_name == "ceiling_light":
-				c = base if (x > 2 and x < TILE - 3 and y > 2 and y < TILE - 3) else Color("b8b29a")
+				c = base if (x > 2 and x < PT - 3 and y > 2 and y < PT - 3) else Color("b8b29a")
 			elif texture_name == "yellow_wallpaper" and x % 6 == 0:
 				c = base.darkened(0.12)
 			elif texture_name.begins_with("toy_brick") and Vector2(x % 16, y % 16).distance_to(Vector2(8, 8)) < 4.5:
@@ -116,12 +121,12 @@ func _placeholder(texture_name: String) -> Image:
 				var row := y / 6
 				c = base.darkened(0.35) if y % 6 == 5 or (x + row * 4) % 8 == 0 else base.lightened(0.08 * (y % 6) / 5.0)
 			elif texture_name == "bookshelf":
-				var shelf := y % 16 < 2 or x < 2 or x >= TILE - 2
+				var shelf := y % 16 < 2 or x < 2 or x >= PT - 2
 				var book_colors: Array[Color] = [Color("c0392b"), Color("2e86c1"), Color("27ae60"), Color("f1c40f"), Color("8e44ad"), Color("e67e22")]
 				c = Blocks.PLACEHOLDER_COLORS["planks"].darkened(0.1) if shelf else book_colors[(x / 3 + (y / 16) * 2) % book_colors.size()].darkened(0.1 if x % 3 == 0 else 0.0)
 			elif texture_name == "rug":
-				var border := x < 3 or y < 3 or x >= TILE - 3 or y >= TILE - 3
-				var diamond: bool = absi(x - TILE / 2) + absi(y - TILE / 2) in [8, 9]
+				var border := x < 3 or y < 3 or x >= PT - 3 or y >= PT - 3
+				var diamond: bool = absi(x - PT / 2) + absi(y - PT / 2) in [8, 9]
 				c = Color("e0b040") if border or diamond else base.darkened(rng.randf_range(0.0, 0.08))
 			elif texture_name == "dark_planks" and y % 8 == 0:
 				c = base.darkened(0.35)

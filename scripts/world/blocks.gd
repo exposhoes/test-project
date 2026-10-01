@@ -74,25 +74,25 @@ const DEFS := {
 	CRYSTAL_ORE: {"name": "Kristal Madeni", "all": "crystal_ore"},
 	SNOW: {"name": "Kar", "top": "snow", "side": "snow", "bottom": "dirt"},
 	BRICKS: {"name": "Tuğla", "all": "bricks"},
-	CRAFTING_TABLE: {"name": "Çalışma Masası", "top": "crafting_top", "side": "crafting_side", "bottom": "planks"},
+	CRAFTING_TABLE: {"name": "Çalışma Masası", "top": "crafting_top", "side": "crafting_side", "bottom": "planks", "transparent": true, "model": true, "model_height": 0.8},
 	YELLOW_WALLPAPER: {"name": "Sarı Duvar Kağıdı", "all": "yellow_wallpaper"},
 	DAMP_CARPET: {"name": "Nemli Halı", "all": "damp_carpet"},
 	TOY_BRICK_RED: {"name": "Kırmızı Oyuncak Blok", "all": "toy_brick_red"},
 	TOY_BRICK_BLUE: {"name": "Mavi Oyuncak Blok", "all": "toy_brick_blue"},
 	TOY_BRICK_YELLOW: {"name": "Sarı Oyuncak Blok", "all": "toy_brick_yellow"},
-	FURNACE: {"name": "Fırın", "top": "furnace_top", "side": "furnace_side", "bottom": "cobblestone"},
+	FURNACE: {"name": "Fırın", "top": "furnace_top", "side": "furnace_side", "bottom": "cobblestone", "model": true, "model_height": 1.0},
 	HALLS_PORTAL: {"name": "Koridor Kapısı", "top": "planks", "side": "halls_portal", "bottom": "planks"},
 	CEILING_TILE: {"name": "Tavan Karosu", "all": "ceiling_tile"},
 	CEILING_LIGHT: {"name": "Floresan Lamba", "all": "ceiling_light"},
 	FACTORY_PORTAL: {"name": "Fabrika Kapısı", "top": "planks", "side": "factory_portal", "bottom": "planks"},
 	PLAYROOM_WALL: {"name": "Oyun Odası Duvarı", "all": "playroom_wall"},
-	LANTERN: {"name": "Fener", "all": "lantern", "light": true},
-	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks"},
+	LANTERN: {"name": "Fener", "all": "lantern", "light": true, "transparent": true, "model": true, "model_height": 1.0},
+	BED: {"name": "Yatak", "top": "bed_top", "side": "bed_side", "bottom": "planks", "transparent": true, "model": true, "model_height": 0.5625},
 	BERRY_BUSH: {"name": "Çilek Çalısı", "all": "berry_bush", "transparent": true},
-	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks"},
+	CHEST: {"name": "Sandık", "top": "chest_top", "side": "chest_side", "bottom": "planks", "transparent": true, "model": true, "model_height": 0.88},
 	PLASTER: {"name": "Sıva Duvar", "all": "plaster"},
 	ROOF_TILE: {"name": "Kiremit", "all": "roof_tile"},
-	BOOKSHELF: {"name": "Kitaplık", "top": "planks", "side": "bookshelf", "bottom": "planks"},
+	BOOKSHELF: {"name": "Kitaplık", "top": "planks", "side": "bookshelf", "bottom": "planks", "model": true, "model_height": 1.0},
 	RUG: {"name": "Halı", "all": "rug"},
 	DARK_PLANKS: {"name": "Koyu Tahta", "all": "dark_planks"},
 	FLOWERS: {"name": "Çiçek", "all": "flowers", "transparent": true},
@@ -159,6 +159,11 @@ const PLACEHOLDER_COLORS := {
 
 static func is_solid(id: int) -> bool:
 	return id != AIR
+
+
+## Blok yüzleri yerine 3D model ile çizilen bloklar (ör. yatak, BedModel).
+static func has_model(id: int) -> bool:
+	return DEFS.has(id) and DEFS[id].get("model", false)
 
 
 static func is_transparent(id: int) -> bool:

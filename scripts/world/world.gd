@@ -35,6 +35,8 @@ var _jobs := {}  # Vector2i -> {"task": id, "out": {}, "version": int}
 ## Chunk her anında yeniden mesh'lendiğinde artar; eski iş parçacığı sonuçları böylece atılır.
 var _versions := {}
 const LIGHT_RANGE := 10.0
+## Modelle çizilen blokların (yatak) sahne düğümleri: blok konumu -> Node3D.
+var _models := {}
 
 
 func _ready() -> void:
@@ -84,6 +86,8 @@ func set_block(pos: Vector3i, id: int) -> void:
 	if not edits.has(c):
 		edits[c] = {}
 	edits[c][Chunk.index(lx, pos.y, lz)] = id
+	for d: Vector3i in [Vector3i.ZERO, Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1)]:
+		_refresh_model(pos + d)
 	_remesh(c)
 	if lx == 0:
 		_remesh(c + Vector2i(-1, 0))
@@ -131,6 +135,41 @@ func _remove_light(pos: Vector3i) -> void:
 	if _lights.has(pos):
 		_lights[pos].queue_free()
 		_lights.erase(pos)
+
+
+## Konumdaki model bloğunun (yatak, kitaplık) 3D modelini kurar, günceller ya da kaldırır.
+func _refresh_model(pos: Vector3i) -> void:
+	if _models.has(pos):
+		_models[pos].queue_free()
+		_models.erase(pos)
+	var id := get_block(pos)
+	var node: Node3D = null
+	if id == Blocks.BED:
+		var lay := BedModel.layout(pos, get_block)
+		if not lay.is_empty():
+			node = BedModel.create(lay["dir"], lay["length"])
+			node.position = Vector3(pos) + Vector3(0.5, 0, 0.5)
+	elif CubeModel.has(id):
+		node = CubeModel.create(id, pos, func(p: Vector3i) -> bool: return Blocks.is_transparent(get_block(p)) and not Blocks.has_model(get_block(p)))
+		node.position = Vector3(pos)
+	if node:
+		add_child(node)
+		_models[pos] = node
+
+
+const MODEL_BLOCKS := [Blocks.BED, Blocks.BOOKSHELF, Blocks.CHEST, Blocks.CRAFTING_TABLE, Blocks.FURNACE, Blocks.LANTERN]
+
+
+## Chunk ilk kez mesh'lenirken içindeki model bloklarını kurar.
+func _spawn_models(c: Vector2i) -> void:
+	var chunk: Chunk = _chunks.get(c)
+	if chunk == null:
+		return
+	for id: int in MODEL_BLOCKS:
+		var i := chunk.blocks.find(id)
+		while i != -1:
+			_refresh_model(chunk.origin() + Chunk.position_of(i))
+			i = chunk.blocks.find(id, i + 1)
 
 
 func is_meshed_at(pos: Vector3) -> bool:
@@ -192,6 +231,7 @@ func _process(_delta: float) -> void:
 			continue
 		for n in [c, c + Vector2i(1, 0), c + Vector2i(-1, 0), c + Vector2i(0, 1), c + Vector2i(0, -1)]:
 			_ensure_chunk(n)
+		_spawn_models(c)
 		if threaded:
 			_start_job(c)
 		else:
@@ -258,4 +298,8 @@ func _unload_far() -> void:
 			for p: Vector3i in _lights.keys():
 				if chunk_coord(p) == c:
 					_remove_light(p)
+			for p: Vector3i in _models.keys():
+				if chunk_coord(p) == c:
+					_models[p].queue_free()
+					_models.erase(p)
 			_meshed.erase(c)

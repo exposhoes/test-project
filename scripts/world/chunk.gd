@@ -61,6 +61,8 @@ static var _face_shade := PackedColorArray()
 static var _face_normals := PackedVector3Array()
 ## Blok kimliğine göre şeffaflık ve atlas başına (kimlik*6+yüz)*4 köşe UV'si önbelleği.
 static var _transparent := PackedByteArray()
+## Modelle çizilen bloklar (yüzleri çizilmez, yalnızca alçak çarpışma kutusu eklenir): kimlik -> yükseklik.
+static var _model_height := PackedFloat32Array()
 static var _uv_atlas: BlockAtlas
 static var _uv_cache := PackedVector2Array()
 
@@ -76,6 +78,9 @@ static func _prepare_tables(atlas: BlockAtlas) -> void:
 		_transparent.resize(256)
 		for id in 256:
 			_transparent[id] = 1 if (id == Blocks.AIR or (Blocks.DEFS.has(id) and Blocks.is_transparent(id))) else 0
+		_model_height.resize(256)
+		for id in 256:
+			_model_height[id] = float(Blocks.DEFS[id].get("model_height", 1.0)) if Blocks.has_model(id) else 0.0
 	if _uv_atlas != atlas:
 		_uv_atlas = atlas
 		_uv_cache.resize(256 * 6 * 4)
@@ -122,6 +127,7 @@ static func build_arrays(snap: Array) -> Dictionary:
 	var uvs := PackedVector2Array()
 	var colors := PackedColorArray()
 	var indices := PackedInt32Array()
+	var extra_collision := PackedVector3Array()
 	const LAYER := SIZE * SIZE
 	# Tamamen boş üst katmanları atla.
 	var top := HEIGHT - 1
@@ -141,6 +147,15 @@ static func build_arrays(snap: Array) -> Dictionary:
 				var i := x + z * SIZE + y * LAYER
 				var id := blocks[i]
 				if id == Blocks.AIR:
+					continue
+				var mh := _model_height[id]
+				if mh > 0.0:
+					# Model bloğu: görünmez, alçak bir kutu çarpışması.
+					for f in 6:
+						for tri: Array in [[0, 1, 2], [0, 2, 3]]:
+							for v: int in tri:
+								var q := _face_verts[f * 4 + v]
+								extra_collision.append(Vector3(x, y, z) + Vector3(q.x, q.y * mh, q.z))
 					continue
 				for f in 6:
 					var n: int
@@ -173,19 +188,31 @@ static func build_arrays(snap: Array) -> Dictionary:
 	collision_faces.resize(indices.size())
 	for j in indices.size():
 		collision_faces[j] = verts[indices[j]]
+	collision_faces.append_array(extra_collision)
 	return {"verts": verts, "normals": normals, "uvs": uvs, "colors": colors, "indices": indices, "collision": collision_faces}
 
 
 ## build_arrays sonucunu mesh ve çarpışma şekline çevirir (ana iş parçacığında).
 func apply_arrays(data: Dictionary, material: Material) -> void:
 	var verts: PackedVector3Array = data["verts"]
-	if verts.is_empty():
+	if verts.is_empty() and PackedVector3Array(data["collision"]).is_empty():
 		_mesh_instance.mesh = null
 		_collision.shape = null
 		return
+	if verts.is_empty():
+		_mesh_instance.mesh = null
+	else:
+		_mesh_instance.mesh = _build_mesh(data, material)
+	var shape := ConcavePolygonShape3D.new()
+	shape.backface_collision = true
+	shape.set_faces(data["collision"])
+	_collision.shape = shape
+
+
+static func _build_mesh(data: Dictionary, material: Material) -> ArrayMesh:
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
-	arrays[Mesh.ARRAY_VERTEX] = verts
+	arrays[Mesh.ARRAY_VERTEX] = data["verts"]
 	arrays[Mesh.ARRAY_NORMAL] = data["normals"]
 	arrays[Mesh.ARRAY_TEX_UV] = data["uvs"]
 	arrays[Mesh.ARRAY_COLOR] = data["colors"]
@@ -193,11 +220,7 @@ func apply_arrays(data: Dictionary, material: Material) -> void:
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	mesh.surface_set_material(0, material)
-	_mesh_instance.mesh = mesh
-	var shape := ConcavePolygonShape3D.new()
-	shape.backface_collision = true
-	shape.set_faces(data["collision"])
-	_collision.shape = shape
+	return mesh
 
 
 func _block_at(x: int, y: int, z: int, base: Vector3i) -> int:
