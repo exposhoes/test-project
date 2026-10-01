@@ -35,7 +35,8 @@ const LIST := [
 			{"lie": "emir", "value": false},
 			{"place": "emir", "at": "ev.yatak_yani", "look": "ev.mutfak"},
 			{"say": "emir", "text": "Tamam anne, geliyorum!"},
-			{"cam": "ev.kam_oda", "look": "ev.masa", "t": 1.2},
+			# Odadan mutfağa yürüyüşü gösteren açı (kitaplığın arkasından boş kare çıkmasın).
+			{"cam": "ev.kam_mutfak", "look": "ev.mutfak", "t": 0},
 			{"walk": "emir", "to": "ev.mutfak"},
 			# Anne ocaktan odaya doğru gelir: ikisi de yüzü görünecek şekilde karşılıklı (ocak önü dar, kamera sığmıyordu).
 			{"walk": "anne", "to": "ev.mutfak_on"},

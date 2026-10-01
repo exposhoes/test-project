@@ -187,6 +187,8 @@ func _run(s: Dictionary) -> void:
 		if s.has("look"):
 			a.face_towards(FilmSets.point(s["look"]))
 	elif s.has("cam"):
+		# Replik bitti, sahne değişiyor: eski altyazı yeni çekimde kalıp replik tekrar ediyor gibi görünmesin.
+		_hide_dialogue()
 		# Başka sete geçerken oranın chunk'ları yüklenmeden kesme yapma.
 		var to := FilmSets.point(s["cam"])
 		_loading = true
@@ -313,7 +315,7 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	var lying := a._body.rotation.x != 0.0
 	var head := a.head_position() if lying else a.position + Vector3(0, 1.45, 0)
 	var facing := Vector3(-sin(a.rotation.y), 0, -cos(a.rotation.y))
-	if not force and camera.global_position.distance_to(head) > 2.4 and (lying or not _too_steep(camera.global_position, head)) and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
+	if not force and camera.global_position.distance_to(head) > MIN_CAM_DIST + 0.2 and (lying or not _too_steep(camera.global_position, head)) and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
 		return
 	var sets: FilmSets = world.generator
 	# Dizi gibi: göz hizası (hafif yukarıdan), 3/4 açı, orta-yakın plan. Tepeden çekim yok.
