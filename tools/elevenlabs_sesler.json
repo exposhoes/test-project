@@ -1,14 +1,15 @@
 {
   "_aciklama": "ElevenLabs Voice Library'den her karakter için bir ses seç, Voice ID'sini buraya yaz. Boş bırakılan karakter Microsoft sesiyle kalır. API anahtarı buraya DEĞİL, bilgisayarda ELEVENLABS_API_KEY ortam değişkenine yazılır.",
   "model": "eleven_multilingual_v2",
+  "_secimler": "emir: Teddy Twinkle (sevimli çizgi film erkek çocuğu); ali: Valf (genç, oyuncu); zeynep: Caglayan (neşeli genç kız, Türkçe); komsu_cocuk: Mithi (çocuk); anne: Sindirella (neşeli, sıcak Türk kadını); ogretmen: Tomris (canlı, enerjik, İstanbul Türkçesi); doktor: Akif (sıcak, sakin Türk erkeği); bakkal: Umit Gunacti (kalın, sıcak Türk erkeği)",
   "sesler": {
-    "emir": "BURAYA_VOICE_ID",
-    "ali": "BURAYA_VOICE_ID",
-    "komsu_cocuk": "BURAYA_VOICE_ID",
-    "zeynep": "BURAYA_VOICE_ID",
-    "anne": "BURAYA_VOICE_ID",
-    "ogretmen": "BURAYA_VOICE_ID",
-    "doktor": "BURAYA_VOICE_ID",
-    "bakkal": "BURAYA_VOICE_ID"
+    "emir": "XjGYkUkzth8BPs29fmcV",
+    "ali": "loY1uopAz31XyhAEhNSa",
+    "komsu_cocuk": "MIl0Flub6Sc9KSkX2A42",
+    "zeynep": "sJ0xHHPzz1LOio4QNlB0",
+    "anne": "4HclTlBfboI5cdK18dRI",
+    "ogretmen": "bqaNYmxFgK1TN7CL95PZ",
+    "doktor": "skNtUvQlHhqETjfzZF1H",
+    "bakkal": "OUMjwyTVLkTqFhscEshG"
   }
 }
