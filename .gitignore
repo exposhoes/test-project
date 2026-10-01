@@ -15,3 +15,4 @@ production/session-logs/
 production/session-state/*
 !production/session-state/.gitkeep
 .scratch/
+videolar/

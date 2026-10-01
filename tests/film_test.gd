@@ -36,6 +36,13 @@ func _init() -> void:
 					if parts.size() != 2 or not FilmSets.POINTS.has(parts[0]) or not FilmSets.POINTS[parts[0]].has(parts[1]):
 						fails += 1
 						print("FAIL tanımsız nokta: ", ep["id"], " ", v)
+	# Aynı id'li iki bölüm olursa Episodes.find hep ilkini döndürür, ikincisi hiç oynamaz.
+	var seen := {}
+	for ep: Dictionary in Episodes.LIST:
+		if seen.has(ep["id"]):
+			fails += 1
+			print("FAIL tekrarlanan bölüm id: ", ep["id"])
+		seen[ep["id"]] = true
 	for set_id in FilmSets.SETS:
 		if not FilmSets.POINTS.has(set_id):
 			fails += 1

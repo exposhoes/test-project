@@ -6,10 +6,11 @@ extends Node3D
 
 const MENU_SCENE := "res://scenes/menu.tscn"
 ## Harf başına okunma süresi ve her replik için en az bekleme (çocuklar okuyabilsin).
-const READ_PER_CHAR := 0.055
-const READ_MIN := 1.6
-const TYPE_SPEED := 45.0  # harf/sn
+const READ_PER_CHAR := 0.04
+const READ_MIN := 1.0
+const TYPE_SPEED := 70.0  # harf/sn
 const LOOK_HEIGHT := 1.3
+const BASE_FOV := 62.0
 
 var world := World.new()
 var camera := Camera3D.new()
@@ -17,6 +18,8 @@ var actors := {}
 var playing := false
 ## Testler için: true olursa bekleme süreleri kısalır.
 var fast := false
+## Movie Maker kaydında pencere boyutu sabit kalmalı.
+var recording := false
 ## Eşyalara takılmadan yol bulunamayan yürüyüş sayısı (testler 0 bekler).
 var route_failures := 0
 var _extras: Array[Actor] = []
@@ -24,6 +27,7 @@ var voice := FilmVoice.new()
 var _episode_id := ""
 var _line := 0
 var _loading := false
+var _fov_tween: Tween
 var _loading_at := Vector3.ZERO
 
 var _sun := DirectionalLight3D.new()
@@ -53,6 +57,14 @@ func _ready() -> void:
 	_move_camera(FilmSets.point("ev.kam_dis"), FilmSets.point("ev.kapi_disi"), 0)
 	_build_ui()
 	_show_menu()
+	# Otomatik kayıt: tools/kayit.ps1 Godot'yu "-- --bolum=<id>" ile Movie Maker modunda açar;
+	# bölüm oynar, bitince oyun kapanır ve video klasöre yazılmış olur.
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--bolum="):
+			recording = true
+			await get_tree().process_frame
+			await play(arg.trim_prefix("--bolum="))
+			get_tree().quit()
 
 
 func _process(_delta: float) -> void:
@@ -74,10 +86,6 @@ func play(id: String) -> void:
 	var first: Dictionary = ep["steps"][0]
 	var set_id: String = ep["set"]
 	_move_camera(FilmSets.point(set_id + "." + _establishing_cam(set_id)), FilmSets.point(first.get("at", "ev.yatak")), 0)
-	# Setin chunk'ları hazır olmadan başlama; bu sırada kayıt için geri say.
-	for n in [3, 2, 1]:
-		_show_title("Kayıt için hazırlan\n%d" % n)
-		await _wait(1.0)
 	_title.visible = false
 	var start := FilmSets.point(set_id + "." + FilmSets.POINTS[set_id].keys()[0])
 	_loading = true
@@ -138,7 +146,7 @@ func _run(s: Dictionary) -> void:
 		await _say(s["say"], s["text"])
 	elif s.has("walk"):
 		var a := _actor(s["walk"])
-		var speed := 0.0 if fast else 2.2
+		var speed := 0.0 if fast else 3.2
 		var path := (world.generator as FilmSets).route(a.position, FilmSets.point(s["to"]))
 		if path.is_empty():
 			route_failures += 1
@@ -162,7 +170,7 @@ func _run(s: Dictionary) -> void:
 		var tw := create_tween()
 		tw.tween_property(camera, "fov", 38.0, 0.12)
 		tw.tween_interval(maxf(0.1, s["zoom"]))
-		tw.tween_property(camera, "fov", 62.0, 0.2)
+		tw.tween_property(camera, "fov", BASE_FOV, 0.2)
 		if not fast:
 			await tw.finished
 	elif s.has("shake"):
@@ -184,6 +192,7 @@ func _say(id: String, text: String) -> void:
 	_box.visible = true
 	a.talking = true
 	_line += 1
+	_auto_zoom(text)
 	var voiced := voice.speak(id, text, _episode_id, _line)
 	var total := text.length()
 	var t := 0.0
@@ -200,7 +209,21 @@ func _say(id: String, text: String) -> void:
 		t += get_process_delta_time()
 		await get_tree().process_frame
 	a.talking = false
-	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t if not voiced else 0.35)
+	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t if not voiced else 0.15)
+
+
+## Shorts tarzı kamera: her replikte yavaş yakınlaşma, ünlemli replikte hızlı "vurma" zoom'u.
+func _auto_zoom(text: String) -> void:
+	if fast:
+		return
+	if _fov_tween:
+		_fov_tween.kill()
+	_fov_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	if text.contains("!") or text.contains("?!"):
+		_fov_tween.tween_property(camera, "fov", BASE_FOV - 16.0, 0.1)
+		_fov_tween.tween_property(camera, "fov", BASE_FOV - 8.0, 1.2)
+	else:
+		_fov_tween.tween_property(camera, "fov", maxf(BASE_FOV - 10.0, camera.fov - 3.0), 2.5)
 
 
 func _wait(sec: float) -> void:
@@ -259,6 +282,9 @@ func _extra_loop(e: Actor, x_min: float, x_max: float, speed: float) -> void:
 func _move_camera(pos: Vector3, look: Vector3, t: float) -> void:
 	if _cam_tween:
 		_cam_tween.kill()
+	if _fov_tween:
+		_fov_tween.kill()
+	camera.fov = BASE_FOV
 	if t <= 0.0 or fast:
 		_look = look
 		camera.look_at_from_position(pos, look)
@@ -391,7 +417,7 @@ func _show_menu(format := "", page := 0) -> void:
 func set_portrait(on: bool) -> void:
 	if OS.has_feature("mobile"):
 		DisplayServer.screen_set_orientation(DisplayServer.SCREEN_PORTRAIT if on else DisplayServer.SCREEN_SENSOR_LANDSCAPE)
-	elif DisplayServer.get_name() != "headless":
+	elif DisplayServer.get_name() != "headless" and not recording:
 		DisplayServer.window_set_size(Vector2i(405, 720) if on else Vector2i(1280, 720))
 	_box.anchor_left = 0.04 if on else 0.12
 	_box.anchor_right = 0.96 if on else 0.88
