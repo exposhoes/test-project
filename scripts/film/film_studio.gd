@@ -404,9 +404,9 @@ func _wait(sec: float) -> void:
 ## Noktada başka biri duruyorsa yanında boş bir yer bulur; iki karakter iç içe girmesin.
 func _free_spot(a: Actor, p: Vector3, lie := false) -> Vector3:
 	var sets: FilmSets = world.generator
-	for off in [Vector3.ZERO, Vector3(0.8, 0, 0), Vector3(-0.8, 0, 0), Vector3(0, 0, 0.8), Vector3(0, 0, -0.8),
-			Vector3(0.8, 0, 0.8), Vector3(-0.8, 0, 0.8), Vector3(0.8, 0, -0.8), Vector3(-0.8, 0, -0.8),
-			Vector3(1.2, 0, 0), Vector3(-1.2, 0, 0), Vector3(0, 0, 1.2), Vector3(0, 0, -1.2)]:
+	for off in [Vector3.ZERO, Vector3(1.1, 0, 0), Vector3(-1.1, 0, 0), Vector3(0, 0, 1.1), Vector3(0, 0, -1.1),
+			Vector3(1.1, 0, 1.1), Vector3(-1.1, 0, 1.1), Vector3(1.1, 0, -1.1), Vector3(-1.1, 0, -1.1),
+			Vector3(1.6, 0, 0), Vector3(-1.6, 0, 0), Vector3(0, 0, 1.6), Vector3(0, 0, -1.6)]:
 		var q: Vector3 = p + off
 		# Sıra, masa gibi bir bloğun içine konmasın (yatak hariç: yatma noktası).
 		var cell := Vector3i(q.floor())
@@ -414,7 +414,7 @@ func _free_spot(a: Actor, p: Vector3, lie := false) -> Vector3:
 			continue
 		var taken := false
 		for o: Actor in Actor.everyone:
-			if o != a and o.visible and Vector2(o.position.x - q.x, o.position.z - q.z).length() < 0.6:
+			if o != a and o.visible and Vector2(o.position.x - q.x, o.position.z - q.z).length() < 0.95:
 				taken = true
 				break
 		if not taken:

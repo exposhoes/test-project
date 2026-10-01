@@ -365,7 +365,9 @@ func _build_skin() -> bool:
 			_head_pivot().add_child(hair)
 			hair.position -= _head_pivot().position
 			continue
-		if p["name"] == "head" and p.has("mesh") and ResourceLoader.exists(head_res):
+		# Oyulmuş kafa (head_res) yanlardan ikinci bir yüz gibi görünüyordu; "carved_head": true
+		# verilmedikçe yuvarlak küp kafa kullanılır.
+		if p["name"] == "head" and p.has("mesh") and data.get("carved_head", false) and ResourceLoader.exists(head_res):
 			# Görünüm sayfasının silüetlerinden oyulmuş gerçek kafa (tools/art/build_heads.py,
 			# tools/bake_heads.gd ile .res'e çevrilir; .res Android paketine otomatik girer).
 			mi.mesh = load(head_res)
@@ -386,7 +388,14 @@ func _build_skin() -> bool:
 			continue
 		# Kafa belirgin yuvarlak, gövde/kol/bacak hafif yuvarlak köşeli (Roblox plastik oyuncak görünümü).
 		var sharp: bool = info.get("sharp", false)
-		mi.mesh = _skin_box(size, p["uv"], mat, (0.04 if sharp else (0.3 if p["name"] == "head" else 0.2)))
+		var uv: Dictionary = p["uv"]
+		if p["name"] == "head" and uv.has("back"):
+			# Yan yüzlerdeki profil çizimi 3/4 açıdan ikinci bir yüz gibi görünüyordu (çift kafa);
+			# yanlara arka (saç) dokusu konur.
+			uv = uv.duplicate()
+			uv["left"] = uv["back"]
+			uv["right"] = uv["back"]
+		mi.mesh = _skin_box(size, uv, mat, (0.04 if sharp else (0.3 if p["name"] == "head" else 0.2)))
 		if p["name"] == "head":
 			_head_pivot().position = Vector3(p["pos"][0], p["pos"][1], p["pos"][2])
 			_head_node.add_child(mi)
@@ -574,11 +583,11 @@ func _stop_before_others(target: Vector3) -> Vector3:
 		if o == self or not o.visible or not is_instance_valid(o):
 			continue
 		var d := Vector2(target.x - o.position.x, target.z - o.position.z)
-		if d.length() < 0.7:
+		if d.length() < 1.0:
 			var back := Vector2(position.x - o.position.x, position.z - o.position.z)
 			if back.length() < 0.01:
 				back = Vector2(1, 0)
-			back = back.normalized() * 0.8
+			back = back.normalized() * 1.1
 			return Vector3(o.position.x + back.x, target.y, o.position.z + back.y)
 	return target
 
