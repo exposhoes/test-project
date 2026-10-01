@@ -43,7 +43,7 @@ const ACTORS := {
 			[Vector3(0.54, 0.14, 0.54), Vector3(0, 1.72, 0.02), Color("111111")],
 		],
 		"face": [0.46, Vector3(0, 1.43, -0.25)], "hair": Color("111111"), "eyes": Color("2a1a10")},
-	"emir": {"name": "Emir", "color": Color("ffd23f"), "mouth_x": 0.02, "mouth_h": 0.11,
+	"emir": {"name": "Emir", "color": Color("ffd23f"), "mouth_x": 0.02, "mouth_h": 0.125,
 		"parts": [
 			[Vector3(0.22, 0.6, 0.24), Vector3(-0.13, 0.3, 0), Color("2f4f8f")],   # kot pantolon
 			[Vector3(0.22, 0.6, 0.24), Vector3(0.13, 0.3, 0), Color("2f4f8f")],
@@ -65,7 +65,7 @@ const ACTORS := {
 			[Vector3(0.56, 0.12, 0.56), Vector3(0, 2.03, 0.02), Color("3b2414")],
 		],
 		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("3b2414"), "eyes": Color("2a1a10")},
-	"ali": {"name": "Ali", "color": Color("7fd4ff"), "mouth_x": 0.05,
+	"ali": {"name": "Ali", "color": Color("7fd4ff"), "mouth_x": 0.03, "mouth_h": 0.19,
 		"parts": [
 			[Vector3(0.22, 0.6, 0.24), Vector3(-0.13, 0.3, 0), Color("3a3a3a")],
 			[Vector3(0.22, 0.6, 0.24), Vector3(0.13, 0.3, 0), Color("3a3a3a")],
@@ -235,7 +235,8 @@ func _build_glb() -> bool:
 	return true
 
 
-var _mouth: MeshInstance3D
+var _mouth: Node3D
+var _mouth_basis := Basis()
 var _head_bone := -1
 var _skeleton: Skeleton3D
 
@@ -272,23 +273,30 @@ func _build_glb_mouth(model: Node3D) -> void:
 	var att := BoneAttachment3D.new()
 	att.bone_idx = _head_bone
 	_skeleton.add_child(att)
-	var size := (top - head.y) * 0.13
-	var quad := SphereMesh.new()  # yassı oval ağız
-	quad.radius = size * 0.5
-	quad.height = size * 0.6
-	quad.radial_segments = 16
-	quad.rings = 6
+	# Ağız, çizili gülüş (beyaz dişler) genişliğinde ince bir koyu oval; üst kenarı dişlerin
+	# üstünde sabit kalır, konuşurken aşağı doğru açılır.
+	var span := top - head.y
+	var w := span * float(data.get("mouth_w", 0.24))
+	var oval := SphereMesh.new()
+	oval.radius = w * 0.5
+	oval.height = w
+	oval.radial_segments = 20
+	oval.rings = 8
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color("4a1418")
+	mat.albedo_color = Color("3a0e12")
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	quad.material = mat
-	_mouth = MeshInstance3D.new()
-	_mouth.mesh = quad
+	oval.material = mat
+	var mesh := MeshInstance3D.new()
+	mesh.mesh = oval
+	mesh.position = Vector3(0, -w * 0.5, 0)  # pivot üst kenarda
+	_mouth = Node3D.new()
+	_mouth.add_child(mesh)
 	_mouth.visible = false
 	att.add_child(_mouth)
 	var rest := _skeleton.get_bone_global_rest(_head_bone)
-	_mouth.transform = rest.affine_inverse() * Transform3D(Basis().scaled(Vector3(1, 1, 0.25)),
-			Vector3(head.x + (top - head.y) * float(data.get("mouth_x", 0.0)), mouth_y, front))
+	_mouth.transform = rest.affine_inverse() * Transform3D(Basis(),
+			Vector3(head.x + span * float(data.get("mouth_x", 0.0)), mouth_y, front))
+	_mouth_basis = _mouth.basis
 
 
 ## Kafanın dünyadaki yeri (yatarken de doğru; kamera kadrajı için).
@@ -308,7 +316,7 @@ func _animate_glb_talk(delta: float) -> void:
 		return
 	_talk_timer += delta
 	var open := 0.25 + 0.75 * absf(sin(_talk_timer * 11.0)) * (0.6 + 0.4 * sin(_talk_timer * 3.7))
-	_mouth.scale = Vector3(1.0, maxf(0.2, open), 0.25)
+	_mouth.basis = _mouth_basis * Basis().scaled(Vector3(1.0, 0.1 + 0.3 * open, 0.2))
 	# Konuşurken kafa hafifçe sallansın (yüz ifadesi canlı dursun).
 	var pose := _skeleton.get_bone_pose_rotation(_head_bone)
 	var nod := Quaternion(Vector3.RIGHT, sin(_talk_timer * 5.0) * 0.06) * Quaternion(Vector3.UP, sin(_talk_timer * 2.3) * 0.05)

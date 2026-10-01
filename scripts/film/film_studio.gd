@@ -10,7 +10,7 @@ const READ_PER_CHAR := 0.032
 const READ_MIN := 0.8
 const TYPE_SPEED := 70.0  # harf/sn
 const LOOK_HEIGHT := 1.3
-const BASE_FOV := 62.0
+const BASE_FOV := 70.0
 var _speaker: Actor
 var _watch_t := 0.0
 var _away_t := 0.0
@@ -267,13 +267,14 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	var lying := a._body.rotation.x != 0.0
 	var head := a.head_position() if lying else a.position + Vector3(0, 1.45, 0)
 	var facing := Vector3(-sin(a.rotation.y), 0, -cos(a.rotation.y))
-	if not force and (lying or not _too_steep(camera.global_position, head)) and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
+	if not force and camera.global_position.distance_to(head) > 2.4 and (lying or not _too_steep(camera.global_position, head)) and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
 		return
 	var sets: FilmSets = world.generator
 	# Dizi gibi: göz hizası (hafif yukarıdan), 3/4 açı, orta-yakın plan. Tepeden çekim yok.
 	# Yatan karakterde ayakta duran birinin göz hizasından, odayı da gösteren geniş açı.
 	var lifts := [1.1, 0.8] if lying else [0.0, 0.15, -0.1]
-	var dists := [2.6, 3.2, 2.2, 3.8] if lying else [2.2, 1.8, 2.8, 1.5, 3.6]
+	# Geniş açı: karakter ve etrafı birlikte görünsün (Mehmet istedi); yakına ancak yer yoksa.
+	var dists := [3.4, 4.2, 2.8, 2.2] if lying else [3.6, 4.4, 3.0, 2.4, 1.8]
 	var angs := [0.6, -0.6, 1.0, -1.0, 1.6, -1.6, 2.2, -2.2, 0.0, PI] if lying else [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]
 	for lift in lifts:
 		for dist in dists:
@@ -343,11 +344,13 @@ func _auto_zoom(text: String) -> void:
 	if _fov_tween:
 		_fov_tween.kill()
 	_fov_tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	if text.contains("!") or text.contains("?!"):
-		_fov_tween.tween_property(camera, "fov", BASE_FOV - 16.0, 0.1)
-		_fov_tween.tween_property(camera, "fov", BASE_FOV - 8.0, 1.2)
+	# Zoom yalnızca şok anlarında ("?!", "!!", "Eyvah"); diğer repliklerde çok hafif yaklaşma.
+	var t := text.to_lower()
+	if text.contains("?!") or text.contains("!!") or t.begins_with("eyvah") or t.contains("olamaz"):
+		_fov_tween.tween_property(camera, "fov", BASE_FOV - 18.0, 0.12)
+		_fov_tween.tween_property(camera, "fov", BASE_FOV - 10.0, 1.2)
 	else:
-		_fov_tween.tween_property(camera, "fov", maxf(BASE_FOV - 10.0, camera.fov - 3.0), 2.5)
+		_fov_tween.tween_property(camera, "fov", maxf(BASE_FOV - 4.0, camera.fov - 1.5), 3.0)
 
 
 ## assets/audio/<klasör>/<ad>.ogg|mp3|wav; dosya yoksa null (sessizce atlanır).
