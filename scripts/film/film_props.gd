@@ -266,6 +266,43 @@ static func _mat(tex: Texture2D) -> StandardMaterial3D:
 	return m
 
 
+const EDGE_TRIM := 3  # kenardan kırpılan piksel; üreticinin bıraktığı açık renkli kenar çizgisini siler
+
+
+## Saydam kenara komşu açık renkli halkayı keser, sonra saydam piksellere komşu rengi taşır
+## (doku filtrelenince kenarda beyaz/siyah çizgi oluşmasın diye).
+static func _clean_edges(part: Image) -> void:
+	var w := part.get_width()
+	var h := part.get_height()
+	for _i in EDGE_TRIM:
+		var cut: Array[Vector2i] = []
+		for py in h:
+			for px in w:
+				if part.get_pixel(px, py).a == 0.0:
+					continue
+				if px == 0 or py == 0 or px == w - 1 or py == h - 1 \
+						or part.get_pixel(px - 1, py).a == 0.0 or part.get_pixel(px + 1, py).a == 0.0 \
+						or part.get_pixel(px, py - 1).a == 0.0 or part.get_pixel(px, py + 1).a == 0.0:
+					cut.append(Vector2i(px, py))
+		for c in cut:
+			part.set_pixelv(c, Color(0, 0, 0, 0))
+	for _i in 4:
+		var fill: Array = []
+		for py in h:
+			for px in w:
+				if part.get_pixel(px, py).a > 0.0:
+					continue
+				for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var q := Vector2i(px, py) + d
+					if q.x >= 0 and q.y >= 0 and q.x < w and q.y < h:
+						var c := part.get_pixelv(q)
+						if c.a > 0.0 or c.r + c.g + c.b > 0.0:
+							fill.append([Vector2i(px, py), Color(c.r, c.g, c.b, 0.0)])
+							break
+		for f in fill:
+			part.set_pixelv(f[0], f[1])
+
+
 ## Arka plan rengi (sol üst köşe) dışındaki sütun gruplarını bulur; en geniş 3 grubu
 ## soldan sağa ön/yan/üst olarak kırpıp saydam arka planlı dokuya çevirir.
 static func _split_views(img: Image) -> Array:
@@ -310,6 +347,7 @@ static func _split_views(img: Image) -> Array:
 			for px in part.get_width():
 				if is_bg.call(part.get_pixel(px, py)):
 					part.set_pixel(px, py, Color(0, 0, 0, 0))
+		_clean_edges(part)
 		part.generate_mipmaps()
 		out.append(ImageTexture.create_from_image(part))
 	return out
