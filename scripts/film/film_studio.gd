@@ -62,6 +62,12 @@ func _ready() -> void:
 		var n := FilmProps.build(pr[0], pr[2])
 		n.position = Vector3(pr[1])
 		add_child(n)
+	for fc: Array in sets.facades:
+		var n := FilmProps.build_facade(fc[0], fc[2])
+		if n:
+			n.position = fc[1]
+			n.rotation.y = fc[3]
+			add_child(n)
 	for d: Array in sets.decor:
 		var n := FilmProps.build_decor(d[0])
 		n.position = d[1]

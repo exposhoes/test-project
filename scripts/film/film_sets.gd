@@ -218,6 +218,15 @@ func _prop(o: Vector3i, id: String, at: Vector3i, size: Vector2i) -> void:
 				_prop_cells[o + at + Vector3i(x, y, z)] = true
 
 
+## Bina cephesi: [ad, sol alt dünya konumu, (en, boy), y dönüşü]. Mehmet'in
+## assets/textures/sehir/<ad>.png görseli varsa duvarın önüne kaplanır.
+var facades: Array = []
+
+
+func _facade(o: Vector3i, id: String, at: Vector3, size: Vector2, turn: float) -> void:
+	facades.append([id, Vector3(o) + at, size, turn])
+
+
 ## Süs: [ad, dünya konumu, y dönüşü]; hücre kapatmaz.
 var decor: Array = []
 
@@ -270,6 +279,8 @@ func _build_house(o: Vector3i) -> void:
 		_fill(o, w, w + Vector3i(1, 1, 0), Blocks.GLASS)
 	for w in [Vector3i(-1, 1, 2), Vector3i(9, 1, 2)]:
 		_fill(o, w, w + Vector3i(0, 1, 1), Blocks.GLASS)
+	# Dış cephe görseli (ön duvar ve alınlık).
+	_facade(o, "bina_emir_evi", Vector3(1.2, 0, 9.02), Vector2(6.6, 6.6), 0.0)
 	# Emir'in odası: yatak, kitaplık, sandık.
 	_put(o + Vector3i(1, 0, 1), Blocks.BED)
 	_put(o + Vector3i(1, 0, 2), Blocks.BED)
