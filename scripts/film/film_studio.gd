@@ -11,6 +11,8 @@ const READ_MIN := 1.0
 const TYPE_SPEED := 70.0  # harf/sn
 const LOOK_HEIGHT := 1.3
 const BASE_FOV := 62.0
+var _speaker: Actor
+var _watch_t := 0.0
 
 var world := World.new()
 var camera := Camera3D.new()
@@ -69,7 +71,10 @@ func _ready() -> void:
 			get_tree().quit()
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if not Actor.is_free.is_valid() and world and world.generator is FilmSets:
+		Actor.is_free = (world.generator as FilmSets).is_air
+	_watch_speaker(delta)
 	# Yeni kamera noktası yüklenirken merkez oraya sabit kalsın; yoksa iki nokta arasında gidip gelir ve chunk hiç bitmez.
 	world.update_center(_loading_at if _loading else camera.global_position)
 
@@ -203,6 +208,7 @@ func _say(id: String, text: String) -> void:
 	_box.visible = true
 	a.talking = true
 	_line += 1
+	_speaker = a
 	_frame_speaker(a)
 	_auto_zoom(text)
 	var voiced := voice.speak(id, text, _episode_id, _line)
@@ -224,15 +230,36 @@ func _say(id: String, text: String) -> void:
 	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t if not voiced else 0.15)
 
 
+## Replik boyunca konuşanı izler: yürürse kamera başını takip eder, kadrajdan çıkar
+## ya da biri önünü kapatırsa yeni bir açıya keser. Boş ekran kalmasın.
+func _watch_speaker(delta: float) -> void:
+	if fast or _speaker == null or not is_instance_valid(_speaker) or not _box.visible:
+		return
+	if _cam_tween and _cam_tween.is_running():
+		return
+	var head := _speaker.position + Vector3(0, 1.3, 0)
+	_look = _look.lerp(head, minf(1.0, delta * 4.0))
+	if camera.global_position.distance_to(_look) > 0.01:
+		camera.look_at(_look)
+	_watch_t += delta
+	if _watch_t < 0.25:
+		return
+	_watch_t = 0.0
+	if not _shows(camera.global_position, _speaker.position + Vector3(0, 1.45, 0), _speaker):
+		var fov := camera.fov
+		_frame_speaker(_speaker, true)
+		camera.fov = fov
+
+
 ## Konuşan karşı yüzünü kadrajda göstersin: görünmüyorsa ya da sırtı dönükse,
 ## yüzünün önünde boş ve görüşü açık bir yere kamerayı keser.
-func _frame_speaker(a: Actor) -> void:
+func _frame_speaker(a: Actor, force := false) -> void:
 	if fast:
 		return
 	var head := a.position + Vector3(0, 1.45, 0)
 	var facing := Vector3(-sin(a.rotation.y), 0, -cos(a.rotation.y))
 	var lying := a._body.rotation.x != 0.0
-	if _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
+	if not force and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
 		return
 	var sets: FilmSets = world.generator
 	for lift in [0.25, 0.9]:
@@ -242,6 +269,11 @@ func _frame_speaker(a: Actor) -> void:
 				if sets.is_air(Vector3i(pos.floor())) and _shows(pos, head, a, false):
 					_move_camera(pos, head - Vector3(0, 0.15, 0), 0)
 					return
+
+
+	# Hiç boş nokta yoksa en azından kafaya dön.
+	_look = head
+	camera.look_at(head)
 
 
 func _faces(facing: Vector3, head: Vector3, cam: Vector3) -> bool:
