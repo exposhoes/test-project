@@ -72,6 +72,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if not Actor.is_free.is_valid() and world and world.generator is FilmSets:
+		Actor.is_free = (world.generator as FilmSets).is_air
 	_watch_speaker(delta)
 	# Yeni kamera noktası yüklenirken merkez oraya sabit kalsın; yoksa iki nokta arasında gidip gelir ve chunk hiç bitmez.
 	world.update_center(_loading_at if _loading else camera.global_position)

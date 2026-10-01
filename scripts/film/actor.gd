@@ -130,6 +130,10 @@ const ACTORS := {
 		"face": [0.48, Vector3(0, 1.8, -0.26)], "hair": Color("9a9a9a"), "eyes": Color("2a2a2a")},
 }
 
+## Yürürken engel kontrolü: hücre boşsa true döner (film stüdyosu bağlar; yoksa düz yürür).
+static var is_free: Callable
+## Sahnedeki tüm oyuncular; yürürken birbirinin içinden geçmesinler diye.
+static var everyone: Array[Actor] = []
 var actor_id: String
 var data: Dictionary
 var talking := false
@@ -158,6 +162,8 @@ static func create(id: String) -> Actor:
 
 
 func _ready() -> void:
+	everyone.append(self)
+	tree_exiting.connect(func() -> void: everyone.erase(self))
 	add_child(_body)
 	if _build_glb():
 		return
@@ -443,12 +449,73 @@ func walk_to(target: Vector3, speed := 2.2) -> void:
 	if speed <= 0.0:
 		position = target
 		return
-	var tw := create_tween()
-	tw.tween_property(self, "position", target, position.distance_to(target) / speed)
+	target = _stop_before_others(target)
 	_moving = true
-	await tw.finished
+	for p in _path_to(target):
+		var f := Vector3(p.x, position.y, p.z)
+		if f.distance_to(position) > 0.05:
+			face_towards(f)
+		var tw := create_tween()
+		tw.tween_property(self, "position", p, position.distance_to(p) / speed)
+		await tw.finished
 	_moving = false
 	_body.position.y = 0.0
+
+
+## Hedefte başka biri duruyorsa onun önünde (yaklaşık bir adım geride) durur.
+func _stop_before_others(target: Vector3) -> Vector3:
+	for o in everyone:
+		if o == self or not o.visible or not is_instance_valid(o):
+			continue
+		var d := Vector2(target.x - o.position.x, target.z - o.position.z)
+		if d.length() < 0.7:
+			var back := Vector2(position.x - o.position.x, position.z - o.position.z)
+			if back.length() < 0.01:
+				back = Vector2(1, 0)
+			back = back.normalized() * 0.8
+			return Vector3(o.position.x + back.x, target.y, o.position.z + back.y)
+	return target
+
+
+## Bloklar ve diğer oyuncular arasından ızgara üzerinde yol bulur (köşeleri atlayan
+## basit bir A*). Yol yoksa ya da engel kontrolü bağlı değilse düz çizgi döner.
+func _path_to(target: Vector3) -> Array[Vector3]:
+	var straight: Array[Vector3] = [target]
+	if not is_free.is_valid():
+		return straight
+	var y := int(floor(position.y + 0.1))
+	var a := Vector2i(floori(position.x), floori(position.z))
+	var b := Vector2i(floori(target.x), floori(target.z))
+	if a == b:
+		return straight
+	var lo := Vector2i(mini(a.x, b.x) - 6, mini(a.y, b.y) - 6)
+	var hi := Vector2i(maxi(a.x, b.x) + 7, maxi(a.y, b.y) + 7)
+	var grid := AStarGrid2D.new()
+	grid.region = Rect2i(lo, hi - lo)
+	grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+	grid.update()
+	var taken := {}
+	for o in everyone:
+		if o != self and o.visible and is_instance_valid(o):
+			taken[Vector2i(floori(o.position.x), floori(o.position.z))] = true
+	for x in range(lo.x, hi.x):
+		for z in range(lo.y, hi.y):
+			var c := Vector2i(x, z)
+			var free: bool = is_free.call(Vector3i(x, y, z)) and is_free.call(Vector3i(x, y + 1, z))
+			if (not free or taken.has(c)) and c != a and c != b:
+				grid.set_point_solid(c)
+	var cells := grid.get_id_path(a, b)
+	if cells.size() < 2:
+		return straight
+	# Düz giden ara hücreleri at, sadece dönüş noktalarını yürü.
+	var out: Array[Vector3] = []
+	for i in range(1, cells.size() - 1):
+		var d1 := cells[i] - cells[i - 1]
+		var d2 := cells[i + 1] - cells[i]
+		if d1 != d2:
+			out.append(Vector3(cells[i].x + 0.5, position.y, cells[i].y + 0.5))
+	out.append(target)
+	return out
 
 
 ## Yüzünü bir noktaya çevirir (model -Z'ye bakar).
