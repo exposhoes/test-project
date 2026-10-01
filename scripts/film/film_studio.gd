@@ -19,6 +19,7 @@ var playing := false
 var fast := false
 ## Eşyalara takılmadan yol bulunamayan yürüyüş sayısı (testler 0 bekler).
 var route_failures := 0
+var _extras: Array[Actor] = []
 var voice := FilmVoice.new()
 var _episode_id := ""
 var _line := 0
@@ -78,6 +79,7 @@ func play(id: String) -> void:
 	while not world.is_meshed_at(FilmSets.point(set_id + "." + FilmSets.POINTS[set_id].keys()[0])):
 		await get_tree().process_frame
 	_set_bars(true)
+	_spawn_extras(set_id)
 	for step: Dictionary in ep["steps"]:
 		await _run(step)
 	_hide_dialogue()
@@ -210,6 +212,38 @@ func _clear_actors() -> void:
 	for a: Actor in actors.values():
 		a.queue_free()
 	actors.clear()
+	for e: Actor in _extras:
+		e.queue_free()
+	_extras.clear()
+
+
+## Setin önündeki caddenin kaldırımlarında gidip gelen figüranlar: şehir canlı görünsün.
+func _spawn_extras(set_id: String) -> void:
+	if fast:
+		return
+	var corner := FilmSets.point(set_id + "." + FilmSets.POINTS[set_id].keys()[0])
+	# Setlerin kapısı +z yönüne bakar: önündeki (z'si büyük olan en yakın) cadde.
+	var az: int = FilmSets.AVENUES_Z[0]
+	for z: int in FilmSets.AVENUES_Z:
+		if z > corner.z and (az < corner.z or z < az):
+			az = z
+	var kinds := ["komsu_adam", "komsu_kadin", "komsu_cocuk", "komsu_adam", "komsu_kadin", "komsu_cocuk"]
+	for k in kinds.size():
+		var e := Actor.create(kinds[k])
+		add_child(e)
+		_extras.append(e)
+		var side_z := az - 0.6 if k % 2 == 0 else az + 4.3
+		var x0 := corner.x - 18.0 + k * 7.0
+		e.position = Vector3(x0, FilmSets.GROUND + 1, side_z)
+		_extra_loop(e, x0 - 12.0, x0 + 12.0, 1.1 + (k % 3) * 0.3)
+
+
+func _extra_loop(e: Actor, x_min: float, x_max: float, speed: float) -> void:
+	var going_right := true
+	while is_instance_valid(e) and playing:
+		var target := Vector3(x_max if going_right else x_min, e.position.y, e.position.z)
+		await e.walk_to(target, speed)
+		going_right = not going_right
 
 
 func _move_camera(pos: Vector3, look: Vector3, t: float) -> void:
