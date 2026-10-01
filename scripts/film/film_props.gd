@@ -56,7 +56,9 @@ static func build(id: String, size: Vector2i, turn_override = null) -> Node3D:
 	if glb:
 		model.add_child(glb)
 	else:
+		_begin_texture(id)
 		_model(model, id, foot)
+		_tex = null
 	model.position = Vector3(-foot.x / 2, 0, -foot.z / 2)
 	var pivot := Node3D.new()
 	pivot.add_child(model)
@@ -173,7 +175,8 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			var fz := d - 0.25 + 0.01
 			for k in 2:
 				var cx := w / 2 + (k - 0.5) * dw / 2
-				_box(r, Vector3(dw / 2 - 0.03, h - 0.24, 0.03), Vector3(cx, 0.08 + (h - 0.14) / 2, fz), c.lightened(0.06))
+				if _face(r, Vector3(dw / 2 - 0.03, h - 0.24, 0.03), Vector3(cx, 0.08 + (h - 0.14) / 2, fz), "on_gardirop_kapagi", c.lightened(0.06)):
+					continue
 				_box(r, Vector3(dw / 2 - 0.2, h - 0.6, 0.02), Vector3(cx, 0.08 + (h - 0.14) / 2, fz + 0.02), c.darkened(0.05))
 				_box(r, Vector3(0.06, 0.06, 0.05), Vector3(w / 2 + (k - 0.5) * 0.14, h * 0.5, fz + 0.04), c.darkened(0.5))
 		"calisma_masasi", "yemek_masasi", "ogretmen_masasi":
@@ -205,7 +208,8 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			var doors := int(round(w / 0.5))
 			for k in doors:
 				var cx := (k + 0.5) * w / doors
-				_box(r, Vector3(w / doors - 0.03, h - 0.24, 0.02), Vector3(cx, 0.1 + (h - 0.19) / 2, d - 0.06), c.lightened(0.04))
+				if _face(r, Vector3(w / doors - 0.03, h - 0.24, 0.02), Vector3(cx, 0.1 + (h - 0.19) / 2, d - 0.06), "on_dolap_kapagi", c.lightened(0.04)):
+					continue
 				_box(r, Vector3(0.12, 0.025, 0.03), Vector3(cx, h - 0.2, d - 0.035), STEEL)
 			_box(r, Vector3(0.5, 0.012, 0.35), Vector3(w * 0.3, h + 0.001, d / 2), Color("5d6268"))  # evye
 			_box(r, Vector3(0.03, 0.25, 0.03), Vector3(w * 0.3, h + 0.125, 0.15), STEEL)  # musluk
@@ -213,25 +217,28 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 		"ocak":
 			var c := _tone(id, WHITE)
 			_box(r, Vector3(w - 0.04, h, d - 0.06), Vector3(w / 2, h / 2, d / 2 - 0.02), c)
-			_box(r, Vector3(w - 0.2, h * 0.5, 0.02), Vector3(w / 2, h * 0.35, d - 0.04), Color("202428"))  # fırın camı
-			_box(r, Vector3(w - 0.3, 0.03, 0.04), Vector3(w / 2, h * 0.65, d - 0.02), STEEL)
-			for k in 4:
-				_box(r, Vector3(0.05, 0.05, 0.03), Vector3(0.2 + k * (w - 0.4) / 3, h * 0.85, d - 0.04), Color("333333"))
-			for p in [Vector2(0.28, 0.3), Vector2(w - 0.28, 0.3), Vector2(0.28, d - 0.35), Vector2(w - 0.28, d - 0.35)]:
-				_box(r, Vector3(0.22, 0.02, 0.22), Vector3(p.x, h + 0.01, p.y), Color("1f1f1f"))
+			if not _face(r, Vector3(w - 0.08, h - 0.04, 0.02), Vector3(w / 2, h / 2, d - 0.04), "on_firin", c):
+				_box(r, Vector3(w - 0.2, h * 0.5, 0.02), Vector3(w / 2, h * 0.35, d - 0.04), Color("202428"))  # fırın camı
+				_box(r, Vector3(w - 0.3, 0.03, 0.04), Vector3(w / 2, h * 0.65, d - 0.02), STEEL)
+				for k in 4:
+					_box(r, Vector3(0.05, 0.05, 0.03), Vector3(0.2 + k * (w - 0.4) / 3, h * 0.85, d - 0.04), Color("333333"))
+			if not _face(r, Vector3(w - 0.06, 0.01, d - 0.08), Vector3(w / 2, h + 0.003, d / 2 - 0.02), "ust_ocak", c, true):
+				for p in [Vector2(0.28, 0.3), Vector2(w - 0.28, 0.3), Vector2(0.28, d - 0.35), Vector2(w - 0.28, d - 0.35)]:
+					_box(r, Vector3(0.22, 0.02, 0.22), Vector3(p.x, h + 0.01, p.y), Color("1f1f1f"))
 		"buzdolabi":
 			var c := _tone(id, WHITE)
 			_box(r, Vector3(w - 0.08, h, d - 0.1), Vector3(w / 2, h / 2, d / 2 - 0.04), c)
-			_box(r, Vector3(w - 0.1, 0.015, 0.03), Vector3(w / 2, h * 0.66, d - 0.08), c.darkened(0.25))  # kapı arası
-			_box(r, Vector3(0.035, 0.35, 0.05), Vector3(w * 0.78, h * 0.8, d - 0.05), STEEL)
-			_box(r, Vector3(0.035, 0.6, 0.05), Vector3(w * 0.78, h * 0.42, d - 0.05), STEEL)
+			if not _face(r, Vector3(w - 0.1, h - 0.04, 0.02), Vector3(w / 2, h / 2, d - 0.08), "on_buzdolabi", c):
+				_box(r, Vector3(w - 0.1, 0.015, 0.03), Vector3(w / 2, h * 0.66, d - 0.08), c.darkened(0.25))  # kapı arası
+				_box(r, Vector3(0.035, 0.35, 0.05), Vector3(w * 0.78, h * 0.8, d - 0.05), STEEL)
+				_box(r, Vector3(0.035, 0.6, 0.05), Vector3(w * 0.78, h * 0.42, d - 0.05), STEEL)
 		"komodin":
 			var c := _tone(id, Color("f4f1ea"))
 			_box(r, Vector3(0.6, h - 0.05, 0.55), Vector3(w / 2, (h - 0.05) / 2 + 0.05, d / 2), c)
 			for p in [Vector2(-0.25, -0.22), Vector2(0.25, -0.22), Vector2(-0.25, 0.22), Vector2(0.25, 0.22)]:
 				_box(r, Vector3(0.05, 0.05, 0.05), Vector3(w / 2 + p.x, 0.025, d / 2 + p.y), c.darkened(0.3))
-			_box(r, Vector3(0.5, 0.18, 0.02), Vector3(w / 2, h * 0.65, d / 2 + 0.28), c.darkened(0.06))
-			_box(r, Vector3(0.05, 0.05, 0.04), Vector3(w / 2, h * 0.65, d / 2 + 0.3), Color("8a8a8a"))
+			if not _face(r, Vector3(0.5, 0.18, 0.02), Vector3(w / 2, h * 0.65, d / 2 + 0.28), "on_cekmece", c.darkened(0.06)):
+				_box(r, Vector3(0.05, 0.05, 0.04), Vector3(w / 2, h * 0.65, d / 2 + 0.3), Color("8a8a8a"))
 			_box(r, Vector3(0.14, 0.04, 0.14), Vector3(w / 2, h + 0.02, d / 2), Color("8a8a8a"))  # lamba
 			_box(r, Vector3(0.03, 0.2, 0.03), Vector3(w / 2, h + 0.12, d / 2), Color("8a8a8a"))
 			_box(r, Vector3(0.26, 0.18, 0.26), Vector3(w / 2, h + 0.3, d / 2), Color("ffe08a"))
@@ -285,7 +292,7 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				_box(r, Vector3(w / 2 - 0.25, 0.3, 0.02), Vector3(w * (0.27 + 0.46 * k), 0.25, d - 0.3), c.lightened(0.06))
 			_box(r, Vector3(0.3, 0.05, 0.2), Vector3(w / 2, 0.525, d / 2 - 0.1), Color("222222"))  # ayak
 			_box(r, Vector3(1.7, 0.95, 0.06), Vector3(w / 2, 1.0, d / 2 - 0.1), Color("1b1d20"))  # ekran
-			_box(r, Vector3(1.6, 0.85, 0.01), Vector3(w / 2, 1.0, d / 2 - 0.065), Color("2b4a6b"))
+			_face(r, Vector3(1.6, 0.85, 0.01), Vector3(w / 2, 1.0, d / 2 - 0.065), "on_tv", Color("2b4a6b"))
 		"kuvet":
 			_box(r, Vector3(w - 0.05, h, d - 0.1), Vector3(w / 2, h / 2, d / 2), Color("f7f7f7"))
 			_box(r, Vector3(w - 0.3, 0.02, d - 0.35), Vector3(w / 2, h - 0.08, d / 2), Color("8fd3f0"))  # su
@@ -421,8 +428,8 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 		"ust_dolap":
 			_box(r, Vector3(w - 0.04, 0.6, 0.4), Vector3(w / 2, 1.75, 0.2), Color("f2efe9"))
 			for k in int(maxf(1.0, w)):
-				_box(r, Vector3(0.9, 0.52, 0.02), Vector3(0.5 + k, 1.75, 0.41), Color("e7e1d8"))
-				_box(r, Vector3(0.1, 0.03, 0.03), Vector3(0.5 + k, 1.53, 0.43), STEEL)
+				if not _face(r, Vector3(0.9, 0.52, 0.02), Vector3(0.5 + k, 1.75, 0.41), "on_ust_dolap", Color("e7e1d8")):
+					_box(r, Vector3(0.1, 0.03, 0.03), Vector3(0.5 + k, 1.53, 0.43), STEEL)
 		"berjer":
 			var c := _tone(id, Color("6b8f71"))
 			_box(r, Vector3(0.85, 0.3, 0.8), Vector3(w / 2, 0.25, d / 2 + 0.05), c.darkened(0.1))
@@ -433,7 +440,7 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 		"tv_sehpasi":
 			_box(r, Vector3(w - 0.1, 0.5, d - 0.4), Vector3(w / 2, 0.25, d / 2), Color("5b3a22"))
 			_box(r, Vector3(1.7, 0.95, 0.06), Vector3(w / 2, 1.0, d / 2), Color("1b1d20"))
-			_box(r, Vector3(1.6, 0.85, 0.01), Vector3(w / 2, 1.0, d / 2 + 0.035), Color("3a6a9b"))
+			_face(r, Vector3(1.6, 0.85, 0.01), Vector3(w / 2, 1.0, d / 2 + 0.035), "on_tv", Color("3a6a9b"))
 		"koli":
 			_box(r, Vector3(0.6, 0.45, 0.5), Vector3(w / 2 - 0.1, 0.225, d / 2), Color("c49a63"))
 			_box(r, Vector3(0.45, 0.35, 0.4), Vector3(w / 2 + 0.15, 0.45 + 0.175 - 0.0, d / 2 - 0.05), Color("b98b55"))
@@ -451,12 +458,108 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, f, f / 2, WOOD)
 
 
+## Eşya dokuları (Mehmet'in gerçekçi görselleri, istemler: docs/gorsel-istemleri-esya-dokulari.md):
+## assets/textures/esya/dokular/<ad>.png.
+## Her eşyanın ana dokusu ve o dokunun yerini tuttuğu ana renk; ana renge yakın (açık/koyu tonları dahil)
+## parçalar dokuyla kaplanır, diğer parçalar (kitap, ekran, düğme) kendi renginde kalır.
+const TEXTURES := {
+	"yemek_masasi": "ahsap_koyu", "sandalye": "ahsap_koyu", "sehpa": "ahsap_koyu", "komodin": "ahsap_acik",
+	"tv_sehpasi": "ahsap_koyu", "ogretmen_masasi": "ahsap_koyu",
+	"gardirop": "ahsap_acik", "calisma_masasi": "ahsap_acik", "bank": "ahsap_acik", "sira": "ahsap_acik",
+	"oyuncak_kutusu": "ahsap_acik", "market_rafi": "ahsap_acik",
+	"mutfak_tezgahi": "beyaz_lake", "ust_dolap": "beyaz_lake", "kasa": "beyaz_lake",
+	"buzdolabi": "beyaz_lake", "camasir_makinesi": "beyaz_lake", "ocak": "beyaz_lake", "icecek_dolabi": "beyaz_lake",
+	"koltuk": "kumas_gri", "berjer": "kumas_gri",
+}
+## Eşyanın kodda yazılı ana rengi PNG'den gelmiyorsa burada.
+const TEXTURE_REF := {
+	"sira": Color("c9a06a"), "kuvet": Color("f7f7f7"), "lavabo": Color("f7f7f7"), "klozet": Color("f7f7f7"),
+	"dus": Color("f2f2f2"), "ust_dolap": Color("f2efe9"), "kasa": Color("e9ecef"), "camasir_makinesi": Color("f4f4f4"),
+	"icecek_dolabi": Color("d8dde2"),
+}
+## Her eşyada geçerli ortak dokular: renk → doku (çelik kulplar, tezgâh taşı).
+const COLOR_TEXTURES := {"9ea7ad": "metal_celik", "7b7f84": "tezgah_tas"}
+static var _tex: Texture2D = null
+static var _ref := Color.WHITE
+static var _tex_cache := {}
+
+
+static func _texture(name: String) -> Texture2D:
+	if _tex_cache.has(name):
+		return _tex_cache[name]
+	var path := "res://assets/textures/esya/dokular/%s.png" % name
+	var tex: Texture2D = null
+	if ResourceLoader.exists(path):
+		tex = load(path)
+	elif FileAccess.file_exists(path):
+		tex = ImageTexture.create_from_image(Image.load_from_file(path))
+	_tex_cache[name] = tex
+	return tex
+
+
+static func _begin_texture(id: String) -> void:
+	_tex = _texture(TEXTURES[id]) if TEXTURES.has(id) else null
+	if _tex:
+		_ref = TEXTURE_REF.get(id, _tone(id, WOOD))
+
+
+## Parça rengi ana renge yakınsa (aynı renk, açık/koyu) doku ve parlaklık oranı; değilse null.
+static func _texture_tint(color: Color):
+	var r := Vector3(color.r / maxf(_ref.r, 0.02), color.g / maxf(_ref.g, 0.02), color.b / maxf(_ref.b, 0.02))
+	var lo := minf(r.x, minf(r.y, r.z))
+	var hi := maxf(r.x, maxf(r.y, r.z))
+	if lo <= 0.0 or hi / lo > 1.3:
+		return null
+	var k := clampf((r.x + r.y + r.z) / 3.0, 0.3, 1.0)
+	return Color(k, k, k)
+
+
+## Ön yüz görseli (on_dolap_kapagi, on_tv...): görsel varsa parçanın ön yüzüne (top=true ise üstüne)
+## bir kez kaplanır ve true döner; yoksa parça düz renkte kurulur, false döner (kulp gibi süsler eklensin).
+static func _face(parent: Node3D, size: Vector3, center: Vector3, name: String, color: Color, top := false) -> bool:
+	var tex := _texture(name)
+	var saved := _tex
+	_tex = null
+	_box(parent, size, center, color)
+	_tex = saved
+	if tex == null:
+		return false
+	var q := MeshInstance3D.new()
+	var qm := QuadMesh.new()
+	qm.size = Vector2(size.x, size.z if top else size.y)
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = tex
+	m.roughness = 0.6
+	qm.material = m
+	q.mesh = qm
+	if top:
+		q.rotation.x = -PI / 2
+		q.position = center + Vector3(0, size.y / 2 + 0.002, 0)
+	else:
+		q.position = center + Vector3(0, 0, size.z / 2 + 0.002)
+	parent.add_child(q)
+	return true
+
+
 static func _box(parent: Node3D, size: Vector3, center: Vector3, color: Color) -> void:
 	var mi := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = color
+	var tex: Texture2D = null
+	var tint = null
+	if COLOR_TEXTURES.has(color.to_html(false)):
+		tex = _texture(COLOR_TEXTURES[color.to_html(false)])
+		tint = Color.WHITE
+	elif _tex:
+		tint = _texture_tint(color)
+		tex = _tex if tint != null else null
+	if tex:
+		mat.albedo_texture = tex
+		mat.albedo_color = tint
+		mat.uv1_triplanar = true
+		mat.uv1_scale = Vector3(1.5, 1.5, 1.5)
 	mat.roughness = 0.8
 	mesh.material = mat
 	mi.mesh = mesh
@@ -717,7 +820,7 @@ static func _split_views(img: Image) -> Array:
 
 ## Açılır ahşap giriş kapısı: menteşe sol alt köşede (0,0,0), kapı +X yönüne 1 blok uzanır.
 ## Doku: assets/textures/esya/kapi_ahsap.png (kodla çizildi).
-static func build_door() -> Node3D:
+static func build_door(interior := false) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Kapi"
 	var hinge := Node3D.new()
@@ -727,6 +830,8 @@ static func build_door() -> Node3D:
 	bm.size = Vector3(0.96, 2.92, 0.08)
 	var m := StandardMaterial3D.new()
 	var path := "res://assets/textures/esya/kapi_ahsap.png"
+	if interior and (ResourceLoader.exists("res://assets/textures/esya/dokular/kapi_ic.png") or FileAccess.file_exists("res://assets/textures/esya/dokular/kapi_ic.png")):
+		path = "res://assets/textures/esya/dokular/kapi_ic.png"
 	if ResourceLoader.exists(path) or FileAccess.file_exists(path):
 		var tex = load(path)
 		m.albedo_texture = tex if tex is Texture2D else ImageTexture.create_from_image(Image.load_from_file(path))

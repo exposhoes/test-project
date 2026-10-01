@@ -64,7 +64,7 @@ func _ready() -> void:
 		n.position = Vector3(pr[1])
 		add_child(n)
 	for dr: Array in sets.doors:
-		var n := FilmProps.build_door()
+		var n := FilmProps.build_door(dr.size() > 2 and dr[2])
 		n.position = dr[0]
 		n.rotation.y = dr[1]
 		add_child(n)

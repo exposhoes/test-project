@@ -461,7 +461,7 @@ func _build_house(o: Vector3i) -> void:
 		_fill(o, d, d + Vector3i(0, 2, 0), Blocks.AIR)
 	for d in [Vector3i(5, 5, -1), Vector3i(9, 5, 3)]:
 		_fill(o, d, d + Vector3i(0, 1, 0), Blocks.AIR)
-	doors.append([Vector3(o) + Vector3(2, 0, -3.5), 0.0])  # banyo kapısı
+	doors.append([Vector3(o) + Vector3(2, 0, -3.5), 0.0, true])  # banyo kapısı
 	# Garaj: geniş açık kapı, üstünde beyaz lento; içinde araba.
 	_fill(o, Vector3i(-7, 0, 7), Vector3i(-3, 2, 7), Blocks.AIR)
 	_fill(o, Vector3i(-7, 3, 7), Vector3i(-3, 3, 7), Blocks.TRIM_WHITE)
@@ -1048,13 +1048,14 @@ func _iwall(o: Vector3i, from: Vector3i, to: Vector3i, block := Blocks.PLASTER) 
 
 
 ## Kapı: 3 blok yüksek boşluk ve açılır kapı. along_x: duvar x boyunca (z sabit).
-func _door(o: Vector3i, p: Vector3i, along_x: bool, swing := true) -> void:
+## outer: bina giriş kapısı (ahşap); diğerleri iç kapı (beyaz, kapi_ic).
+func _door(o: Vector3i, p: Vector3i, along_x: bool, swing := true, outer := false) -> void:
 	_fill(o, p, p + Vector3i(0, 2, 0), Blocks.AIR)
 	if swing:
 		if along_x:
-			doors.append([Vector3(o) + Vector3(p.x, p.y, p.z + 0.5), 0.0])
+			doors.append([Vector3(o) + Vector3(p.x, p.y, p.z + 0.5), 0.0, not outer])
 		else:
-			doors.append([Vector3(o) + Vector3(p.x + 0.5, p.y, p.z), -PI / 2])
+			doors.append([Vector3(o) + Vector3(p.x + 0.5, p.y, p.z), -PI / 2, not outer])
 
 
 ## Tente: x0..x1 boyunca, z'de, y yüksekliğinde iki renkli çizgili.
@@ -1091,8 +1092,8 @@ func _build_school(o: Vector3i) -> void:
 	_fill(o, Vector3i(16, -1, -8), Vector3i(17, -1, 10), Blocks.SIDEWALK)
 	_fill(o, Vector3i(0, -1, -3), Vector3i(14, -1, -2), Blocks.SIDEWALK)
 	_door(o, Vector3i(15, 0, 5), false)
-	_door(o, Vector3i(7, 0, 11), true)
-	_door(o, Vector3i(16, 0, 11), true)
+	_door(o, Vector3i(7, 0, 11), true, true, true)
+	_door(o, Vector3i(16, 0, 11), true, true, true)
 	_door(o, Vector3i(17, 0, 11), true, false)
 	_door(o, Vector3i(3, 0, -4), true)
 	_door(o, Vector3i(11, 0, -4), true)
@@ -1226,7 +1227,7 @@ func _build_market(o: Vector3i) -> void:
 ## servis penceresi, arkada mutfak (ocak, tezgâh, buzdolabı).
 func _build_restaurant(o: Vector3i) -> void:
 	_shell(o, Vector2i(0, 0), Vector2i(14, 12), 1, Blocks.BRICKS, Blocks.DARK_PLANKS)
-	_door(o, Vector3i(7, 0, 0), true)
+	_door(o, Vector3i(7, 0, 0), true, true, true)
 	_awning(o, 3, 11, 3, -1, Blocks.TOY_BRICK_RED)
 	_fill(o, Vector3i(5, 4, 0), Vector3i(9, 4, 0), Blocks.TOY_BRICK_YELLOW)  # tabela
 	_iwall(o, Vector3i(1, 0, 8), Vector3i(13, 0, 8))
@@ -1251,7 +1252,7 @@ func _build_restaurant(o: Vector3i) -> void:
 ## Pastane (dış x 0..7, z 0..9; kapı güneyde): pasta vitrini, kasa, fırın, ekmek rafları, iki masa.
 func _build_bakery(o: Vector3i) -> void:
 	_shell(o, Vector2i(0, 0), Vector2i(7, 9), 1, Blocks.FACADE_CREAM, Blocks.TILE_BATH)
-	_door(o, Vector3i(3, 0, 0), true)
+	_door(o, Vector3i(3, 0, 0), true, true, true)
 	_fill(o, Vector3i(5, 0, 0), Vector3i(6, 2, 0), Blocks.GLASS)
 	_awning(o, 0, 7, 3, -1, Blocks.TOY_BRICK_RED)
 	_fill(o, Vector3i(1, 0, 5), Vector3i(4, 0, 5), Blocks.GLASS)
@@ -1271,7 +1272,7 @@ func _build_bakery(o: Vector3i) -> void:
 ## odası ve eczane; önde ambulans.
 func _build_hospital(o: Vector3i) -> void:
 	_shell(o, Vector2i(-1, -7), Vector2i(13, 9), 1, Blocks.TRIM_WHITE, Blocks.TILE_BATH)
-	_door(o, Vector3i(6, 0, 9), true)
+	_door(o, Vector3i(6, 0, 9), true, true, true)
 	_fill(o, Vector3i(7, 0, 9), Vector3i(7, 2, 9), Blocks.GLASS)
 	for c in [Vector3i(6, 4, 10), Vector3i(6, 5, 10), Vector3i(6, 6, 10), Vector3i(5, 5, 10), Vector3i(7, 5, 10)]:
 		_put(o + c, Blocks.TOY_BRICK_RED)
