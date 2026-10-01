@@ -9,6 +9,40 @@ const SKIN := Color("f1c7a0")
 
 ## "parts": [boyut, merkez, renk] kutuları; "face": [kenar, merkez]; "hair"/"eyes": kodla çizilen yüzün renkleri.
 const ACTORS := {
+	# Figüranlar: sokakta yürüyen komşular (konuşmazlar).
+	"komsu_adam": {"name": "Komşu", "color": Color("cccccc"),
+		"parts": [
+			[Vector3(0.24, 0.8, 0.26), Vector3(-0.14, 0.4, 0), Color("4a4a55")],
+			[Vector3(0.24, 0.8, 0.26), Vector3(0.14, 0.4, 0), Color("4a4a55")],
+			[Vector3(0.56, 0.7, 0.32), Vector3(0, 1.15, 0), Color("3f6fb0")],
+			[Vector3(0.16, 0.64, 0.18), Vector3(-0.37, 1.17, 0), Color("3f6fb0")],
+			[Vector3(0.16, 0.64, 0.18), Vector3(0.37, 1.17, 0), Color("3f6fb0")],
+			[Vector3(0.5, 0.5, 0.5), Vector3(0, 1.75, 0), SKIN],
+			[Vector3(0.54, 0.12, 0.54), Vector3(0, 2.02, 0.02), Color("2a2a2a")],
+		],
+		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("2a2a2a"), "eyes": Color("2a1a10")},
+	"komsu_kadin": {"name": "Komşu", "color": Color("cccccc"),
+		"parts": [
+			[Vector3(0.56, 0.9, 0.34), Vector3(0, 0.45, 0), Color("2f7a6a")],
+			[Vector3(0.54, 0.6, 0.32), Vector3(0, 1.2, 0), Color("e8c05a")],
+			[Vector3(0.16, 0.56, 0.18), Vector3(-0.36, 1.22, 0), Color("e8c05a")],
+			[Vector3(0.16, 0.56, 0.18), Vector3(0.36, 1.22, 0), Color("e8c05a")],
+			[Vector3(0.5, 0.5, 0.5), Vector3(0, 1.75, 0), SKIN],
+			[Vector3(0.56, 0.12, 0.56), Vector3(0, 2.03, 0.02), Color("8a5a30")],
+			[Vector3(0.56, 0.5, 0.3), Vector3(0, 1.78, 0.14), Color("8a5a30")],
+		],
+		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("8a5a30"), "eyes": Color("2a1a10")},
+	"komsu_cocuk": {"name": "Çocuk", "color": Color("cccccc"),
+		"parts": [
+			[Vector3(0.22, 0.6, 0.24), Vector3(-0.13, 0.3, 0), Color("c07030")],
+			[Vector3(0.22, 0.6, 0.24), Vector3(0.13, 0.3, 0), Color("c07030")],
+			[Vector3(0.52, 0.6, 0.3), Vector3(0, 0.9, 0), Color("9a4fd0")],
+			[Vector3(0.16, 0.56, 0.18), Vector3(-0.35, 0.92, 0), Color("9a4fd0")],
+			[Vector3(0.16, 0.56, 0.18), Vector3(0.35, 0.92, 0), Color("9a4fd0")],
+			[Vector3(0.5, 0.5, 0.5), Vector3(0, 1.45, 0), SKIN],
+			[Vector3(0.54, 0.14, 0.54), Vector3(0, 1.72, 0.02), Color("111111")],
+		],
+		"face": [0.46, Vector3(0, 1.43, -0.25)], "hair": Color("111111"), "eyes": Color("2a1a10")},
 	"emir": {"name": "Emir", "color": Color("ffd23f"),
 		"parts": [
 			[Vector3(0.22, 0.6, 0.24), Vector3(-0.13, 0.3, 0), Color("2f4f8f")],   # kot pantolon
