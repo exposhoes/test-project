@@ -322,7 +322,7 @@ func _build_school(o: Vector3i) -> void:
 		_fill(o, Vector3i(15, 1, z), Vector3i(15, 2, z), Blocks.GLASS)
 	# Kara tahta (arka duvarda koyu şerit) ve öğretmen masası.
 	_fill(o, Vector3i(4, 1, 0), Vector3i(11, 2, 0), Blocks.BEDROCK)
-	_put(o + Vector3i(7, 0, 2), Blocks.CRAFTING_TABLE)
+	_prop(o, "ogretmen_masasi", Vector3i(7, 0, 2), Vector2i(2, 1))
 	# Sıralar.
 	for row in [4, 7]:
 		for x in [3, 4, 5, 9, 10, 11]:
@@ -365,7 +365,7 @@ func _build_hospital(o: Vector3i) -> void:
 	_put(o + Vector3i(7, 4, 10), Blocks.TOY_BRICK_RED)
 	# Danışma masası, yataklar, bekleme sandalyeleri, ışıklar.
 	for x in range(5, 9):
-		_put(o + Vector3i(x, 0, 5), Blocks.CRAFTING_TABLE if x == 6 else Blocks.PLANKS)
+		_put(o + Vector3i(x, 0, 5), Blocks.PLANKS)
 	for b in [Vector3i(1, 0, 1), Vector3i(1, 0, 2), Vector3i(11, 0, 1), Vector3i(11, 0, 2)]:
 		_put(o + b, Blocks.BED)
 	for z in [5, 7]:
@@ -401,10 +401,8 @@ func _build_shop(o: Vector3i) -> void:
 	# Tezgâh, raflar, dondurma dolabı.
 	for x in range(3, 8):
 		_put(o + Vector3i(x, 0, 3), Blocks.PLANKS)
-	_put(o + Vector3i(5, 0, 3), Blocks.CRAFTING_TABLE)
-	for z in range(1, 8):
-		_put(o + Vector3i(0, 0, z), Blocks.CHEST)
-		_put(o + Vector3i(0, 1, z), Blocks.CHEST if z % 2 == 0 else Blocks.BERRY_BUSH)
+	# Market rafları (gerçek raf, Minecraft sandığı değil).
+	_prop(o, "market_rafi", Vector3i(0, 0, 1), Vector2i(1, 7))
 	for z in range(4, 7):
 		_put(o + Vector3i(10, 0, z), Blocks.GLASS)
 		_put(o + Vector3i(10, 1, z), Blocks.TOY_BRICK_BLUE)

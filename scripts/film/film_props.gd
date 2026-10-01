@@ -7,7 +7,7 @@ extends RefCounted
 ## Eşya yüksekliği (blok). Yürünemeyen hücreler ve GLB ölçeği buna göre.
 const HEIGHTS := {
 	"gardirop": 2.0, "calisma_masasi": 0.8, "mutfak_tezgahi": 0.9, "ocak": 0.9,
-	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
+	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
 ## daha geniş tabanlarda x/z ölçeklenir.
@@ -106,7 +106,7 @@ static func _fallback(root: Node3D, id: String, f: Vector3) -> void:
 			_box(root, Vector3(0.02, f.y - 0.12, f.z / 2 - 0.08), Vector3(f.x - 0.01, f.y / 2, f.z * 0.75 - 0.1), Color("b07a48"))
 			_box(root, Vector3(0.04, 0.22, 0.04), Vector3(f.x + 0.01, f.y / 2, f.z / 2 - 0.13), DARK)
 			_box(root, Vector3(0.04, 0.22, 0.04), Vector3(f.x + 0.01, f.y / 2, f.z / 2 + 0.03), DARK)
-		"calisma_masasi", "yemek_masasi":
+		"calisma_masasi", "yemek_masasi", "ogretmen_masasi":
 			_box(root, Vector3(f.x - 0.05, 0.06, f.z - 0.05), Vector3(f.x / 2, f.y - 0.03, f.z / 2), WOOD)
 			for c in [Vector2(0.1, 0.1), Vector2(f.x - 0.1, 0.1), Vector2(0.1, f.z - 0.1), Vector2(f.x - 0.1, f.z - 0.1)]:
 				_box(root, Vector3(0.07, f.y - 0.06, 0.07), Vector3(c.x, (f.y - 0.06) / 2, c.y), DARK)
@@ -124,6 +124,14 @@ static func _fallback(root: Node3D, id: String, f: Vector3) -> void:
 			_box(root, Vector3(f.x - 0.06, f.y, f.z - 0.08), Vector3(f.x / 2, f.y / 2, f.z / 2), WHITE)
 			_box(root, Vector3(0.02, 0.02, f.z - 0.12), Vector3(0.0, f.y * 0.62, f.z / 2), STEEL)
 			_box(root, Vector3(0.03, 0.4, 0.04), Vector3(0.0, f.y * 0.8, 0.15), STEEL)
+		"market_rafi":
+			_box(root, Vector3(f.x - 0.1, f.y, 0.06), Vector3(f.x / 2 - 0.05, f.y / 2, 0.03), Color("d9d9d9"))
+			var cols := [Color("e84a4a"), Color("ffd23f"), Color("3aa655"), Color("2e6fd8"), Color("ff8fc8")]
+			for i in 4:
+				var h := 0.1 + i * 0.5
+				_box(root, Vector3(f.x - 0.1, 0.04, f.z - 0.05), Vector3(f.x / 2 - 0.05, h, f.z / 2), Color("bfbfbf"))
+				for k in int(f.z * 3):
+					_box(root, Vector3(0.22, 0.28, 0.2), Vector3(0.35 + (k % 2) * 0.25, h + 0.16, 0.2 + k * 0.32), cols[(i + k) % cols.size()])
 		"komodin":
 			_box(root, Vector3(0.7, f.y, 0.7), Vector3(0.5, f.y / 2, 0.5), Color("f4f1ea"))
 			_box(root, Vector3(0.02, 0.2, 0.55), Vector3(0.86, f.y * 0.55, 0.5), Color("e2dccd"))
