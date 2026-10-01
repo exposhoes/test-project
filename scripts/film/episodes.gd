@@ -878,6 +878,29 @@ const LIST := [
 			{"title": "Sen en çok hangi oyuncağı seversin? Yorumlara yaz!", "t": 2.5},
 		],
 	},
+	{
+		"id": "asi_korkusu", "name": "Bölüm 24: Ali Hasta Numarası Yapıyor", "set": "hastane", "time": 0.35,
+		"steps": [
+			{"place": "ali", "at": "hastane.yatak_1", "look": "hastane.yatak_1_yani", "lie": true},
+			{"place": "emir", "at": "hastane.giris", "look": "hastane.danisma"},
+			{"place": "doktor", "at": "hastane.danisma_arka", "look": "hastane.danisma"},
+			{"cam": "hastane.kam_yatak", "look": "hastane.yatak_1", "t": 0},
+			{"say": "ali", "text": "Ahh... Çok hastayım. Bugün matematik sınavına giremem..."},
+			{"title": "Ali Hasta Numarası Yapıyor", "t": 1.2},
+			{"walk": "emir", "to": "hastane.yatak_1_yani"},
+			{"say": "emir", "text": "Ali! Sana çorba getirdim. Ama sınav ertelendi, yarın olacakmış."},
+			{"say": "ali", "text": "Ertelendi mi? Yaşasın! Hemen iyileştim!"},
+			{"place": "ali", "at": "hastane.yatak_1_yani", "look": "hastane.danisma"},
+			{"shake": 0.3},
+			{"walk": "doktor", "to": "hastane.danisma"},
+			{"cam": "hastane.kam_ic", "look": "hastane.danisma", "t": 0},
+			{"say": "doktor", "text": "Bu kadar hızlı iyileşen hasta görmedim. Ama emin olmak için bir iğne yapalım."},
+			{"zoom": 0.6},
+			{"say": "ali", "text": "İğne mi?! Ahh, yine hastalandım!"},
+			{"say": "emir", "text": "Ali, en iyi ilaç doğruyu söylemek!"},
+			{"title": "Sen hiç hasta numarası yaptın mı? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 

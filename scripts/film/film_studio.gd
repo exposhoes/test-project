@@ -79,8 +79,12 @@ func play(id: String) -> void:
 		_show_title("Kayıt için hazırlan\n%d" % n)
 		await _wait(1.0)
 	_title.visible = false
-	while not world.is_meshed_at(FilmSets.point(set_id + "." + FilmSets.POINTS[set_id].keys()[0])):
+	var start := FilmSets.point(set_id + "." + FilmSets.POINTS[set_id].keys()[0])
+	_loading = true
+	_loading_at = start
+	while not world.is_meshed_at(start):
 		await get_tree().process_frame
+	_loading = false
 	_set_bars(true)
 	_spawn_extras(set_id)
 	for step: Dictionary in ep["steps"]:
