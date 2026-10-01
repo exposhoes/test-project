@@ -216,6 +216,16 @@ func _build_glb() -> bool:
 	var players := model.find_children("*", "AnimationPlayer", true, false)
 	if not players.is_empty():
 		_anim = players[0]
+		# Blender kopyası adlar ("walk.001", Godot'da "walk_001") düz ada çevrilsin, yoksa yürürken kayar.
+		for lib_name in _anim.get_animation_library_list():
+			var lib := _anim.get_animation_library(lib_name)
+			for n: StringName in lib.get_animation_list():
+				var plain := String(n)
+				var tail := plain.get_slice("_", plain.get_slice_count("_") - 1)
+				if tail.length() == 3 and tail.is_valid_int():
+					plain = plain.left(-4)
+				if plain != String(n) and not lib.has_animation(plain):
+					lib.rename_animation(n, plain)
 		for n in ["walk", "idle"]:
 			if _anim.has_animation(n):
 				_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
