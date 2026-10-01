@@ -1,43 +1,49 @@
 {
-  "_aciklama": "ElevenLabs Voice Library'den her karakter için bir ses seç, Voice ID'sini buraya yaz. Boş bırakılan karakter Microsoft sesiyle kalır. API anahtarı buraya DEĞİL, bilgisayarda ELEVENLABS_API_KEY ortam değişkenine yazılır.",
-  "model": "eleven_multilingual_v2",
-  "_secimler": "emir: Teddy Twinkle (sevimli çizgi film erkek çocuğu); ali: Valf (genç, oyuncu); zeynep: Caglayan (neşeli genç kız, Türkçe); komsu_cocuk: Mithi (çocuk); anne: Elif Akın (sıcak, sakin, doğal Türk kadını); ogretmen: Mahmut Hoca (54 yaşında erkek, olgun ve net öğretmen sesi); doktor: Akif (sıcak, sakin Türk erkeği); bakkal: Umit Gunacti (kalın, sıcak Türk erkeği)",
-  "sesler": {
-    "emir": "XjGYkUkzth8BPs29fmcV",
-    "ali": "loY1uopAz31XyhAEhNSa",
-    "komsu_cocuk": "MIl0Flub6Sc9KSkX2A42",
-    "zeynep": "sJ0xHHPzz1LOio4QNlB0",
-    "anne": "NH9bimvGxCDlyOWKzhrl",
-    "ogretmen": "xHqOjnu0AbcqNgTDQJu6",
-    "doktor": "skNtUvQlHhqETjfzZF1H",
-    "bakkal": "OUMjwyTVLkTqFhscEshG"
-  },
-  "_ayar_aciklama": "Her karakter hep aynı ayarla üretilir. stability yüksek = sabit ses, style yüksek = daha duygulu. Ayar değiştirmek var olan sesleri kendiliğinden yeniden üretmez (hak harcamamak için); yeniden üretmek için --kim <karakter> --zorla kullan.",
-  "ayarlar": {
-    "varsayilan": {
-      "stability": 0.5,
-      "similarity_boost": 0.85,
-      "style": 0.55,
-      "use_speaker_boost": true
-    },
-    "emir": {
-      "stability": 0.45,
-      "similarity_boost": 0.85,
-      "style": 0.5,
-      "use_speaker_boost": true
-    },
-    "anne": {
-      "stability": 0.45,
-      "similarity_boost": 0.85,
-      "style": 0.5,
-      "use_speaker_boost": true
-    }
-  },
-  "_perde_aciklama": "ElevenLabs aynı sesi her üretimde biraz kalın ya da ince okuyabiliyor. hedef_perde (Hz) yazılı karakterde replik, perdesi hedefin perde_payi oranı içinde çıkana kadar en çok 'deneme' kez üretilir, en yakını seçilir. Emir 305 Hz: Mehmet'in beğendiği Bölüm 1 sesi.",
-  "hedef_perde": {
-    "emir": 305,
-    "anne": 215
-  },
-  "perde_payi": 0.1,
-  "deneme": 4
+    "_aciklama":  "ElevenLabs Voice Library\u0027den her karakter için bir ses seç, Voice ID\u0027sini buraya yaz. Boş bırakılan karakter Microsoft sesiyle kalır. API anahtarı buraya DEĞİL, bilgisayarda ELEVENLABS_API_KEY ortam değişkenine yazılır.",
+    "model":  "eleven_multilingual_v2",
+    "_secimler":  "emir: Teddy Twinkle (sevimli çizgi film erkek çocuğu); ali: Valf (genç, oyuncu); zeynep: Caglayan (neşeli genç kız, Türkçe); komsu_cocuk: Mithi (çocuk); anne: Elif Akın (sıcak, sakin, doğal Türk kadını); ogretmen: Alper K. (erkek; dinamik, canlı, eğitici); doktor: Akif (sıcak, sakin Türk erkeği); bakkal: Umit Gunacti (kalın, sıcak Türk erkeği)",
+    "sesler":  {
+                   "emir":  "XjGYkUkzth8BPs29fmcV",
+                   "ali":  "loY1uopAz31XyhAEhNSa",
+                   "komsu_cocuk":  "MIl0Flub6Sc9KSkX2A42",
+                   "zeynep":  "sJ0xHHPzz1LOio4QNlB0",
+                   "anne":  "NH9bimvGxCDlyOWKzhrl",
+                   "ogretmen":  "8Xd5Bg2N5sjGBxgk04rd",
+                   "doktor":  "skNtUvQlHhqETjfzZF1H",
+                   "bakkal":  "OUMjwyTVLkTqFhscEshG"
+               },
+    "_ayar_aciklama":  "Her karakter hep aynı ayarla üretilir. stability yüksek = sabit ses, style yüksek = daha duygulu. Ayar değiştirmek var olan sesleri kendiliğinden yeniden üretmez (hak harcamamak için); yeniden üretmek için --kim \u003ckarakter\u003e --zorla kullan.",
+    "ayarlar":  {
+                    "varsayilan":  {
+                                       "stability":  0.5,
+                                       "similarity_boost":  0.85,
+                                       "style":  0.55,
+                                       "use_speaker_boost":  true
+                                   },
+                    "emir":  {
+                                 "stability":  0.45,
+                                 "similarity_boost":  0.85,
+                                 "style":  0.5,
+                                 "use_speaker_boost":  true
+                             },
+                    "anne":  {
+                                 "stability":  0.45,
+                                 "similarity_boost":  0.85,
+                                 "style":  0.5,
+                                 "use_speaker_boost":  true
+                             },
+                    "ogretmen":  {
+                                     "stability":  0.35,
+                                     "similarity_boost":  0.85,
+                                     "style":  0.7,
+                                     "use_speaker_boost":  true
+                                 }
+                },
+    "_perde_aciklama":  "ElevenLabs aynı sesi her üretimde biraz kalın ya da ince okuyabiliyor. hedef_perde (Hz) yazılı karakterde replik, perdesi hedefin perde_payi oranı içinde çıkana kadar en çok \u0027deneme\u0027 kez üretilir, en yakını seçilir. Emir 305 Hz: Mehmet\u0027in beğendiği Bölüm 1 sesi.",
+    "hedef_perde":  {
+                        "emir":  305,
+                        "anne":  215
+                    },
+    "perde_payi":  0.1,
+    "deneme":  4
 }
