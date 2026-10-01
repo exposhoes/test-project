@@ -94,6 +94,9 @@ async def main() -> None:
     kimler = set()
     if "--kim" in sys.argv:
         kimler = set(sys.argv[sys.argv.index("--kim") + 1].split(","))
+    bolumler = set()
+    if "--bolum" in sys.argv:  # ör. --bolum bolum1,okul1 (sadece bu bölümler)
+        bolumler = set(sys.argv[sys.argv.index("--bolum") + 1].split(","))
     kok = pathlib.Path(__file__).resolve().parent.parent / "assets" / "audio" / "voices"
     yapilan = 0
     el = elevenlabs_sesleri()
@@ -101,9 +104,11 @@ async def main() -> None:
         print("ElevenLabs sesleri:", ", ".join(k for k in el if k != "_model"))
     for r in replikler:
         hedef = kok / r["bolum"] / ("%02d.mp3" % r["satir"])
+        if bolumler and r["bolum"] not in bolumler:
+            continue
         if kimler and r["kim"] not in kimler:
             continue
-        if hedef.exists() and not hepsi and not kimler:
+        if hedef.exists() and not hepsi and not kimler and not bolumler:
             continue
         hedef.parent.mkdir(parents=True, exist_ok=True)
         ses, perde, hiz = SESLER.get(r["kim"], VARSAYILAN)
