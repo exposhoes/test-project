@@ -89,8 +89,36 @@ func _process(delta: float) -> void:
 	if not Actor.is_free.is_valid() and world and world.generator is FilmSets:
 		Actor.is_free = (world.generator as FilmSets).is_air
 	_watch_speaker(delta)
+	_keep_distance(delta)
 	# Yeni kamera noktası yüklenirken merkez oraya sabit kalsın; yoksa iki nokta arasında gidip gelir ve chunk hiç bitmez.
 	world.update_center(_loading_at if _loading else camera.global_position)
+
+
+## Kamera hiçbir karakterin yüzüne girmesin: biri ~2.6 bloktan yakına gelirse kamera
+## yavaşça geri çekilir (duvara girmeden). Mehmet: "uzak açıdan çek, yüzüne girme".
+const MIN_CAM_DIST := 2.6
+
+
+func _keep_distance(delta: float) -> void:
+	if fast or not playing or world == null or not (world.generator is FilmSets):
+		return
+	var sets := world.generator as FilmSets
+	for a in Actor.everyone:
+		if not is_instance_valid(a) or not a.visible:
+			continue
+		var head: Vector3 = a.head_position() if a._body.rotation.x != 0.0 else a.position + Vector3(0, 1.3, 0)
+		var away := camera.global_position - head
+		away.y = 0.0
+		var d := away.length()
+		if d >= MIN_CAM_DIST or d < 0.01:
+			continue
+		var step := away.normalized() * minf(MIN_CAM_DIST - d, delta * 3.0)
+		var next := camera.global_position + step
+		if sets.is_air(Vector3i(next.floor())):
+			if _cam_tween and _cam_tween.is_running():
+				_cam_tween.kill()
+			camera.global_position = next
+			camera.look_at(_look if _look != Vector3.ZERO else head)
 
 
 ## Bölümü baştan sona oynatır (await ile beklenebilir).
@@ -290,7 +318,7 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	# Yatan karakterde ayakta duran birinin göz hizasından, odayı da gösteren geniş açı.
 	var lifts := [1.1, 0.8] if lying else [0.0, 0.15, -0.1]
 	# Geniş açı: karakter ve etrafı birlikte görünsün (Mehmet istedi); yakına ancak yer yoksa.
-	var dists := [3.4, 4.2, 2.8, 2.2] if lying else [3.6, 4.4, 3.0, 2.4, 2.1]
+	var dists := [3.6, 4.2, 3.0, 2.7] if lying else [4.0, 4.8, 3.4, 2.8]
 	var angs := [0.6, -0.6, 1.0, -1.0, 1.6, -1.6, 2.2, -2.2, 0.0, PI] if lying else [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]
 	for lift in lifts:
 		for dist in dists:
