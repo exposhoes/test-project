@@ -15,6 +15,9 @@ import json
 import pathlib
 import sys
 
+import os
+import urllib.request
+
 import edge_tts
 
 # karakter: (ses, perde, hız). Perde Hz cinsinden; + ince, - kalın.
@@ -61,6 +64,30 @@ def duygu(metin: str, perde: str, hiz: str) -> tuple[str, str]:
     return f"{p:+d}Hz", f"{h + GENEL_HIZ:+d}%"
 
 
+# ElevenLabs (daha gerçekçi, duygulu ses): ELEVENLABS_API_KEY ortam değişkeni varsa ve
+# karakterin ses kimliği tools/elevenlabs_sesler.json'da yazılıysa o kullanılır; yoksa Microsoft sesi.
+# Anahtar asla depoya yazılmaz, sadece Mehmet'in bilgisayarındaki ortam değişkeninde durur.
+EL_AYAR = pathlib.Path(__file__).resolve().parent / "elevenlabs_sesler.json"
+
+
+def elevenlabs_sesleri() -> dict:
+    if not os.environ.get("ELEVENLABS_API_KEY") or not EL_AYAR.exists():
+        return {}
+    ayar = json.loads(EL_AYAR.read_text(encoding="utf-8"))
+    return {k: v for k, v in ayar.get("sesler", {}).items() if v and not v.startswith("BURAYA")} | {"_model": ayar.get("model", "eleven_multilingual_v2")}
+
+
+def elevenlabs_kaydet(metin: str, ses_id: str, model: str, hedef: pathlib.Path) -> None:
+    istek = urllib.request.Request(
+        f"https://api.elevenlabs.io/v1/text-to-speech/{ses_id}?output_format=mp3_44100_128",
+        data=json.dumps({"text": metin, "model_id": model, "language_code": "tr",
+                         "voice_settings": {"stability": 0.4, "similarity_boost": 0.8, "style": 0.45}}).encode(),
+        headers={"xi-api-key": os.environ["ELEVENLABS_API_KEY"], "Content-Type": "application/json", "Accept": "audio/mpeg"},
+    )
+    with urllib.request.urlopen(istek, timeout=60) as cevap:
+        hedef.write_bytes(cevap.read())
+
+
 async def main() -> None:
     replikler = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
     hepsi = "--hepsi" in sys.argv
@@ -69,6 +96,9 @@ async def main() -> None:
         kimler = set(sys.argv[sys.argv.index("--kim") + 1].split(","))
     kok = pathlib.Path(__file__).resolve().parent.parent / "assets" / "audio" / "voices"
     yapilan = 0
+    el = elevenlabs_sesleri()
+    if el:
+        print("ElevenLabs sesleri:", ", ".join(k for k in el if k != "_model"))
     for r in replikler:
         hedef = kok / r["bolum"] / ("%02d.mp3" % r["satir"])
         if kimler and r["kim"] not in kimler:
@@ -79,6 +109,11 @@ async def main() -> None:
         ses, perde, hiz = SESLER.get(r["kim"], VARSAYILAN)
         perde, hiz = duygu(r["metin"], perde, hiz)
         try:
+            if r["kim"] in el:
+                elevenlabs_kaydet(r["metin"], el[r["kim"]], el["_model"], hedef)
+                yapilan += 1
+                print(hedef.relative_to(kok), r["kim"], "(ElevenLabs)", r["metin"][:40])
+                continue
             await edge_tts.Communicate(r["metin"], ses, pitch=perde, rate=hiz).save(str(hedef))
         except Exception as hata:  # "..." gibi okunacak sesi olmayan replik ya da ağ hatası: atla, sonra tekrar denenir
             hedef.unlink(missing_ok=True)

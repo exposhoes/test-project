@@ -1,0 +1,14 @@
+{
+  "_aciklama": "ElevenLabs Voice Library'den her karakter için bir ses seç, Voice ID'sini buraya yaz. Boş bırakılan karakter Microsoft sesiyle kalır. API anahtarı buraya DEĞİL, bilgisayarda ELEVENLABS_API_KEY ortam değişkenine yazılır.",
+  "model": "eleven_multilingual_v2",
+  "sesler": {
+    "emir": "BURAYA_VOICE_ID",
+    "ali": "BURAYA_VOICE_ID",
+    "komsu_cocuk": "BURAYA_VOICE_ID",
+    "zeynep": "BURAYA_VOICE_ID",
+    "anne": "BURAYA_VOICE_ID",
+    "ogretmen": "BURAYA_VOICE_ID",
+    "doktor": "BURAYA_VOICE_ID",
+    "bakkal": "BURAYA_VOICE_ID"
+  }
+}
