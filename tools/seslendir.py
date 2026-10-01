@@ -20,8 +20,8 @@ import edge_tts
 # karakter: (ses, perde, hız). Perde Hz cinsinden; + ince, - kalın.
 SESLER = {
     "emir":        ("tr-TR-EmelNeural",  "+45Hz", "+6%"),   # ince erkek çocuk sesi (Mehmet istedi)
-    "ali":         ("tr-TR-AhmetNeural", "+55Hz", "+12%"),  # erkek çocuk, biraz farklı
-    "komsu_cocuk": ("tr-TR-AhmetNeural", "+80Hz", "+5%"),   # erkek çocuk
+    "ali":         ("tr-TR-EmelNeural",  "+35Hz", "+12%"),  # ince erkek çocuk sesi (Mehmet istedi), biraz farklı
+    "komsu_cocuk": ("tr-TR-EmelNeural",  "+55Hz", "+3%"),   # erkek çocuk
     "zeynep":      ("tr-TR-EmelNeural",  "+60Hz", "+5%"),   # kız çocuk
     "anne":        ("tr-TR-EmelNeural",  "-8Hz",  "-10%"),  # yumuşak, sakin anne sesi
     "ogretmen":    ("tr-TR-EmelNeural",  "-10Hz", "-5%"),   # kadın

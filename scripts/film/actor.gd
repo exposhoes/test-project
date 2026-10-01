@@ -65,7 +65,7 @@ const ACTORS := {
 			[Vector3(0.56, 0.12, 0.56), Vector3(0, 2.03, 0.02), Color("3b2414")],
 		],
 		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("3b2414"), "eyes": Color("2a1a10")},
-	"ali": {"name": "Ali", "color": Color("7fd4ff"),
+	"ali": {"name": "Ali", "color": Color("7fd4ff"), "mouth_x": 0.05,
 		"parts": [
 			[Vector3(0.22, 0.6, 0.24), Vector3(-0.13, 0.3, 0), Color("3a3a3a")],
 			[Vector3(0.22, 0.6, 0.24), Vector3(0.13, 0.3, 0), Color("3a3a3a")],
@@ -231,7 +231,79 @@ func _build_glb() -> bool:
 				_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
 		_play("idle")
 	_face_idle = null
+	_build_glb_mouth(model)
 	return true
+
+
+var _mouth: MeshInstance3D
+var _head_bone := -1
+var _skeleton: Skeleton3D
+
+
+## 3D modellerde ağız dokuya çizili, oynamıyor. Kafa kemiğine yüzün önüne küçük koyu bir
+## ağız takılır; konuşurken açılıp kapanır, kafa da hafifçe sallanır.
+func _build_glb_mouth(model: Node3D) -> void:
+	var sks := model.find_children("*", "Skeleton3D", true, false)
+	var mis := model.find_children("*", "MeshInstance3D", true, false)
+	if sks.is_empty() or mis.is_empty():
+		return
+	_skeleton = sks[0]
+	for i in _skeleton.get_bone_count():
+		if _skeleton.get_bone_name(i).ends_with("Head"):
+			_head_bone = i
+	if _head_bone == -1:
+		return
+	# Yüz önü: kafa kemiğinin biraz üstündeki köşelerden en öndeki (model +Z'ye bakar).
+	var mi: MeshInstance3D = mis[0]
+	var to_sk := _skeleton.global_transform.affine_inverse() * mi.global_transform
+	var head := _skeleton.get_bone_global_rest(_head_bone).origin
+	var top := -INF
+	var verts: PackedVector3Array = mi.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+	for v in verts:
+		top = maxf(top, (to_sk * v).y)
+	var mouth_y := head.y + (top - head.y) * float(data.get("mouth_h", 0.15))
+	var front := -INF
+	for v in verts:
+		var g := to_sk * v
+		if absf(g.y - mouth_y) < (top - head.y) * 0.05 and absf(g.x - head.x) < (top - head.y) * 0.08:
+			front = maxf(front, g.z)
+	if front == -INF:
+		return
+	var att := BoneAttachment3D.new()
+	att.bone_idx = _head_bone
+	_skeleton.add_child(att)
+	var size := (top - head.y) * 0.16
+	var quad := SphereMesh.new()  # yassı oval ağız
+	quad.radius = size * 0.5
+	quad.height = size * 0.6
+	quad.radial_segments = 16
+	quad.rings = 6
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color("4a1418")
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	quad.material = mat
+	_mouth = MeshInstance3D.new()
+	_mouth.mesh = quad
+	_mouth.visible = false
+	att.add_child(_mouth)
+	var rest := _skeleton.get_bone_global_rest(_head_bone)
+	_mouth.transform = rest.affine_inverse() * Transform3D(Basis().scaled(Vector3(1, 1, 0.25)),
+			Vector3(head.x + (top - head.y) * float(data.get("mouth_x", 0.0)), mouth_y, front))
+
+
+func _animate_glb_talk(delta: float) -> void:
+	if _mouth == null:
+		return
+	_mouth.visible = talking
+	if not talking:
+		return
+	_talk_timer += delta
+	var open := 0.25 + 0.75 * absf(sin(_talk_timer * 11.0)) * (0.6 + 0.4 * sin(_talk_timer * 3.7))
+	_mouth.scale = Vector3(1.0, maxf(0.2, open), 0.25)
+	# Konuşurken kafa hafifçe sallansın (yüz ifadesi canlı dursun).
+	var pose := _skeleton.get_bone_pose_rotation(_head_bone)
+	var nod := Quaternion(Vector3.RIGHT, sin(_talk_timer * 5.0) * 0.06) * Quaternion(Vector3.UP, sin(_talk_timer * 2.3) * 0.05)
+	_skeleton.set_bone_pose_rotation(_head_bone, pose * nod)
 
 
 func _play(name: String) -> void:
@@ -538,6 +610,7 @@ func face_towards(point: Vector3) -> void:
 func _process(delta: float) -> void:
 	if _anim:
 		_play("walk" if _moving else "idle")
+		_animate_glb_talk(delta)
 		return
 	if talking:
 		_talk_timer += delta
