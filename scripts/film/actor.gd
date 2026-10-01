@@ -355,7 +355,7 @@ const GESTURES := {
 	"gul": ["laugh"],
 	"sok": ["scared", "afraid"],
 	"kiz": ["angry", "complain"],
-	"selam": ["greet", "wave"],
+	"selam": ["wave"],  # greet_01 adım atan bir hareket; yerinde yürüyor gibi görünüyordu
 	"agla": ["cry", "sob"],
 	"evet": ["agree"],
 }
