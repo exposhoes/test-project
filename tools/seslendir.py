@@ -41,7 +41,12 @@ async def main() -> None:
             continue
         hedef.parent.mkdir(parents=True, exist_ok=True)
         ses, perde, hiz = SESLER.get(r["kim"], VARSAYILAN)
-        await edge_tts.Communicate(r["metin"], ses, pitch=perde, rate=hiz).save(str(hedef))
+        try:
+            await edge_tts.Communicate(r["metin"], ses, pitch=perde, rate=hiz).save(str(hedef))
+        except Exception as hata:  # "..." gibi okunacak sesi olmayan replik ya da ağ hatası: atla, sonra tekrar denenir
+            hedef.unlink(missing_ok=True)
+            print("ATLANDI", r["bolum"], r["satir"], repr(r["metin"][:40]), type(hata).__name__)
+            continue
         yapilan += 1
         print(hedef.relative_to(kok), r["kim"], r["metin"][:40])
     print("bitti:", yapilan, "dosya")
