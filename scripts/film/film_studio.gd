@@ -6,8 +6,8 @@ extends Node3D
 
 const MENU_SCENE := "res://scenes/menu.tscn"
 ## Harf başına okunma süresi ve her replik için en az bekleme (çocuklar okuyabilsin).
-const READ_PER_CHAR := 0.04
-const READ_MIN := 1.0
+const READ_PER_CHAR := 0.032
+const READ_MIN := 0.8
 const TYPE_SPEED := 70.0  # harf/sn
 const LOOK_HEIGHT := 1.3
 const BASE_FOV := 62.0
@@ -229,7 +229,7 @@ func _say(id: String, text: String) -> void:
 		t += get_process_delta_time()
 		await get_tree().process_frame
 	a.talking = false
-	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t if not voiced else 0.15)
+	await _wait(maxf(READ_MIN, total * READ_PER_CHAR) - t if not voiced else 0.05)
 
 
 ## Replik boyunca konuşanı izler: yürürse kamera başını takip eder, kadrajdan çıkar
