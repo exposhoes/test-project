@@ -901,6 +901,31 @@ const LIST := [
 			{"title": "Sen hiç hasta numarası yaptın mı? Yorumlara yaz!", "t": 2.5},
 		],
 	},
+	{
+		"id": "cuzdan", "name": "Bölüm 25: Kayıp Cüzdan", "set": "pazar", "time": 0.4,
+		"steps": [
+			{"place": "bakkal", "at": "pazar.tezgah1_arka", "look": "pazar.tezgah1_on"},
+			{"place": "emir", "at": "pazar.cesme_yani", "look": "pazar.orta"},
+			{"place": "ali", "at": "pazar.orta", "look": "pazar.cesme_yani"},
+			{"cam": "pazar.kam_genel", "look": "pazar.orta", "t": 0},
+			{"say": "emir", "text": "Ali, bak! Çeşmenin yanında bir cüzdan buldum!"},
+			{"title": "Kayıp Cüzdan", "t": 1.2},
+			{"say": "ali", "text": "İçinde para var mı? Hepsiyle dondurma alalım!"},
+			{"zoom": 0.6},
+			{"say": "emir", "text": "Olmaz Ali! Bu birinin emeği. Sahibini bulmalıyız."},
+			{"walk": "emir", "to": "pazar.tezgah1_on"},
+			{"walk": "ali", "to": "pazar.tezgah2_on"},
+			{"cam": "pazar.kam_tezgah", "look": "pazar.tezgah1_on", "t": 0},
+			{"say": "emir", "text": "Amca, bu cüzdan sizin mi?"},
+			{"say": "bakkal", "text": "Aaa! Benim cüzdanım! Bütün sabah aradım. Çok teşekkür ederim evladım!"},
+			{"say": "bakkal", "text": "Dürüstlüğün için al, iki dondurma benden!"},
+			{"shake": 0.3},
+			{"turn": "ali", "to": "pazar.tezgah1_on"},
+			{"say": "ali", "text": "Vay... Dürüst olunca dondurma bedavaya geliyormuş!"},
+			{"say": "emir", "text": "Dondurma için değil Ali, doğrusu bu olduğu için!"},
+			{"title": "Sen cüzdan bulsan ne yapardın? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 
