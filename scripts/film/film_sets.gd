@@ -29,7 +29,7 @@ const POINTS := {
 		"mutfak": Vector3(6.5, 0, 2.6),
 		"ocak": Vector3(7.5, 0, 1.4),
 		"masa": Vector3(5.5, 0, 4.4),
-		"canta": Vector3(2.2, 0, 5.0),
+		"canta": Vector3(2.0, 0, 5.4),          # çalışma masasının önü (masa z=6)
 		"kapi_ici": Vector3(4.5, 0, 5.8),
 		"kapi_disi": Vector3(4.5, 0, 9.0),
 		"bahce": Vector3(8.0, 0, 11.0),
@@ -202,6 +202,29 @@ func _tree_spot(g: Vector2i) -> bool:
 	return (hash(g) % 23) == 0
 
 
+## Bloğa dönüşmeyen gerçek eşyalar: [ad, dünya köşesi (blok), taban (x, z blok)].
+## Hücreleri yürünemez sayılır; görünüşü FilmProps kurar (GLB varsa o, yoksa köşeli yedek).
+var props: Array = []
+var _prop_cells := {}
+
+
+func _prop(o: Vector3i, id: String, at: Vector3i, size: Vector2i) -> void:
+	props.append([id, o + at, size])
+	var h := int(ceil(FilmProps.height(id)))
+	for x in size.x:
+		for z in size.y:
+			for y in maxi(h, 2):
+				_prop_cells[o + at + Vector3i(x, y, z)] = true
+
+
+## Süs: [ad, dünya konumu, y dönüşü]; hücre kapatmaz.
+var decor: Array = []
+
+
+func _decor(o: Vector3i, id: String, at: Vector3, turn: float) -> void:
+	decor.append([id, Vector3(o) + at, turn])
+
+
 func _put(p: Vector3i, id: int) -> void:
 	_blocks[p] = id
 
@@ -250,13 +273,22 @@ func _build_house(o: Vector3i) -> void:
 	_put(o + Vector3i(1, 0, 1), Blocks.BED)
 	_put(o + Vector3i(1, 0, 2), Blocks.BED)
 	_fill(o, Vector3i(2, 0, 0), Vector3i(3, 1, 0), Blocks.BOOKSHELF)
-	_put(o + Vector3i(1, 0, 5), Blocks.CHEST)
-	# Mutfak: tezgah, fırın, dolap.
-	_put(o + Vector3i(7, 0, 0), Blocks.CRAFTING_TABLE)
-	_put(o + Vector3i(8, 0, 0), Blocks.FURNACE)
-	_put(o + Vector3i(6, 0, 0), Blocks.CHEST)
-	# Oturma alanı: masa ve kırmızı halı.
-	_put(o + Vector3i(5, 0, 3), Blocks.CRAFTING_TABLE)
+	# Minecraft sandık/çalışma masası yerine gerçek ev eşyaları (bkz. PROPS, film_props.gd).
+	_prop(o, "gardirop", Vector3i(0, 0, 5), Vector2i(1, 2))
+	_prop(o, "calisma_masasi", Vector3i(1, 0, 6), Vector2i(2, 1))
+	_prop(o, "komodin", Vector3i(1, 0, 0), Vector2i(1, 1))
+	_prop(o, "oyuncak_kutusu", Vector3i(0, 0, 3), Vector2i(1, 1))
+	# Duvar ve zemin süsleri (yürümeyi engellemez): poster, saat, top, oda halısı.
+	_decor(o, "poster", Vector3(0.02, 1.5, 3.6), PI / 2)
+	_decor(o, "duvar_saati", Vector3(2.0, 2.5, 0.02), 0.0)
+	_decor(o, "futbol_topu", Vector3(3.3, 0, 3.6), 0.0)
+	_decor(o, "oda_halisi", Vector3(1.2, 0, 3.0), 0.0)
+	# Mutfak: tezgah, ocak, buzdolabı.
+	_prop(o, "mutfak_tezgahi", Vector3i(6, 0, 0), Vector2i(2, 1))
+	_prop(o, "ocak", Vector3i(8, 0, 0), Vector2i(1, 1))
+	_prop(o, "buzdolabi", Vector3i(8, 0, 1), Vector2i(1, 1))
+	# Oturma alanı: yemek masası ve kırmızı halı.
+	_prop(o, "yemek_masasi", Vector3i(5, 0, 3), Vector2i(1, 1))
 	_fill(o, Vector3i(3, -1, 4), Vector3i(6, -1, 5), Blocks.RUG)
 	_put(o + Vector3i(0, 3, 6), Blocks.LANTERN)
 	_put(o + Vector3i(8, 3, 6), Blocks.LANTERN)
@@ -433,7 +465,7 @@ func _build_field(o: Vector3i) -> void:
 
 ## Karakter bu hücrede durabilir mi (ayak ve baş hizası boş mu)?
 func is_air(cell: Vector3i) -> bool:
-	return _blocks.get(cell, Blocks.AIR) == Blocks.AIR and cell.y > GROUND
+	return _blocks.get(cell, Blocks.AIR) == Blocks.AIR and cell.y > GROUND and not _prop_cells.has(cell)
 
 
 ## İki nokta arası bloklara çarpmadan görülebiliyor mu (kamera kadrajı için).
@@ -446,7 +478,7 @@ func clear_sight(a: Vector3, b: Vector3) -> bool:
 
 
 func is_free(cell: Vector3i) -> bool:
-	return _blocks.get(cell, Blocks.AIR) == Blocks.AIR and _blocks.get(cell + Vector3i.UP, Blocks.AIR) == Blocks.AIR
+	return is_air(cell) and is_air(cell + Vector3i.UP)
 
 
 ## Eşyaların etrafından dolaşan yürüme yolu (ızgarada genişlik öncelikli arama).

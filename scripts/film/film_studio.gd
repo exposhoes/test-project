@@ -56,6 +56,17 @@ func _ready() -> void:
 	add_child(_music)
 	world.render_distance = 4
 	world.generator = FilmSets.new()
+	# Gerçek ev eşyaları (gardırop, masa...) bloklara değil sahneye eklenir.
+	var sets := world.generator as FilmSets
+	for pr: Array in sets.props:
+		var n := FilmProps.build(pr[0], pr[2])
+		n.position = Vector3(pr[1])
+		add_child(n)
+	for d: Array in sets.decor:
+		var n := FilmProps.build_decor(d[0])
+		n.position = d[1]
+		n.rotation.y = d[2]
+		add_child(n)
 	camera.fov = 62.0
 	camera.far = 200.0
 	add_child(camera)

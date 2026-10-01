@@ -237,6 +237,7 @@ func _build_glb() -> bool:
 			for loop_name in ["walk", "idle", "wait", "talk", "speech", "run"]:
 				if low.begins_with(loop_name):
 					_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+			_strip_root_motion(_anim.get_animation(n))
 		_play(_find_anim(["idle", "wait"]))
 	_face_idle = null
 	# Çizili ağzın üstüne konan koyu oval kafa döndükçe yanakta kayıyordu; kapalı. Konuşmayı
@@ -349,6 +350,7 @@ func _animate_glb_talk(delta: float) -> void:
 
 
 var _gesture_left := 0.0
+const TALK_ANIMS := ["talk", "speech", "complain", "agree"]
 const GESTURES := {
 	"gul": ["laugh", "clap", "dance"],
 	"sok": ["scared", "afraid"],
@@ -689,6 +691,21 @@ func _path_to(target: Vector3) -> Array[Vector3]:
 	return out
 
 
+## Tripo animasyonlarında kalça kemiği öne/yana ilerleyip döngü başında geri
+## sıçrıyor; karakter geri geri kayıyor gibi görünüyordu. Yatay kaymayı sil,
+## ilerlemeyi zaten walk_to yapıyor.
+static func _strip_root_motion(an: Animation) -> void:
+	for t in an.get_track_count():
+		if an.track_get_type(t) != Animation.TYPE_POSITION_3D:
+			continue
+		if not String(an.track_get_path(t)).to_lower().contains("hips"):
+			continue
+		var first: Vector3 = an.track_get_key_value(t, 0)
+		for k in an.track_get_key_count(t):
+			var v: Vector3 = an.track_get_key_value(t, k)
+			an.track_set_key_value(t, k, Vector3(first.x, v.y, first.z))
+
+
 ## Yüzünü bir noktaya çevirir (model -Z'ye bakar).
 func face_towards(point: Vector3) -> void:
 	var d := point - position
@@ -703,8 +720,9 @@ func _process(delta: float) -> void:
 			_play(_find_anim(["walk"]))
 		elif _gesture_left > 0.0:
 			_gesture_left -= delta
-		elif talking and _find_anim(["talk", "speech"]) != "":
-			_play(_find_anim(["talk", "speech"]))
+		elif talking and _find_anim(TALK_ANIMS) != "":
+			# Talk animasyonu olmayan modeller (Anne, Ali) konuşurken onay/el hareketiyle konuşur.
+			_play(_find_anim(TALK_ANIMS))
 		else:
 			_play(_find_anim(["idle", "wait"]))
 		_animate_glb_talk(delta)

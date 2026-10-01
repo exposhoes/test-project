@@ -44,6 +44,7 @@ const LIST := [
 			{"say": "anne", "text": "Senin sevdiğin fırın elma ve çilek!"},
 			{"say": "emir", "text": "Yaşasın! En sevdiğim!"},
 			{"walk": "emir", "to": "ev.canta"},
+			{"turn": "emir", "to": Vector3(2.0, 11, 6.5)},  # masadaki çanta/defter
 			{"say": "emir", "text": "Çantam, kalemlerim, defterim... Hepsi tamam!"},
 			{"walk": "anne", "to": "ev.masa", "wait": false},
 			{"walk": "emir", "to": "ev.kapi_ici"},
