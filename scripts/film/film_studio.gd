@@ -141,7 +141,7 @@ func _run(s: Dictionary) -> void:
 	elif s.has("place"):
 		var a := _actor(s["place"])
 		a.visible = true
-		a.position = _free_spot(a, FilmSets.point(s["at"]))
+		a.position = _free_spot(a, FilmSets.point(s["at"]), s.get("lie", false))
 		a.set_lying(s.get("lie", false))
 		if s.has("look"):
 			a.face_towards(FilmSets.point(s["look"]))
@@ -212,6 +212,7 @@ func _say(id: String, text: String) -> void:
 	_speaker = a
 	_frame_speaker(a)
 	_auto_zoom(text)
+	_auto_sfx(text)
 	var voiced := voice.speak(id, text, _episode_id, _line)
 	var total := text.length()
 	var t := 0.0
@@ -238,7 +239,8 @@ func _watch_speaker(delta: float) -> void:
 		return
 	if _cam_tween and _cam_tween.is_running():
 		return
-	var aim := _speaker.position + Vector3(0, 1.3, 0)
+	var down := _speaker._body.rotation.x != 0.0
+	var aim := _speaker.head_position() if down else _speaker.position + Vector3(0, 1.3, 0)
 	_look = _look.lerp(aim, minf(1.0, delta * 4.0))
 	if camera.global_position.distance_to(_look) > 0.01:
 		camera.look_at(_look)
@@ -246,7 +248,7 @@ func _watch_speaker(delta: float) -> void:
 	if _watch_t < 0.25:
 		return
 	_watch_t = 0.0
-	var head := _speaker.position + Vector3(0, 1.45, 0)
+	var head := _speaker.head_position() if down else _speaker.position + Vector3(0, 1.45, 0)
 	var facing := Vector3(-sin(_speaker.rotation.y), 0, -cos(_speaker.rotation.y))
 	var away := not _speaker._moving and _speaker._body.rotation.x == 0.0 and not _faces(facing, head, camera.global_position)
 	_away_t = _away_t + 0.25 if away else 0.0
@@ -262,16 +264,20 @@ func _watch_speaker(delta: float) -> void:
 func _frame_speaker(a: Actor, force := false) -> void:
 	if fast:
 		return
-	var head := a.position + Vector3(0, 1.45, 0)
-	var facing := Vector3(-sin(a.rotation.y), 0, -cos(a.rotation.y))
 	var lying := a._body.rotation.x != 0.0
+	var head := a.head_position() if lying else a.position + Vector3(0, 1.45, 0)
+	var facing := Vector3(-sin(a.rotation.y), 0, -cos(a.rotation.y))
 	if not force and (lying or not _too_steep(camera.global_position, head)) and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
 		return
 	var sets: FilmSets = world.generator
 	# Dizi gibi: göz hizası (hafif yukarıdan), 3/4 açı, orta-yakın plan. Tepeden çekim yok.
-	for lift in [0.0, 0.15, -0.1]:
-		for dist in [2.2, 1.8, 2.8, 1.5]:
-			for ang in [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]:
+	# Yatan karakterde ayakta duran birinin göz hizasından, odayı da gösteren geniş açı.
+	var lifts := [1.1, 0.8] if lying else [0.0, 0.15, -0.1]
+	var dists := [2.6, 3.2, 2.2, 3.8] if lying else [2.2, 1.8, 2.8, 1.5, 3.6]
+	var angs := [0.6, -0.6, 1.0, -1.0, 1.6, -1.6, 2.2, -2.2, 0.0, PI] if lying else [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]
+	for lift in lifts:
+		for dist in dists:
+			for ang in angs:
 				if a._moving and dist < 1.9:
 					continue  # yürüyenin yoluna kamera koyma, içinden geçer
 				var pos: Vector3 = head + facing.rotated(Vector3.UP, ang) * dist + Vector3(0, lift, 0)
@@ -319,6 +325,15 @@ func _shows(cam: Vector3, head: Vector3, who: Actor, check_frame := true) -> boo
 		if sp.x < vs.x * 0.15 or sp.x > vs.x * 0.85 or sp.y < vs.y * 0.08 or sp.y > vs.y * 0.7:
 			return false
 	return true
+
+
+## Komik ve şaşırtıcı anlara kendiliğinden efekt: kahkahada gülme, "?!" ya da "Eyvah"ta şok sesi.
+func _auto_sfx(text: String) -> void:
+	var t := text.to_lower()
+	if t.contains("haha") or t.contains("hihi") or t.contains("kıkır"):
+		play_sfx("gulme")
+	elif text.contains("?!") or t.begins_with("eyvah") or t.begins_with("ne?") or t.contains("olamaz"):
+		play_sfx("saskin")
 
 
 ## Shorts tarzı kamera: her replikte yavaş yakınlaşma, ünlemli replikte hızlı "vurma" zoom'u.
@@ -382,12 +397,15 @@ func _wait(sec: float) -> void:
 
 
 ## Noktada başka biri duruyorsa yanında boş bir yer bulur; iki karakter iç içe girmesin.
-func _free_spot(a: Actor, p: Vector3) -> Vector3:
+func _free_spot(a: Actor, p: Vector3, lie := false) -> Vector3:
 	var sets: FilmSets = world.generator
 	for off in [Vector3.ZERO, Vector3(0.8, 0, 0), Vector3(-0.8, 0, 0), Vector3(0, 0, 0.8), Vector3(0, 0, -0.8),
-			Vector3(0.8, 0, 0.8), Vector3(-0.8, 0, 0.8), Vector3(0.8, 0, -0.8), Vector3(-0.8, 0, -0.8)]:
+			Vector3(0.8, 0, 0.8), Vector3(-0.8, 0, 0.8), Vector3(0.8, 0, -0.8), Vector3(-0.8, 0, -0.8),
+			Vector3(1.2, 0, 0), Vector3(-1.2, 0, 0), Vector3(0, 0, 1.2), Vector3(0, 0, -1.2)]:
 		var q: Vector3 = p + off
-		if off != Vector3.ZERO and not sets.is_air(Vector3i(q.floor()) + Vector3i(0, 0, 0)):
+		# Sıra, masa gibi bir bloğun içine konmasın (yatak hariç: yatma noktası).
+		var cell := Vector3i(q.floor())
+		if not (lie or (sets.is_air(cell) and sets.is_air(cell + Vector3i.UP))):
 			continue
 		var taken := false
 		for o: Actor in Actor.everyone:

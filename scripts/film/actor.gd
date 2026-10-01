@@ -291,6 +291,15 @@ func _build_glb_mouth(model: Node3D) -> void:
 			Vector3(head.x + (top - head.y) * float(data.get("mouth_x", 0.0)), mouth_y, front))
 
 
+## Kafanın dünyadaki yeri (yatarken de doğru; kamera kadrajı için).
+func head_position() -> Vector3:
+	if _skeleton and _head_bone != -1:
+		return (_skeleton.global_transform * _skeleton.get_bone_global_pose(_head_bone)).origin + Vector3(0, 0.1, 0)
+	if _head_node:
+		return _head_node.global_position
+	return position + Vector3(0, 1.45, 0)
+
+
 func _animate_glb_talk(delta: float) -> void:
 	if _mouth == null:
 		return
@@ -519,7 +528,8 @@ func display_name() -> String:
 
 ## Yatağa uzanmış (true) ya da ayakta.
 func set_lying(lying: bool) -> void:
-	_body.rotation.x = -PI / 2.0 if lying else 0.0
+	# Sırt üstü yatar: baş yastığa (-Z), yüz tavana bakar.
+	_body.basis = Basis(Vector3(-1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0)) if lying else Basis()
 	_body.position = Vector3(0, 0.3, 0.8) if lying else Vector3.ZERO
 
 

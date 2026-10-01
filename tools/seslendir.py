@@ -24,11 +24,37 @@ SESLER = {
     "komsu_cocuk": ("tr-TR-EmelNeural",  "+55Hz", "+3%"),   # erkek çocuk
     "zeynep":      ("tr-TR-EmelNeural",  "+60Hz", "+5%"),   # kız çocuk
     "anne":        ("tr-TR-EmelNeural",  "-8Hz",  "-10%"),  # yumuşak, sakin anne sesi
-    "ogretmen":    ("tr-TR-EmelNeural",  "-10Hz", "-5%"),   # kadın
+    "ogretmen":    ("tr-TR-EmelNeural",  "-5Hz",  "+10%"),  # kadın, canlı ve hızlı (Mehmet istedi)
     "doktor":      ("tr-TR-AhmetNeural", "+0Hz",  "-3%"),   # erkek
     "bakkal":      ("tr-TR-AhmetNeural", "-15Hz", "-8%"),   # yaşlı erkek
 }
 VARSAYILAN = ("tr-TR-AhmetNeural", "+0Hz", "+0%")
+
+
+def _hz(v: str) -> int:
+    return int(v.replace("Hz", ""))
+
+
+def _yuzde(v: str) -> int:
+    return int(v.replace("%", ""))
+
+
+def duygu(metin: str, perde: str, hiz: str) -> tuple[str, str]:
+    """Replikteki işaretlere göre ton: ünlem heyecanlı (ince, hızlı), soru meraklı,
+    üç nokta durgun/üzgün (yavaş, kalın), kahkaha neşeli."""
+    p, h = _hz(perde), _yuzde(hiz)
+    kucuk = metin.lower()
+    if "?!" in metin or "!!" in metin:
+        p, h = p + 18, h + 15
+    elif "!" in metin:
+        p, h = p + 10, h + 10
+    elif "?" in metin:
+        p, h = p + 8, h + 4
+    if "haha" in kucuk or "hihi" in kucuk:
+        p, h = p + 12, h + 8
+    if metin.rstrip().endswith("...") or "eyvah" in kucuk or "üzgün" in kucuk:
+        p, h = p - 8, h - 10
+    return f"{p:+d}Hz", f"{h:+d}%"
 
 
 async def main() -> None:
@@ -47,6 +73,7 @@ async def main() -> None:
             continue
         hedef.parent.mkdir(parents=True, exist_ok=True)
         ses, perde, hiz = SESLER.get(r["kim"], VARSAYILAN)
+        perde, hiz = duygu(r["metin"], perde, hiz)
         try:
             await edge_tts.Communicate(r["metin"], ses, pitch=perde, rate=hiz).save(str(hedef))
         except Exception as hata:  # "..." gibi okunacak sesi olmayan replik ya da ağ hatası: atla, sonra tekrar denenir
