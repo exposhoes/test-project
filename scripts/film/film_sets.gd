@@ -14,6 +14,7 @@ const SETS := {
 	"bakkal": Vector3i(0, GROUND + 1, -36),
 	"park": Vector3i(40, GROUND + 1, -36),
 	"saha": Vector3i(-40, GROUND + 1, -36),
+	"pazar": Vector3i(-8, GROUND + 1, 32),
 }
 ## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
 const CITY_MIN := Vector2i(-64, -56)
@@ -98,6 +99,16 @@ const POINTS := {
 		"kam_genel": Vector3(11.0, 6.0, 22.0),
 		"kam_kale": Vector3(9.0, 2.2, 9.5),
 		"kam_kenar": Vector3(12.0, 2.0, 12.0),
+	},
+	"pazar": {
+		"giris": Vector3(16.5, 0, -1.5),
+		"tezgah1_on": Vector3(2.5, 0, 0.5),
+		"tezgah1_arka": Vector3(2.5, 0, 3.5),
+		"tezgah2_on": Vector3(8.5, 0, 0.5),
+		"cesme_yani": Vector3(16.5, 0, 10.0),
+		"orta": Vector3(11.5, 0, 6.0),
+		"kam_genel": Vector3(16.0, 6.0, -6.0),
+		"kam_tezgah": Vector3(4.8, 2.3, -1.2),
 	},
 }
 
@@ -526,7 +537,7 @@ func _build_city() -> void:
 			i += 1
 	# Kuzey sırası: caddeye bakan apartmanlar ve altı dükkânlı binalar.
 	_row(Vector2i(-62, 32), Vector2i(-20, 32), -1)
-	_bazaar(Vector3i(-8, Y0, 32))
+	_bazaar(SETS["pazar"])
 	_row(Vector2i(35, 32), Vector2i(72, 32), -1)
 	_row(Vector2i(83, 32), Vector2i(98, 32), -1)
 	# Güney sırası.
@@ -698,11 +709,13 @@ func _bazaar(c: Vector3i) -> void:
 				continue
 			# Tezgâh: 4 blok uzun masa, üstünde mal, arkasında kasa, köşede direkler, üstte tente.
 			_fill(o, c + Vector3i(x0, 0, row_z), c + Vector3i(x0 + 3, 0, row_z), Blocks.PLANKS)
-			_fill(o, c + Vector3i(x0, 1, row_z), c + Vector3i(x0 + 3, 1, row_z), goods[k % goods.size()])
-			_put(c + Vector3i(x0 + 1, 0, row_z + (1 if row_z == 2 else -1)), Blocks.CHEST)
+			# Mal kenarlarda; ortası boş kalsın ki satıcının yüzü görünsün.
+			var back: int = row_z + (1 if row_z == 2 else -1)
+			_put(c + Vector3i(x0, 1, row_z), goods[k % goods.size()])
+			_put(c + Vector3i(x0 + 3, 1, row_z), goods[(k + 2) % goods.size()])
+			_put(c + Vector3i(x0 + 2, 0, back), Blocks.CHEST)
 			for px in [x0, x0 + 3]:
-				_fill(o, c + Vector3i(px, 0, row_z - 1), c + Vector3i(px, 2, row_z - 1), Blocks.LOG)
-				_fill(o, c + Vector3i(px, 0, row_z + 1), c + Vector3i(px, 2, row_z + 1), Blocks.LOG)
+				_fill(o, c + Vector3i(px, 0, back), c + Vector3i(px, 2, back), Blocks.LOG)
 			for ax in range(x0, x0 + 4):
 				_fill(o, c + Vector3i(ax, 3, row_z - 1), c + Vector3i(ax, 3, row_z + 1), awnings[k % awnings.size()] if ax % 2 == 0 else Blocks.SNOW)
 			k += 1

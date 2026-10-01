@@ -773,6 +773,32 @@ const LIST := [
 			{"title": "Tuzak kuran tuzağa düşer! Sence Ali ceza alır mı?", "t": 2.5},
 		],
 	},
+	{
+		"id": "pazarlik", "name": "Bölüm 20: Pazarlık Ustası", "set": "pazar", "time": 0.35,
+		"steps": [
+			{"place": "bakkal", "at": "pazar.tezgah1_arka", "look": "pazar.tezgah1_on"},
+			{"place": "emir", "at": "pazar.giris", "look": "pazar.orta"},
+			{"place": "ali", "at": "pazar.orta", "look": "pazar.giris"},
+			{"cam": "pazar.kam_genel", "look": "pazar.orta", "t": 0},
+			{"say": "ali", "text": "Emir! Pazarda en iyi pazarlığı kim yapar? Tabii ki ben!"},
+			{"title": "Pazarlık Ustası", "t": 1.2},
+			{"walk": "ali", "to": "pazar.tezgah1_on"},
+			{"walk": "emir", "to": "pazar.tezgah2_on"},
+			{"cam": "pazar.kam_tezgah", "look": "pazar.tezgah1_on", "t": 0},
+			{"say": "ali", "text": "Amca, bu çilekler kaç lira?"},
+			{"say": "bakkal", "text": "Kilosu 40 lira evladım."},
+			{"say": "ali", "text": "40 mı?! 50 veririm!"},
+			{"zoom": 0.6},
+			{"say": "bakkal", "text": "Eee... Tamam, sen bilirsin."},
+			{"turn": "ali", "to": "pazar.tezgah2_on"},
+			{"say": "ali", "text": "Gördün mü Emir? Pazarlığı kazandım!"},
+			{"shake": 0.3},
+			{"say": "emir", "text": "Ali... Pazarlıkta fiyat düşürülür, yükseltilmez!"},
+			{"say": "ali", "text": "Aaa! Amca, 30 versem?"},
+			{"say": "bakkal", "text": "Anlaşma anlaşmadır. Ama al, bir kilo da hediye!"},
+			{"title": "Sen hiç pazarlık yaptın mı? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 
