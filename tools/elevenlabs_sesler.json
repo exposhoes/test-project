@@ -11,5 +11,22 @@
     "ogretmen": "bqaNYmxFgK1TN7CL95PZ",
     "doktor": "skNtUvQlHhqETjfzZF1H",
     "bakkal": "OUMjwyTVLkTqFhscEshG"
+  },
+  "_ayar_aciklama": "Her karakter hep aynı ayar ve aynı seed ile üretilir; böylece ses bölümden bölüme değişmez. stability yüksek = sabit ses, style yüksek = daha duygulu.",
+  "ayarlar": {
+    "varsayilan": {
+      "stability": 0.5,
+      "similarity_boost": 0.85,
+      "style": 0.55,
+      "use_speaker_boost": true,
+      "seed": 4242
+    },
+    "emir": {
+      "stability": 0.55,
+      "similarity_boost": 0.9,
+      "style": 0.5,
+      "use_speaker_boost": true,
+      "seed": 1111
+    }
   }
 }

@@ -41,11 +41,22 @@ def kalan_hak() -> int:
     return int(s["character_limit"]) - int(s["character_count"])
 
 
-def uret(metin: str, ses_id: str) -> bytes:
+def ayar(kim: str) -> dict:
+    """Karakterin sabit ses ayarı (tools/elevenlabs_sesler.json > ayarlar); her bölümde aynı ses çıkması için."""
+    a = AYAR.get("ayarlar", {})
+    return {**a.get("varsayilan", {}), **a.get(kim, {})}
+
+
+def uret(r: dict, ses_id: str, onceki: str = "", sonraki: str = "") -> bytes:
+    a = dict(ayar(r["kim"]))
+    seed = a.pop("seed", None)
+    govde = {"text": r["metin"], "model_id": AYAR.get("model", "eleven_multilingual_v2"), "language_code": "tr",
+             "voice_settings": a, "previous_text": onceki, "next_text": sonraki}  # komşu replikler tonlamayı duygulu yapar
+    if seed is not None:
+        govde["seed"] = seed
     istek = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{ses_id}?output_format=mp3_44100_128",
-        data=json.dumps({"text": metin, "model_id": AYAR.get("model", "eleven_multilingual_v2"), "language_code": "tr",
-                         "voice_settings": {"stability": 0.4, "similarity_boost": 0.8, "style": 0.45}}).encode(),
+        data=json.dumps(govde).encode(),
         headers={"xi-api-key": anahtar(), "Content-Type": "application/json", "Accept": "audio/mpeg"},
     )
     with urllib.request.urlopen(istek, timeout=90) as c:
@@ -53,7 +64,8 @@ def uret(metin: str, ses_id: str) -> bytes:
 
 
 def iz(r: dict, ses_id: str) -> str:
-    return hashlib.sha1((ses_id + "|" + r["metin"]).encode("utf-8")).hexdigest()[:12]
+    ek = json.dumps(ayar(r["kim"]), sort_keys=True)  # ayar değişince replik yeniden üretilir
+    return hashlib.sha1((ses_id + "|" + ek + "|" + r["metin"]).encode("utf-8")).hexdigest()[:12]
 
 
 def main() -> None:
@@ -89,7 +101,12 @@ def main() -> None:
             continue
         # Önce hepsini belleğe üret; biri bile başarısız olursa bölümün dosyalarına dokunma.
         try:
-            uretilen = [(r, ses_id, uret(r["metin"], ses_id)) for r, ses_id in eksik]
+            uretilen = []
+            for r, ses_id in eksik:
+                i = satirlar.index(r)
+                onceki = satirlar[i - 1]["metin"] if i > 0 else ""
+                sonraki = satirlar[i + 1]["metin"] if i + 1 < len(satirlar) else ""
+                uretilen.append((r, ses_id, uret(r, ses_id, onceki, sonraki)))
         except urllib.error.HTTPError as hata:
             print("%-12s HATA %s: %s" % (bolum, hata.code, hata.read().decode("utf-8", "replace")[:200]))
             hak = kalan_hak()
