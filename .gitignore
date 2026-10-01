@@ -16,3 +16,6 @@ production/session-state/*
 !production/session-state/.gitkeep
 .scratch/
 videolar/
+
+# Video kaydı sırasında geçici ayar (tools/kayit.ps1)
+override.cfg
