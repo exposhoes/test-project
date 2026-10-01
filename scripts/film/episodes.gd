@@ -37,8 +37,10 @@ const LIST := [
 			{"say": "emir", "text": "Tamam anne, geliyorum!"},
 			{"cam": "ev.kam_oda", "look": "ev.masa", "t": 1.2},
 			{"walk": "emir", "to": "ev.mutfak"},
+			# Anne ocaktan odaya doğru gelir: ikisi de yüzü görünecek şekilde karşılıklı (ocak önü dar, kamera sığmıyordu).
+			{"walk": "anne", "to": "ev.mutfak_on"},
 			{"turn": "anne", "to": "ev.mutfak"},
-			{"turn": "emir", "to": "ev.ocak"},
+			{"turn": "emir", "to": "ev.mutfak_on"},
 			{"say": "anne", "text": "Günaydın uykucu! Önce elini yüzünü yıka, sonra kahvaltı."},
 			{"say": "emir", "text": "Günaydın anne! Kahvaltıda ne var?"},
 			{"say": "anne", "text": "Senin sevdiğin fırın elma ve çilek!"},

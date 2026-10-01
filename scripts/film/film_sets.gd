@@ -28,6 +28,7 @@ const POINTS := {
 		"yatak_yani": Vector3(2.8, 0, 2.0),
 		"mutfak": Vector3(6.5, 0, 2.6),
 		"ocak": Vector3(7.5, 0, 1.4),
+		"mutfak_on": Vector3(6.8, 0, 4.0),       # mutfakla oda arası, konuşma yeri
 		"masa": Vector3(5.5, 0, 4.4),
 		"canta": Vector3(2.0, 0, 5.4),          # çalışma masasının önü (masa z=6)
 		"kapi_ici": Vector3(4.5, 0, 5.8),
@@ -213,7 +214,7 @@ func _prop(o: Vector3i, id: String, at: Vector3i, size: Vector2i) -> void:
 	var h := int(ceil(FilmProps.height(id)))
 	for x in size.x:
 		for z in size.y:
-			for y in maxi(h, 2):
+			for y in maxi(h, 1):
 				_prop_cells[o + at + Vector3i(x, y, z)] = true
 
 

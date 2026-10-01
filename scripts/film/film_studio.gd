@@ -322,9 +322,10 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	# Geniş açı: karakter ve etrafı birlikte görünsün (Mehmet istedi); yakına ancak yer yoksa.
 	var dists := [3.6, 4.2, 3.0, 2.7] if lying else [4.0, 4.8, 3.4, 2.8]
 	var angs := [0.6, -0.6, 1.0, -1.0, 1.6, -1.6, 2.2, -2.2, 0.0, PI] if lying else [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]
-	for lift in lifts:
-		for dist in dists:
-			for ang in angs:
+	# Önce açı: yüzü önden gösteren açı, uzak mesafede yandan profile tercih edilir.
+	for ang in angs:
+		for lift in lifts:
+			for dist in dists:
 				if a._moving and dist < 1.9:
 					continue  # yürüyenin yoluna kamera koyma, içinden geçer
 				var pos: Vector3 = head + facing.rotated(Vector3.UP, ang) * dist + Vector3(0, lift, 0)
@@ -346,7 +347,7 @@ func _too_steep(cam: Vector3, head: Vector3) -> bool:
 
 func _faces(facing: Vector3, head: Vector3, cam: Vector3) -> bool:
 	var d := cam - head
-	return facing.dot(Vector3(d.x, 0, d.z).normalized()) > 0.25
+	return facing.dot(Vector3(d.x, 0, d.z).normalized()) > 0.45  # yandan profil değil, yüz görünsün
 
 
 ## Kameradan konuşanın başı görünüyor mu: bloklar ve diğer oyuncular önünü kapatmıyor,
