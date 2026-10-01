@@ -60,7 +60,7 @@ func _ready() -> void:
 	# Gerçek ev eşyaları (gardırop, masa...) bloklara değil sahneye eklenir.
 	var sets := world.generator as FilmSets
 	for pr: Array in sets.props:
-		var n := FilmProps.build(pr[0], pr[2])
+		var n := FilmProps.build(pr[0], pr[2], pr[3] if pr.size() > 3 else null)
 		n.position = Vector3(pr[1])
 		add_child(n)
 	for dr: Array in sets.doors:

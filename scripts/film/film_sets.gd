@@ -16,6 +16,10 @@ const SETS := {
 	"saha": Vector3i(-40, GROUND + 1, -36),
 	"pazar": Vector3i(-8, GROUND + 1, 32),
 	"oyun": Vector3i(83, GROUND + 1, 32),
+	"market": Vector3i(13, GROUND + 1, -36),
+	"lokanta": Vector3i(-60, GROUND + 1, -10),
+	"pastane": Vector3i(-26, GROUND + 1, -10),
+	"otopark": Vector3i(-60, GROUND + 1, -37),
 }
 ## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
 const CITY_MIN := Vector2i(-64, -56)
@@ -58,7 +62,7 @@ const POINTS := {
 		"kam_bodrum": Vector3(14.0, -2.3, -2.4),
 		"kam_yatak_odasi": Vector3(7.6, 7.2, 5.8),
 		"kam_teras": Vector3(15.6, 7.0, 6.4),
-		"kam_bahce": Vector3(23.5, 3.0, 14.0),
+		"kam_bahce": Vector3(24.0, 2.5, 20.5),
 		"kam_ev_genel": Vector3(20.0, 7.0, 20.0),
 	},
 	"okul": {
@@ -74,6 +78,31 @@ const POINTS := {
 		"kam_sinif": Vector3(7.5, 2.6, 9.5),
 		"kam_tahta": Vector3(7.5, 2.2, 3.5),
 		"kam_bahce": Vector3(7.5, 5.0, 26.0),
+		"koridor": Vector3(17.0, 0, 6.0),
+		"merdiven": Vector3(16.5, 0, -3.0),
+		"kantin": Vector3(22.5, 0, 2.5),
+		"kantin_masa": Vector3(22.5, 0, 7.0),
+		"ogretmenler": Vector3(23.5, 0, -3.0),
+		"mudur": Vector3(12.5, 0, -5.5),
+		"tuvalet": Vector3(2.5, 0, -5.5),
+		"arka_koridor": Vector3(7.5, 0, -2.5),
+		"okul_kapi": Vector3(17.0, 0, 13.5),
+		"bayrak": Vector3(11.0, 0, 16.5),
+		"basket": Vector3(-7.5, 0, 1.5),
+		"sinif_b": Vector3(7.5, 5, 8.5),
+		"sinif_b_tahta": Vector3(7.5, 5, 1.6),
+		"resim_odasi": Vector3(7.5, 5, -4.0),
+		"kutuphane": Vector3(20.5, 5, -1.0),
+		"ust_koridor": Vector3(16.5, 5, 6.0),
+		"kam_koridor": Vector3(16.5, 2.5, 10.2),
+		"kam_kantin": Vector3(19.5, 2.5, 9.5),
+		"kam_ogretmenler": Vector3(24.3, 2.6, -7.5),
+		"kam_mudur": Vector3(13.6, 2.3, -5.2),
+		"kam_sinif_b": Vector3(7.5, 7.6, 9.5),
+		"kam_kutuphane": Vector3(19.5, 7.5, 9.5),
+		"kam_resim": Vector3(13.5, 7.4, -2.5),
+		"kam_basket": Vector3(-1.5, 3.5, 12.0),
+		"kam_okul_genel": Vector3(12.0, 9.0, 30.0),
 	},
 	"hastane": {
 		"giris": Vector3(6.5, 0, 9.0),
@@ -88,6 +117,14 @@ const POINTS := {
 		"kam_ic": Vector3(6.5, 2.6, 8.0),
 		"kam_yatak": Vector3(4.6, 2.5, 6.4),
 		"kam_dis": Vector3(12.0, 4.5, 18.0),
+		"muayene": Vector3(3.0, 0, -3.0),
+		"muayene_doktor": Vector3(1.5, 0, -6.0),
+		"muayene_yatak": Vector3(5.5, 0.42, -5.5),
+		"eczane_on": Vector3(8.5, 0, -2.5),
+		"eczane_arka": Vector3(8.5, 0, -5.0),
+		"ambulans": Vector3(9.5, 0, 16.0),
+		"kam_muayene": Vector3(4.6, 2.4, -2.0),
+		"kam_eczane": Vector3(11.8, 2.4, -2.0),
 	},
 	"bakkal": {
 		"kapi": Vector3(5.5, 0, 8.6),
@@ -110,6 +147,18 @@ const POINTS := {
 		"kam_genel": Vector3(8.0, 5.0, 20.0),
 		"kam_ortu": Vector3(8.2, 2.0, 7.0),
 		"kam_bank": Vector3(5.5, 1.8, 9.5),
+		"kopru": Vector3(20.5, 0, 6.0),
+		"havuz": Vector3(25.5, 0, 6.0),
+		"cesme_yani": Vector3(30.0, 0, 11.5),
+		"kameriye": Vector3(29.5, 0, 1.0),
+		"bufe": Vector3(18.5, 0, 14.5),
+		"bufe_ici": Vector3(18.5, 0, 12.0),
+		"yuruyus": Vector3(25.5, 0, 10.0),
+		"kam_havuz": Vector3(21.0, 2.5, 12.5),
+		"kam_cesme": Vector3(26.5, 2.5, 13.5),
+		"kam_kameriye": Vector3(24.5, 2.6, 0.5),
+		"kam_bufe": Vector3(21.5, 2.0, 15.5),
+		"kam_park_genel": Vector3(17.0, 10.0, 24.0),
 	},
 	"saha": {
 		"orta": Vector3(11.0, 0, 7.0),
@@ -145,6 +194,54 @@ const POINTS := {
 		"kam_kaydirak": Vector3(6.0, 2.2, 0.5),
 		"kam_salincak": Vector3(15.0, 2.6, 5.5),
 	},
+	"market": {
+		"giris": Vector3(3.0, 0, 12.0),
+		"dis": Vector3(3.0, 0, 16.0),
+		"kasa_on": Vector3(5.0, 0, 9.0),
+		"kasa_arka": Vector3(5.0, 0, 11.5),
+		"kasa_2_arka": Vector3(9.0, 0, 11.5),
+		"reyon_1": Vector3(4.5, 0, 5.5),
+		"reyon_2": Vector3(7.5, 0, 5.5),
+		"meyve": Vector3(2.0, 0, 5.0),
+		"icecek": Vector3(10.0, 0, 5.5),
+		"depo": Vector3(4.5, 0, -1.0),
+		"kam_ic": Vector3(10.5, 2.6, 12.0),
+		"kam_kasa": Vector3(7.0, 2.2, 9.4),
+		"kam_reyon": Vector3(5.0, 2.2, 9.0),
+		"kam_depo": Vector3(10.5, 2.2, 0.0),
+		"kam_dis": Vector3(6.0, 5.0, 21.0),
+	},
+	"lokanta": {
+		"giris": Vector3(7.5, 0, 1.5),
+		"dis": Vector3(7.5, 0, -2.0),
+		"masa_1": Vector3(4.5, 0, 3.5),
+		"masa_2": Vector3(8.5, 0, 6.5),
+		"masa_3": Vector3(12.5, 0, 3.5),
+		"tezgah_on": Vector3(4.5, 0, 7.4),
+		"tezgah_arka": Vector3(4.5, 0, 9.5),
+		"mutfak": Vector3(8.0, 0, 10.0),
+		"kam_ic": Vector3(12.5, 2.6, 1.5),
+		"kam_mutfak": Vector3(11.5, 2.4, 10.5),
+		"kam_dis": Vector3(7.5, 4.0, -7.0),
+	},
+	"pastane": {
+		"giris": Vector3(3.5, 0, 1.5),
+		"dis": Vector3(3.5, 0, -2.0),
+		"vitrin_on": Vector3(2.5, 0, 4.0),
+		"vitrin_arka": Vector3(2.5, 0, 6.5),
+		"masa": Vector3(3.5, 0, 2.5),
+		"kam_ic": Vector3(6.2, 2.4, 1.2),
+		"kam_vitrin": Vector3(2.5, 2.0, 2.0),
+		"kam_dis": Vector3(3.5, 3.5, -7.0),
+	},
+	"otopark": {
+		"giris": Vector3(8.0, 0, 15.5),
+		"gise": Vector3(12.5, 0, 16.5),
+		"araba_yani": Vector3(3.5, 0, 5.5),
+		"orta": Vector3(8.5, 0, 7.0),
+		"kam_genel": Vector3(8.5, 7.0, 22.0),
+		"kam_gise": Vector3(9.5, 2.0, 12.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -159,6 +256,10 @@ func _init() -> void:
 	_build_shop(SETS["bakkal"])
 	_build_park(SETS["park"])
 	_build_field(SETS["saha"])
+	_build_market(SETS["market"])
+	_build_restaurant(SETS["lokanta"])
+	_build_bakery(SETS["pastane"])
+	_build_parking(SETS["otopark"])
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -229,8 +330,8 @@ var props: Array = []
 var _prop_cells := {}
 
 
-func _prop(o: Vector3i, id: String, at: Vector3i, size: Vector2i) -> void:
-	props.append([id, o + at, size])
+func _prop(o: Vector3i, id: String, at: Vector3i, size: Vector2i, turn = null) -> void:
+	props.append([id, o + at, size] if turn == null else [id, o + at, size, turn])
 	var h := int(ceil(FilmProps.height(id)))
 	for x in size.x:
 		for z in size.y:
@@ -364,7 +465,7 @@ func _build_house(o: Vector3i) -> void:
 	# Garaj: geniş açık kapı, üstünde beyaz lento; içinde araba.
 	_fill(o, Vector3i(-7, 0, 7), Vector3i(-3, 2, 7), Blocks.AIR)
 	_fill(o, Vector3i(-7, 3, 7), Vector3i(-3, 3, 7), Blocks.TRIM_WHITE)
-	_car(o + Vector3i(-6, 0, 1), Blocks.TOY_BRICK_RED, false)
+	_car(o + Vector3i(-6, 0, 1), "araba", false, true)
 	# Merdivenler: yukarı (x 7..11) ve bodruma (x 12..15), merdiven holünde.
 	for k in 5:
 		_fill(o, Vector3i(7 + k, 0, -9), Vector3i(7 + k, k, -8), Blocks.PLANKS)
@@ -409,12 +510,35 @@ func _build_house(o: Vector3i) -> void:
 	_fill(o, Vector3i(0, 5, -9), Vector3i(3, 6, -9), Blocks.BOOKSHELF)
 	# Teras: masa ve saksı çiçekler.
 	_prop(o, "yemek_masasi", Vector3i(13, 5, 3), Vector2i(1, 1))
-	for p in [Vector3i(10, 5, 6), Vector3i(16, 5, 6), Vector3i(16, 5, 0)]:
-		_put(o + p, Blocks.FLOWERS)
+	_prop(o, "semsiye", Vector3i(13, 5, 3), Vector2i(1, 1))
+	_prop(o, "sandalye", Vector3i(12, 5, 3), Vector2i(1, 1), PI / 2)
+	_prop(o, "sandalye", Vector3i(14, 5, 3), Vector2i(1, 1), -PI / 2)
+	for p in [Vector3i(10, 5, 6), Vector3i(16, 5, 6), Vector3i(16, 5, 0), Vector3i(10, 5, 0)]:
+		_prop(o, "saksi", p, Vector2i(1, 1))
 	# Bodrum: sandıklar ve raflar.
 	_fill(o, Vector3i(0, -4, -9), Vector3i(2, -4, -9), Blocks.CHEST)
 	_fill(o, Vector3i(4, -4, -9), Vector3i(8, -3, -9), Blocks.BOOKSHELF)
 	_fill(o, Vector3i(0, -4, -3), Vector3i(1, -4, -2), Blocks.CHEST)
+	_prop(o, "kiler_rafi", Vector3i(0, -4, -7), Vector2i(1, 2), PI / 2)
+	_prop(o, "kiler_rafi", Vector3i(9, -4, -9), Vector2i(2, 1))
+	for k in [Vector3i(2, -4, -3), Vector3i(3, -4, -2), Vector3i(6, -4, -2), Vector3i(4, -4, -7)]:
+		_prop(o, "koli", k, Vector2i(1, 1))
+	for l in [Vector3i(8, -2, -3), Vector3i(1, -2, -5), Vector3i(8, -2, -8)]:
+		_put(o + l, Blocks.LANTERN)
+	# Banyo: fayanslı duvarlar, duş, havluluk; salon: berjer, bitkiler, tablo; mutfak: üst dolap, sandalyeler.
+	for w in [[Vector3i(-1, 0, -9), Vector3i(-1, 1, -5)], [Vector3i(5, 0, -9), Vector3i(5, 1, -5)], [Vector3i(0, 0, -4), Vector3i(4, 1, -4)]]:
+		_fill(o, w[0], w[1], Blocks.TILE_BATH)
+	_fill(o, Vector3i(2, 0, -4), Vector3i(2, 1, -4), Blocks.AIR)
+	_prop(o, "dus", Vector3i(0, 0, -6), Vector2i(1, 2))
+	_prop(o, "havluluk", Vector3i(4, 0, -6), Vector2i(1, 1), -PI / 2)
+	_fill(o, Vector3i(1, -1, -7), Vector3i(3, -1, -6), Blocks.RUG)
+	_prop(o, "berjer", Vector3i(16, 0, 3), Vector2i(1, 1), -PI / 2)
+	_prop(o, "bitki", Vector3i(16, 0, 6), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(10, 0, 0), Vector2i(1, 1))
+	_decor(o, "poster", Vector3(16.97, 1.6, 4.5), -PI / 2)
+	_prop(o, "ust_dolap", Vector3i(6, 0, 0), Vector2i(3, 1))
+	_prop(o, "sandalye", Vector3i(4, 0, 3), Vector2i(1, 1), PI / 2)
+	_prop(o, "sandalye", Vector3i(6, 0, 3), Vector2i(1, 1), -PI / 2)
 	# Işıklar.
 	for l in [Vector3i(13, 3, 3), Vector3i(-1, 3, -3), Vector3i(9, 3, -3), Vector3i(2, 3, -7), Vector3i(-5, 3, -7),
 			Vector3i(-5, 3, 3), Vector3i(14, 3, -7), Vector3i(4, -2, -6), Vector3i(12, -2, -3), Vector3i(4, 7, 3),
@@ -474,87 +598,6 @@ func _build_house(o: Vector3i) -> void:
 	_put(o + Vector3i(2, 0, 11), Blocks.BERRY_BUSH)
 
 
-## Okul: tuğla bina, önde sınıf (sıralar, kara tahta), arkada oyun bahçesi (kaydırak, top alanı).
-func _build_school(o: Vector3i) -> void:
-	_fill(o, Vector3i(-1, -1, -1), Vector3i(15, -1, 11), Blocks.COBBLESTONE)
-	_fill(o, Vector3i(0, -1, 0), Vector3i(14, -1, 10), Blocks.PLANKS)
-	_walls(o, Vector3i(-1, 0, -1), Vector3i(15, 3, 11), Blocks.BRICKS)
-	_fill(o, Vector3i(-1, 4, -1), Vector3i(15, 4, 11), Blocks.STONE)
-	_fill(o, Vector3i(-2, 5, -2), Vector3i(16, 5, 12), Blocks.ROOF_TILE)
-	_fill(o, Vector3i(0, 6, 0), Vector3i(14, 6, 10), Blocks.ROOF_TILE)
-	# Kapı ve pencereler.
-	_fill(o, Vector3i(7, 0, 11), Vector3i(8, 1, 11), Blocks.AIR)
-	for x in [1, 2, 4, 5, 10, 11, 13]:
-		_fill(o, Vector3i(x, 1, 11), Vector3i(x, 2, 11), Blocks.GLASS)
-	for z in [2, 3, 6, 7]:
-		_fill(o, Vector3i(-1, 1, z), Vector3i(-1, 2, z), Blocks.GLASS)
-		_fill(o, Vector3i(15, 1, z), Vector3i(15, 2, z), Blocks.GLASS)
-	# Kara tahta (arka duvarda koyu şerit) ve öğretmen masası.
-	_fill(o, Vector3i(4, 1, 0), Vector3i(11, 2, 0), Blocks.BEDROCK)
-	_prop(o, "ogretmen_masasi", Vector3i(7, 0, 2), Vector2i(2, 1))
-	# Sıralar.
-	for row in [4, 7]:
-		for x in [3, 4, 5, 9, 10, 11]:
-			_put(o + Vector3i(x, 0, row), Blocks.PLANKS)
-	# Tavan lambaları, kitaplıklar, zemin ve sınıf panosu.
-	for lx in [3, 7, 11]:
-		_put(o + Vector3i(lx, 3, 5), Blocks.CEILING_LIGHT)
-	_fill(o, Vector3i(0, 0, 1), Vector3i(0, 1, 3), Blocks.BOOKSHELF)
-	_fill(o, Vector3i(14, 0, 1), Vector3i(14, 1, 3), Blocks.BOOKSHELF)
-	_fill(o, Vector3i(0, -1, 0), Vector3i(14, -1, 10), Blocks.DARK_PLANKS)
-	_fill(o, Vector3i(1, 1, 10), Vector3i(4, 2, 10), Blocks.PLAYROOM_WALL)
-	# Bahçe: kapıdan yol, renkli oyuncak tuğlalarından kaydırak ve kum havuzu.
-	for z in range(12, 20):
-		_fill(o, Vector3i(7, -1, z), Vector3i(8, -1, z), Blocks.GRAVEL)
-	for i in 4:
-		_fill(o, Vector3i(15, 0, 16 + i), Vector3i(15, 3 - i, 16 + i), Blocks.TOY_BRICK_RED)
-	_fill(o, Vector3i(16, 0, 16), Vector3i(16, 3, 16), Blocks.TOY_BRICK_BLUE)
-	_fill(o, Vector3i(0, -1, 16), Vector3i(4, -1, 20), Blocks.SAND)
-	for c in [Vector3i(-1, 0, 15), Vector3i(5, 0, 15), Vector3i(-1, 0, 21), Vector3i(5, 0, 21)]:
-		_put(o + c, Blocks.TOY_BRICK_YELLOW)
-	for x in [1, 2, 3, 4, 5, 10, 11, 12, 13]:
-		_put(o + Vector3i(x, 0, 12), Blocks.FLOWERS)
-
-
-## Hastane: beyaz duvarlar, kapının üstünde kırmızı artı, içeride danışma masası, iki hasta yatağı, bekleme sandalyeleri.
-func _build_hospital(o: Vector3i) -> void:
-	_fill(o, Vector3i(-1, -1, -1), Vector3i(13, -1, 9), Blocks.COBBLESTONE)
-	_fill(o, Vector3i(0, -1, 0), Vector3i(12, -1, 8), Blocks.SNOW)
-	_walls(o, Vector3i(-1, 0, -1), Vector3i(13, 3, 9), Blocks.SNOW)
-	_fill(o, Vector3i(-1, 4, -1), Vector3i(13, 4, 9), Blocks.STONE)
-	_fill(o, Vector3i(6, 0, 9), Vector3i(7, 1, 9), Blocks.GLASS)
-	_fill(o, Vector3i(6, 0, 9), Vector3i(6, 1, 9), Blocks.AIR)
-	for x in [1, 2, 3, 9, 10, 11]:
-		_fill(o, Vector3i(x, 1, 9), Vector3i(x, 2, 9), Blocks.GLASS)
-	# Kırmızı artı (kapının üstünde).
-	_put(o + Vector3i(6, 3, 10), Blocks.TOY_BRICK_RED)
-	_put(o + Vector3i(6, 4, 10), Blocks.TOY_BRICK_RED)
-	_put(o + Vector3i(6, 5, 10), Blocks.TOY_BRICK_RED)
-	_put(o + Vector3i(5, 4, 10), Blocks.TOY_BRICK_RED)
-	_put(o + Vector3i(7, 4, 10), Blocks.TOY_BRICK_RED)
-	# Danışma masası, yataklar, bekleme sandalyeleri, ışıklar.
-	for x in range(5, 9):
-		_put(o + Vector3i(x, 0, 5), Blocks.PLANKS)
-	for b in [Vector3i(1, 0, 1), Vector3i(1, 0, 2), Vector3i(11, 0, 1), Vector3i(11, 0, 2)]:
-		_put(o + b, Blocks.BED)
-	for z in [5, 7]:
-		_put(o + Vector3i(0, 0, z), Blocks.TOY_BRICK_BLUE)
-	_put(o + Vector3i(0, 2, 8), Blocks.LANTERN)
-	_put(o + Vector3i(12, 2, 8), Blocks.LANTERN)
-	_put(o + Vector3i(6, 2, 0), Blocks.LANTERN)
-	for z in range(10, 15):
-		_put(o + Vector3i(6, -1, z), Blocks.GRAVEL)
-	# Gerçekçi dokunuşlar: karo tavan ve floresan lambalar, yatak aralarında perde, girişte çiçekler.
-	_fill(o, Vector3i(0, 3, 0), Vector3i(12, 3, 8), Blocks.CEILING_TILE)
-	for l in [Vector3i(3, 3, 2), Vector3i(9, 3, 2), Vector3i(6, 3, 6)]:
-		_put(o + l, Blocks.CEILING_LIGHT)
-	_fill(o, Vector3i(3, 0, 0), Vector3i(3, 1, 1), Blocks.PLAYROOM_WALL)
-	_fill(o, Vector3i(9, 0, 0), Vector3i(9, 1, 1), Blocks.PLAYROOM_WALL)
-	_fill(o, Vector3i(0, -1, 0), Vector3i(12, -1, 8), Blocks.PLASTER)
-	for x in [3, 4, 8, 9]:
-		_put(o + Vector3i(x, 0, 10), Blocks.FLOWERS)
-
-
 ## Mahalle bakkalı: tuğla dükkân, camlı vitrin, renkli tente, tezgâh, raflar (sandıklar), dondurma dolabı.
 func _build_shop(o: Vector3i) -> void:
 	_fill(o, Vector3i(-1, -1, -1), Vector3i(11, -1, 9), Blocks.COBBLESTONE)
@@ -584,34 +627,6 @@ func _build_shop(o: Vector3i) -> void:
 	_put(o + Vector3i(5, -1, 8), Blocks.RUG)
 	for x in [2, 3, 7, 8]:
 		_put(o + Vector3i(x, 0, 11), Blocks.FLOWERS)
-
-
-## Park: çakıl yollar, banklar, piknik örtüsü (renkli oyuncak tuğlaları), büyük ağaçlar, çiçek çalıları.
-func _build_park(o: Vector3i) -> void:
-	for x in range(0, 17):
-		_put(o + Vector3i(x, -1, 14), Blocks.GRAVEL)
-	for z in range(0, 17):
-		_put(o + Vector3i(8, -1, z), Blocks.GRAVEL)
-	for x in range(3, 7):
-		_put(o + Vector3i(x, 0, 5), Blocks.PLANKS)
-	_put(o + Vector3i(3, 0, 6), Blocks.LOG)
-	_put(o + Vector3i(6, 0, 6), Blocks.LOG)
-	for z in range(8, 11):
-		for x in range(9, 12):
-			_put(o + Vector3i(x, -1, z), Blocks.TOY_BRICK_RED if (x + z) % 2 == 0 else Blocks.SNOW)
-	_put(o + Vector3i(10, 0, 8), Blocks.CHEST)
-	for t in [Vector3i(2, 0, 11), Vector3i(14, 0, 3), Vector3i(1, 0, 1)]:
-		_fill(o, t, t + Vector3i(0, 4, 0), Blocks.LOG)
-		_fill(o, t + Vector3i(-2, 3, -2), t + Vector3i(2, 5, 2), Blocks.LEAVES)
-		_fill(o, t + Vector3i(0, 3, 0), t + Vector3i(0, 4, 0), Blocks.LOG)
-	for b in [Vector3i(12, 0, 12), Vector3i(13, 0, 12), Vector3i(5, 0, 12), Vector3i(15, 0, 7)]:
-		_put(o + b, Blocks.BERRY_BUSH)
-	# Sokak lambaları ve çiçek tarhları.
-	for l in [Vector3i(7, 0, 13), Vector3i(9, 0, 3), Vector3i(1, 0, 13)]:
-		_fill(o, l, l + Vector3i(0, 2, 0), Blocks.LOG)
-		_put(o + l + Vector3i(0, 3, 0), Blocks.LANTERN)
-	for f in [Vector3i(12, 0, 1), Vector3i(13, 0, 1), Vector3i(14, 0, 1), Vector3i(0, 0, 7), Vector3i(0, 0, 8), Vector3i(15, 0, 13), Vector3i(16, 0, 13)]:
-		_put(o + f, Blocks.FLOWERS)
 
 
 ## Futbol sahası: beyaz çizgiler, iki kale, kenarda seyirci bankı.
@@ -717,7 +732,7 @@ func _clear_line(a: Vector3, b: Vector3, y: int) -> bool:
 const AVENUES_Z := [25, -16]   # doğu-batı caddeleri (4 şeritlik asfaltın ilk z'si)
 const STREETS_X := [-15, 28, 76]  # kuzey-güney sokakları (asfaltın ilk x'i)
 const WALLS := [Blocks.BRICKS, Blocks.PLASTER, Blocks.CONCRETE, Blocks.SNOW, Blocks.YELLOW_WALLPAPER, Blocks.BRICKS]
-const CAR_COLORS := [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_BLUE, Blocks.TOY_BRICK_YELLOW, Blocks.SNOW]
+const CAR_COLORS := ["araba", "araba_mavi", "araba_sari", "araba_beyaz", "araba_siyah", "araba_yesil"]
 const Y0 := GROUND + 1
 
 
@@ -776,14 +791,6 @@ func _build_city() -> void:
 	_row(Vector2i(35, -40), Vector2i(72, -40), 1)
 	_row(Vector2i(83, -40), Vector2i(98, -40), 1)
 	# Setlerin aralarındaki boş parseller.
-	_building(Vector3i(35, Y0, -8), Vector2i(10, 10), 5, 2, false, -1)
-	_building(Vector3i(35, Y0, 6), Vector2i(10, 12), 3, 3, true, 1)
-	_building(Vector3i(67, Y0, -8), Vector2i(7, 26), 4, 4, false, 1)
-	_building(Vector3i(-59, Y0, -8), Vector2i(14, 26), 5, 5, false, 1)
-	_building(Vector3i(-25, Y0, -8), Vector2i(6, 10), 3, 1, true, -1)
-	_building(Vector3i(14, Y0, -36), Vector2i(10, 14), 4, 2, true, 1)
-	_building(Vector3i(59, Y0, -36), Vector2i(14, 14), 5, 3, false, 1)
-	_building(Vector3i(-59, Y0, -36), Vector2i(14, 14), 3, 4, true, 1)
 	_building(Vector3i(-8, Y0, -36), Vector2i(4, 14), 2, 5, true, 1)
 	_building(Vector3i(83, Y0, -8), Vector2i(12, 26), 6, 0, false, -1)
 
@@ -879,12 +886,10 @@ func _tree(p: Vector3i) -> void:
 	_put(p + Vector3i(0, 3, 0), Blocks.LOG)
 
 
-## Basit blok araba: renkli gövde, camlı kabin, koyu tekerlek izi. along_x: yol doğu-batı.
-func _car(p: Vector3i, color: int, along_x: bool) -> void:
-	var l := Vector3i(3, 0, 1) if along_x else Vector3i(1, 0, 3)
-	_fill(Vector3i.ZERO, p, p + l, color)
-	var cab := p + (Vector3i(1, 1, 0) if along_x else Vector3i(0, 1, 1))
-	_fill(Vector3i.ZERO, cab, cab + (Vector3i(1, 0, 1) if along_x else Vector3i(1, 0, 1)), Blocks.GLASS)
+## Araba (gerçek model, film_props): 2 blok geniş, 4 blok uzun. along_x: yol doğu-batı.
+func _car(p: Vector3i, id: String, along_x: bool, back := false) -> void:
+	var turn := (PI / 2 if along_x else 0.0) + (PI if back else 0.0)
+	_prop(Vector3i.ZERO, id, p, Vector2i(4, 2) if along_x else Vector2i(2, 4), turn)
 
 
 ## Mahalle camisi: taş gövde, basamaklı kubbe, iki minare, avlu ve şadırvan.
@@ -991,3 +996,402 @@ func _bazaar(c: Vector3i) -> void:
 	_fill(o, c + Vector3i(15, -1, 5), c + Vector3i(17, -1, 7), Blocks.GLASS)
 	_fill(o, c + Vector3i(16, 0, 6), c + Vector3i(16, 2, 6), Blocks.STONE)
 	_put(c + Vector3i(16, 3, 6), Blocks.LANTERN)
+
+
+# ---------------------------------------------------------------------------
+# Gerçekçi bina yardımcıları (okul, market, lokanta, pastane, hastane, otopark).
+
+## Kat yüksekliği: 4 blok oda + 1 blok döşeme. Kat f'de zemin y = f * STOREY.
+const STOREY := 5
+
+
+## Bina kabuğu: dış duvarlar a..b (yerel x,z; duvar dahil), floors kat. Taş kaide, beyaz kat silmeleri
+## ve köşeler, her 3 bloğun ikisinde pencere, kat döşemeleri, düz çatı ve korkuluk, tavanlarda fener.
+func _shell(o: Vector3i, a: Vector2i, b: Vector2i, floors: int, wall: int, floor_block: int) -> void:
+	var h := floors * STOREY
+	_fill(o, Vector3i(a.x, -1, a.y), Vector3i(b.x, -1, b.y), Blocks.STONE_BASE)
+	_fill(o, Vector3i(a.x + 1, -1, a.y + 1), Vector3i(b.x - 1, -1, b.y - 1), floor_block)
+	_walls(o, Vector3i(a.x, 0, a.y), Vector3i(b.x, h - 1, b.y), wall)
+	_walls(o, Vector3i(a.x, 0, a.y), Vector3i(b.x, 0, b.y), Blocks.STONE_BASE)
+	for f in floors:
+		var y0 := f * STOREY
+		var slab := y0 + STOREY - 1
+		_fill(o, Vector3i(a.x, slab, a.y), Vector3i(b.x, slab, b.y), Blocks.CONCRETE if f == floors - 1 else Blocks.PLANKS)
+		_walls(o, Vector3i(a.x, slab, a.y), Vector3i(b.x, slab, b.y), Blocks.TRIM_WHITE)
+		if f > 0:
+			_fill(o, Vector3i(a.x + 1, y0 - 1, a.y + 1), Vector3i(b.x - 1, y0 - 1, b.y - 1), floor_block)
+		for x in range(a.x + 1, b.x):
+			if posmod(x - a.x, 3) != 0:
+				_win(o, Vector3i(x, y0 + 1, a.y))
+				_win(o, Vector3i(x, y0 + 1, b.y))
+		for z in range(a.y + 1, b.y):
+			if posmod(z - a.y, 3) != 0:
+				_win(o, Vector3i(a.x, y0 + 1, z))
+				_win(o, Vector3i(b.x, y0 + 1, z))
+		for z in range(a.y + 1, b.y):
+			for x in range(a.x + 1, b.x):
+				if posmod(x - a.x, 4) == 2 and posmod(z - a.y, 4) == 2:
+					_put(o + Vector3i(x, y0 + 3, z), Blocks.LANTERN)
+	for c in [Vector2i(a.x, a.y), Vector2i(b.x, a.y), Vector2i(a.x, b.y), Vector2i(b.x, b.y)]:
+		_fill(o, Vector3i(c.x, 1, c.y), Vector3i(c.x, h - 1, c.y), Blocks.TRIM_WHITE)
+	_walls(o, Vector3i(a.x, h, a.y), Vector3i(b.x, h, b.y), Blocks.BALCONY_RAIL)
+
+
+func _win(o: Vector3i, p: Vector3i) -> void:
+	_put(o + p, Blocks.WINDOW_BOTTOM)
+	_put(o + p + Vector3i(0, 1, 0), Blocks.WINDOW_TOP)
+
+
+## İç duvar (sıva): from..to, bir kat yüksekliğinde (from.y'den 4 blok).
+func _iwall(o: Vector3i, from: Vector3i, to: Vector3i, block := Blocks.PLASTER) -> void:
+	_fill(o, from, Vector3i(to.x, from.y + STOREY - 2, to.z), block)
+
+
+## Kapı: 3 blok yüksek boşluk ve açılır kapı. along_x: duvar x boyunca (z sabit).
+func _door(o: Vector3i, p: Vector3i, along_x: bool, swing := true) -> void:
+	_fill(o, p, p + Vector3i(0, 2, 0), Blocks.AIR)
+	if swing:
+		if along_x:
+			doors.append([Vector3(o) + Vector3(p.x, p.y, p.z + 0.5), 0.0])
+		else:
+			doors.append([Vector3(o) + Vector3(p.x + 0.5, p.y, p.z), -PI / 2])
+
+
+## Tente: x0..x1 boyunca, z'de, y yüksekliğinde iki renkli çizgili.
+func _awning(o: Vector3i, x0: int, x1: int, y: int, z: int, color: int) -> void:
+	for x in range(x0, x1 + 1):
+		_put(o + Vector3i(x, y, z), color if posmod(x, 2) == 0 else Blocks.SNOW)
+
+
+## Masa ve dört yanında sandalye (masa 2x1, x boyunca).
+func _table4(o: Vector3i, at: Vector3i) -> void:
+	_prop(o, "yemek_masasi", at, Vector2i(2, 1))
+	for dx in 2:
+		_prop(o, "sandalye", at + Vector3i(dx, 0, -1), Vector2i(1, 1))
+		_prop(o, "sandalye", at + Vector3i(dx, 0, 1), Vector2i(1, 1), PI)
+
+
+## Okul: iki katlı tuğla bina (dış x -1..25, z -9..11). Zemin: A sınıfı x0..14 z0..10, koridor x16..17
+## (merdiven x17 z -8..-4), arka koridor z -3..-2, tuvalet x0..6 ve müdür odası x8..14 (z -8..-5),
+## kantin x19..24 z0..10, öğretmenler odası x19..24 z -8..-2. Üst kat: B sınıfı, resim odası, kütüphane.
+## Önde bahçe (bayrak, kaydırak, kum havuzu), batıda basketbol sahası; çevre çitli.
+func _build_school(o: Vector3i) -> void:
+	_shell(o, Vector2i(-1, -9), Vector2i(25, 11), 2, Blocks.BRICKS, Blocks.DARK_PLANKS)
+	for f in 2:
+		var y := f * STOREY
+		_iwall(o, Vector3i(15, y, -1), Vector3i(15, y, 10))
+		_iwall(o, Vector3i(18, y, -8), Vector3i(18, y, 10))
+		_iwall(o, Vector3i(0, y, -1), Vector3i(14, y, -1))
+	# Zemin kat odaları.
+	_iwall(o, Vector3i(15, 0, -8), Vector3i(15, 0, -4))
+	_iwall(o, Vector3i(0, 0, -4), Vector3i(14, 0, -4))
+	_iwall(o, Vector3i(7, 0, -8), Vector3i(7, 0, -5))
+	_iwall(o, Vector3i(19, 0, -1), Vector3i(24, 0, -1))
+	_fill(o, Vector3i(0, -1, -8), Vector3i(6, -1, -5), Blocks.TILE_BATH)
+	_fill(o, Vector3i(16, -1, -8), Vector3i(17, -1, 10), Blocks.SIDEWALK)
+	_fill(o, Vector3i(0, -1, -3), Vector3i(14, -1, -2), Blocks.SIDEWALK)
+	_door(o, Vector3i(15, 0, 5), false)
+	_door(o, Vector3i(7, 0, 11), true)
+	_door(o, Vector3i(16, 0, 11), true)
+	_door(o, Vector3i(17, 0, 11), true, false)
+	_door(o, Vector3i(3, 0, -4), true)
+	_door(o, Vector3i(11, 0, -4), true)
+	_door(o, Vector3i(18, 0, -5), false)
+	_fill(o, Vector3i(18, 0, 2), Vector3i(18, 2, 3), Blocks.AIR)
+	# Üst kat odaları.
+	_iwall(o, Vector3i(15, 5, -8), Vector3i(15, 5, -2))
+	_door(o, Vector3i(15, 5, 5), false)
+	_door(o, Vector3i(15, 5, -5), false)
+	_fill(o, Vector3i(18, 5, 2), Vector3i(18, 7, 3), Blocks.AIR)
+	# Merdiven (x17, güneye doğru çıkar).
+	for k in 5:
+		_fill(o, Vector3i(17, 0, -4 - k), Vector3i(17, k, -4 - k), Blocks.PLANKS)
+	_fill(o, Vector3i(17, 4, -7), Vector3i(17, 4, -4), Blocks.AIR)
+	_fill(o, Vector3i(17, 5, -7), Vector3i(17, 7, -4), Blocks.AIR)
+	# A sınıfı: kara tahta, öğretmen masası, sıralar, kitaplıklar, pano, saat.
+	_fill(o, Vector3i(4, 1, -1), Vector3i(11, 2, -1), Blocks.BEDROCK)
+	_prop(o, "ogretmen_masasi", Vector3i(7, 0, 2), Vector2i(2, 1))
+	for at in [Vector3i(3, 0, 4), Vector3i(9, 0, 4), Vector3i(3, 0, 7), Vector3i(9, 0, 7)]:
+		_prop(o, "sira", at, Vector2i(3, 1))
+	_fill(o, Vector3i(0, 0, 1), Vector3i(0, 1, 3), Blocks.BOOKSHELF)
+	_fill(o, Vector3i(14, 0, 1), Vector3i(14, 1, 3), Blocks.BOOKSHELF)
+	_fill(o, Vector3i(1, 1, 10), Vector3i(4, 2, 10), Blocks.PLAYROOM_WALL)
+	_decor(o, "duvar_saati", Vector3(7.5, 3.3, 0.02), 0.0)
+	_decor(o, "poster", Vector3(0.02, 1.6, 7.5), PI / 2)
+	# Kantin: tezgâh, buzdolabı, masalar.
+	_prop(o, "mutfak_tezgahi", Vector3i(20, 0, 0), Vector2i(4, 1))
+	_prop(o, "buzdolabi", Vector3i(24, 0, 1), Vector2i(1, 1))
+	_prop(o, "icecek_dolabi", Vector3i(24, 0, 2), Vector2i(1, 1))
+	_table4(o, Vector3i(20, 0, 5))
+	_table4(o, Vector3i(20, 0, 8))
+	_table4(o, Vector3i(23, 0, 5))
+	# Öğretmenler odası: toplantı masası, kitaplık.
+	_prop(o, "yemek_masasi", Vector3i(20, 0, -6), Vector2i(3, 2))
+	for x in range(20, 23):
+		_prop(o, "sandalye", Vector3i(x, 0, -7), Vector2i(1, 1))
+		_prop(o, "sandalye", Vector3i(x, 0, -4), Vector2i(1, 1), PI)
+	_fill(o, Vector3i(24, 0, -8), Vector3i(24, 1, -6), Blocks.BOOKSHELF)
+	_prop(o, "bitki", Vector3i(24, 0, -2), Vector2i(1, 1))
+	# Müdür odası.
+	_prop(o, "ogretmen_masasi", Vector3i(10, 0, -7), Vector2i(2, 1))
+	_prop(o, "koltuk", Vector3i(12, 0, -8), Vector2i(2, 1))
+	_fill(o, Vector3i(14, 0, -8), Vector3i(14, 1, -6), Blocks.BOOKSHELF)
+	_prop(o, "bitki", Vector3i(8, 0, -8), Vector2i(1, 1))
+	_fill(o, Vector3i(9, -1, -6), Vector3i(13, -1, -5), Blocks.RUG)
+	# Tuvaletler.
+	_prop(o, "lavabo", Vector3i(1, 0, -8), Vector2i(1, 1))
+	_prop(o, "lavabo", Vector3i(2, 0, -8), Vector2i(1, 1))
+	_prop(o, "klozet", Vector3i(4, 0, -8), Vector2i(1, 1))
+	_prop(o, "klozet", Vector3i(6, 0, -8), Vector2i(1, 1))
+	_fill(o, Vector3i(5, 0, -8), Vector3i(5, 1, -7), Blocks.PLASTER)
+	# B sınıfı (üst kat).
+	_fill(o, Vector3i(4, 6, -1), Vector3i(11, 7, -1), Blocks.BEDROCK)
+	_prop(o, "ogretmen_masasi", Vector3i(7, 5, 2), Vector2i(2, 1))
+	for at in [Vector3i(3, 5, 4), Vector3i(9, 5, 4), Vector3i(3, 5, 7), Vector3i(9, 5, 7)]:
+		_prop(o, "sira", at, Vector2i(3, 1))
+	_decor(o, "duvar_saati", Vector3(7.5, 8.3, 0.02), 0.0)
+	# Resim odası.
+	_prop(o, "yemek_masasi", Vector3i(2, 5, -7), Vector2i(3, 2))
+	_prop(o, "yemek_masasi", Vector3i(9, 5, -7), Vector2i(3, 2))
+	_fill(o, Vector3i(1, 6, -9), Vector3i(13, 7, -9), Blocks.PLAYROOM_WALL)
+	_prop(o, "oyuncak_kutusu", Vector3i(14, 5, -3), Vector2i(1, 1))
+	# Kütüphane.
+	_fill(o, Vector3i(24, 5, -8), Vector3i(24, 6, 10), Blocks.BOOKSHELF)
+	_fill(o, Vector3i(22, 5, -7), Vector3i(22, 6, -3), Blocks.BOOKSHELF)
+	_prop(o, "yemek_masasi", Vector3i(20, 5, 4), Vector2i(3, 2))
+	for x in range(20, 23):
+		_prop(o, "sandalye", Vector3i(x, 5, 3), Vector2i(1, 1))
+		_prop(o, "sandalye", Vector3i(x, 5, 6), Vector2i(1, 1), PI)
+	_fill(o, Vector3i(19, 4, 8), Vector3i(23, 4, 10), Blocks.RUG)
+	# Bahçe: yollar, bayrak direği, kaydırak, kum havuzu, çiçekler, ağaçlar.
+	_fill(o, Vector3i(16, -1, 12), Vector3i(17, -1, 22), Blocks.COBBLESTONE)
+	_fill(o, Vector3i(7, -1, 12), Vector3i(7, -1, 22), Blocks.GRAVEL)
+	_fill(o, Vector3i(12, 0, 15), Vector3i(12, 7, 15), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(13, 5, 15), Vector3i(14, 7, 15), Blocks.TOY_BRICK_RED)
+	for i in 4:
+		_fill(o, Vector3i(20, 0, 16 + i), Vector3i(20, 3 - i, 16 + i), Blocks.TOY_BRICK_RED)
+	_fill(o, Vector3i(21, 0, 16), Vector3i(21, 3, 16), Blocks.TOY_BRICK_BLUE)
+	_fill(o, Vector3i(0, -1, 16), Vector3i(4, -1, 20), Blocks.SAND)
+	_walls(o, Vector3i(-1, 0, 15), Vector3i(5, 0, 21), Blocks.PLANKS)
+	_fill(o, Vector3i(2, 0, 21), Vector3i(2, 0, 21), Blocks.AIR)
+	for x in [0, 1, 2, 3, 4, 5, 9, 10, 11, 13, 14, 19, 20, 21, 22, 23]:
+		_put(o + Vector3i(x, 0, 12), Blocks.FLOWERS)
+	for tr in [Vector3i(24, 0, 20), Vector3i(10, 0, 20)]:
+		_tree(o + tr)
+	_prop(o, "bank", Vector3i(9, 0, 17), Vector2i(2, 1), PI)
+	# Basketbol sahası (batı).
+	_fill(o, Vector3i(-13, -1, -7), Vector3i(-3, -1, 10), Blocks.CONCRETE)
+	_walls(o, Vector3i(-12, -1, -6), Vector3i(-4, -1, 9), Blocks.SNOW)
+	_fill(o, Vector3i(-12, -1, 1), Vector3i(-4, -1, 2), Blocks.SNOW)
+	_fill(o, Vector3i(-11, -1, -5), Vector3i(-5, -1, 0), Blocks.CONCRETE)
+	_fill(o, Vector3i(-11, -1, 3), Vector3i(-5, -1, 8), Blocks.CONCRETE)
+	_prop(o, "basket_potasi", Vector3i(-8, 0, -7), Vector2i(1, 1))
+	_prop(o, "basket_potasi", Vector3i(-8, 0, 10), Vector2i(1, 1), PI)
+	_prop(o, "bank", Vector3i(-2, 0, -2), Vector2i(1, 3), -PI / 2)
+	# Çit (önde iki giriş).
+	for x in range(-14, 26):
+		if x != 7 and x != 16 and x != 17:
+			_put(o + Vector3i(x, 0, 22), Blocks.FENCE_WHITE)
+		_put(o + Vector3i(x, 0, -10), Blocks.FENCE_WHITE)
+	for z in range(-10, 23):
+		_put(o + Vector3i(-14, 0, z), Blocks.FENCE_WHITE)
+
+
+## Süpermarket (dış x 0..12, z -3..13; ön cephe kuzeye, caddeye): camlı vitrin, otomatik kapı,
+## reyonlar, meyve sebze, içecek dolapları, iki kasa, arkada depo.
+func _build_market(o: Vector3i) -> void:
+	_shell(o, Vector2i(0, -3), Vector2i(12, 13), 1, Blocks.FACADE_CREAM, Blocks.TILE_BATH)
+	_fill(o, Vector3i(1, 0, 13), Vector3i(11, 2, 13), Blocks.GLASS)
+	_fill(o, Vector3i(2, 0, 13), Vector3i(3, 2, 13), Blocks.AIR)
+	_awning(o, 0, 12, 3, 14, Blocks.TOY_BRICK_BLUE)
+	_fill(o, Vector3i(3, 4, 13), Vector3i(9, 4, 13), Blocks.TOY_BRICK_RED)  # tabela
+	_iwall(o, Vector3i(1, 0, 1), Vector3i(11, 0, 1))
+	_door(o, Vector3i(6, 0, 1), true)
+	_fill(o, Vector3i(1, -1, -2), Vector3i(11, -1, 0), Blocks.CONCRETE)
+	for x in range(3, 10, 3):
+		_prop(o, "market_rafi", Vector3i(x, 0, 3), Vector2i(1, 6))
+	_prop(o, "meyve_reyonu", Vector3i(1, 0, 3), Vector2i(1, 5))
+	_prop(o, "icecek_dolabi", Vector3i(11, 0, 3), Vector2i(1, 6))
+	_prop(o, "kasa", Vector3i(4, 0, 10), Vector2i(2, 1))
+	_prop(o, "kasa", Vector3i(8, 0, 10), Vector2i(2, 1))
+	# Depo: sandıklar ve koliler.
+	_fill(o, Vector3i(1, 0, -2), Vector3i(3, 1, -2), Blocks.CHEST)
+	for k in [Vector3i(8, 0, -2), Vector3i(9, 0, -2), Vector3i(10, 0, -2), Vector3i(10, 0, 0)]:
+		_prop(o, "koli", k, Vector2i(1, 1))
+	# Önde kaldırım ve saksılar.
+	_fill(o, Vector3i(0, -1, 14), Vector3i(12, -1, 17), Blocks.SIDEWALK)
+	_prop(o, "saksi", Vector3i(0, 0, 14), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(12, 0, 14), Vector2i(1, 1))
+
+
+## Lokanta (dış x 0..14, z 0..12; kapı güneyde, caddeye): yemek salonu (masalar ve sandalyeler),
+## servis penceresi, arkada mutfak (ocak, tezgâh, buzdolabı).
+func _build_restaurant(o: Vector3i) -> void:
+	_shell(o, Vector2i(0, 0), Vector2i(14, 12), 1, Blocks.BRICKS, Blocks.DARK_PLANKS)
+	_door(o, Vector3i(7, 0, 0), true)
+	_awning(o, 3, 11, 3, -1, Blocks.TOY_BRICK_RED)
+	_fill(o, Vector3i(5, 4, 0), Vector3i(9, 4, 0), Blocks.TOY_BRICK_YELLOW)  # tabela
+	_iwall(o, Vector3i(1, 0, 8), Vector3i(13, 0, 8))
+	_fill(o, Vector3i(4, 1, 8), Vector3i(5, 2, 8), Blocks.AIR)
+	_fill(o, Vector3i(4, 0, 8), Vector3i(5, 0, 8), Blocks.DARK_PLANKS)
+	_door(o, Vector3i(11, 0, 8), true)
+	_fill(o, Vector3i(1, -1, 9), Vector3i(13, -1, 11), Blocks.TILE_BATH)
+	for x in [2, 6, 10]:
+		_table4(o, Vector3i(x, 0, 3))
+		_table4(o, Vector3i(x, 0, 6))
+	_prop(o, "ocak", Vector3i(1, 0, 11), Vector2i(1, 1), PI)
+	_prop(o, "mutfak_tezgahi", Vector3i(2, 0, 11), Vector2i(3, 1), PI)
+	_prop(o, "ocak", Vector3i(5, 0, 11), Vector2i(1, 1), PI)
+	_prop(o, "mutfak_tezgahi", Vector3i(6, 0, 11), Vector2i(3, 1), PI)
+	_prop(o, "buzdolabi", Vector3i(13, 0, 10), Vector2i(1, 1))
+	_prop(o, "icecek_dolabi", Vector3i(13, 0, 1), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(1, 0, 1), Vector2i(1, 1))
+	_decor(o, "poster", Vector3(0.02, 1.6, 5.0), PI / 2)
+	_decor(o, "duvar_saati", Vector3(7.0, 2.6, 7.98), PI)
+
+
+## Pastane (dış x 0..7, z 0..9; kapı güneyde): pasta vitrini, kasa, fırın, ekmek rafları, iki masa.
+func _build_bakery(o: Vector3i) -> void:
+	_shell(o, Vector2i(0, 0), Vector2i(7, 9), 1, Blocks.FACADE_CREAM, Blocks.TILE_BATH)
+	_door(o, Vector3i(3, 0, 0), true)
+	_fill(o, Vector3i(5, 0, 0), Vector3i(6, 2, 0), Blocks.GLASS)
+	_awning(o, 0, 7, 3, -1, Blocks.TOY_BRICK_RED)
+	_fill(o, Vector3i(1, 0, 5), Vector3i(4, 0, 5), Blocks.GLASS)
+	for x in range(1, 5):
+		_put(o + Vector3i(x, -1, 5), [Blocks.TOY_BRICK_YELLOW, Blocks.TOY_BRICK_RED][x % 2])
+	_prop(o, "kasa", Vector3i(5, 0, 5), Vector2i(1, 1))
+	_fill(o, Vector3i(1, 0, 8), Vector3i(4, 1, 8), Blocks.BOOKSHELF)
+	_prop(o, "ocak", Vector3i(6, 0, 8), Vector2i(1, 1), PI)
+	_prop(o, "yemek_masasi", Vector3i(1, 0, 2), Vector2i(1, 1))
+	_prop(o, "sandalye", Vector3i(1, 0, 1), Vector2i(1, 1))
+	_prop(o, "sandalye", Vector3i(1, 0, 3), Vector2i(1, 1), PI)
+	_prop(o, "yemek_masasi", Vector3i(5, 0, 2), Vector2i(1, 1))
+	_prop(o, "sandalye", Vector3i(6, 0, 2), Vector2i(1, 1), -PI / 2)
+
+
+## Hastane (dış x -1..13, z -7..9): girişte danışma ve bekleme, iki yataklı koğuş, arkada muayene
+## odası ve eczane; önde ambulans.
+func _build_hospital(o: Vector3i) -> void:
+	_shell(o, Vector2i(-1, -7), Vector2i(13, 9), 1, Blocks.TRIM_WHITE, Blocks.TILE_BATH)
+	_door(o, Vector3i(6, 0, 9), true)
+	_fill(o, Vector3i(7, 0, 9), Vector3i(7, 2, 9), Blocks.GLASS)
+	for c in [Vector3i(6, 4, 10), Vector3i(6, 5, 10), Vector3i(6, 6, 10), Vector3i(5, 5, 10), Vector3i(7, 5, 10)]:
+		_put(o + c, Blocks.TOY_BRICK_RED)
+	_iwall(o, Vector3i(0, 0, -1), Vector3i(12, 0, -1))
+	_iwall(o, Vector3i(6, 0, -6), Vector3i(6, 0, -2))
+	_door(o, Vector3i(3, 0, -1), true)
+	_door(o, Vector3i(9, 0, -1), true)
+	# Danışma, koğuş, bekleme.
+	for x in range(5, 9):
+		_put(o + Vector3i(x, 0, 5), Blocks.PLANKS)
+	for b in [Vector3i(1, 0, 1), Vector3i(1, 0, 2), Vector3i(11, 0, 1), Vector3i(11, 0, 2)]:
+		_put(o + b, Blocks.BED)
+	_fill(o, Vector3i(3, 0, 0), Vector3i(3, 1, 1), Blocks.PLAYROOM_WALL)
+	_fill(o, Vector3i(9, 0, 0), Vector3i(9, 1, 1), Blocks.PLAYROOM_WALL)
+	for z in [5, 7]:
+		_prop(o, "sandalye", Vector3i(0, 0, z), Vector2i(1, 1), PI / 2)
+	_prop(o, "bitki", Vector3i(12, 0, 8), Vector2i(1, 1))
+	# Muayene odası.
+	_prop(o, "ogretmen_masasi", Vector3i(1, 0, -5), Vector2i(2, 1))
+	_put(o + Vector3i(5, 0, -6), Blocks.BED)
+	_put(o + Vector3i(5, 0, -5), Blocks.BED)
+	_prop(o, "lavabo", Vector3i(0, 0, -2), Vector2i(1, 1), PI / 2)
+	# Eczane: ilaç rafları, tezgâh.
+	_fill(o, Vector3i(7, 0, -6), Vector3i(12, 1, -6), Blocks.BOOKSHELF)
+	_prop(o, "mutfak_tezgahi", Vector3i(7, 0, -4), Vector2i(4, 1))
+	_prop(o, "kasa", Vector3i(11, 0, -4), Vector2i(1, 1))
+	# Bahçe yolu, çiçekler, ambulans.
+	for z in range(10, 15):
+		_put(o + Vector3i(6, -1, z), Blocks.GRAVEL)
+	for x in [3, 4, 8]:
+		_put(o + Vector3i(x, 0, 10), Blocks.FLOWERS)
+	_fill(o, Vector3i(9, -1, 11), Vector3i(12, -1, 16), Blocks.ASPHALT)
+	_prop(o, "ambulans", Vector3i(10, 0, 11), Vector2i(2, 4), PI)
+
+
+## Otopark (yerel x 0..16, z -1..16; giriş kuzeyde): asfalt, beyaz park çizgileri, arabalar,
+## bekçi kulübesi, bariyer, lambalar, alçak duvar.
+func _build_parking(o: Vector3i) -> void:
+	_fill(o, Vector3i(-1, -1, -2), Vector3i(17, -1, 17), Blocks.ASPHALT)
+	for x in range(0, 17, 3):
+		_fill(o, Vector3i(x, -1, -1), Vector3i(x, -1, 3), Blocks.ROAD_LINE)
+		_fill(o, Vector3i(x, -1, 10), Vector3i(x, -1, 14), Blocks.ROAD_LINE)
+	var cars := [[1, -1, "araba_mavi"], [4, -1, "araba"], [10, -1, "araba_beyaz"], [13, -1, "araba_siyah"],
+			[4, 11, "araba_sari"], [7, 11, "araba_yesil"], [13, 11, "araba_mavi"]]
+	for c: Array in cars:
+		_car(o + Vector3i(c[0], 0, c[1]), c[2], false, c[1] > 5)
+	for z in range(-2, 18):
+		_put(o + Vector3i(-1, 0, z), Blocks.STONE_BASE)
+		_put(o + Vector3i(17, 0, z), Blocks.STONE_BASE)
+	for x in range(-1, 18):
+		_put(o + Vector3i(x, 0, -2), Blocks.STONE_BASE)
+	# Bekçi kulübesi ve bariyer.
+	_walls(o, Vector3i(11, 0, 15), Vector3i(13, 2, 17), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(11, 3, 15), Vector3i(13, 3, 17), Blocks.CONCRETE)
+	_fill(o, Vector3i(12, 1, 17), Vector3i(12, 1, 17), Blocks.GLASS)
+	_fill(o, Vector3i(11, 1, 16), Vector3i(11, 1, 16), Blocks.GLASS)
+	_door(o, Vector3i(12, 0, 15), true, false)
+	_put(o + Vector3i(12, 2, 16), Blocks.LANTERN)
+	_fill(o, Vector3i(6, 0, 16), Vector3i(6, 1, 16), Blocks.STONE)
+	for y in range(2, 6):
+		_put(o + Vector3i(6, y, 16), Blocks.TOY_BRICK_RED if y % 2 == 0 else Blocks.SNOW)
+	for l in [Vector3i(-1, 1, 6), Vector3i(17, 1, 6), Vector3i(8, 1, -2)]:
+		_lamp(o + l)
+
+
+## Park (yerel x 0..33, z -2..16): yürüyüş yolları, banklar, piknik örtüsü, ağaçlar, gölet ve köprü,
+## fıskiyeli havuz, kameriye, dondurma büfesi, çiçek tarhları, lambalar.
+func _build_park(o: Vector3i) -> void:
+	for x in range(0, 33):
+		_put(o + Vector3i(x, -1, 14), Blocks.GRAVEL)
+	for z in range(-2, 17):
+		_put(o + Vector3i(8, -1, z), Blocks.GRAVEL)
+		_put(o + Vector3i(25, -1, z), Blocks.GRAVEL)
+	_prop(o, "bank", Vector3i(3, 0, 5), Vector2i(4, 1))
+	for z in range(8, 11):
+		for x in range(9, 12):
+			_put(o + Vector3i(x, -1, z), Blocks.TOY_BRICK_RED if (x + z) % 2 == 0 else Blocks.SNOW)
+	_put(o + Vector3i(10, 0, 8), Blocks.CHEST)
+	for tr in [Vector3i(2, 0, 11), Vector3i(14, 0, 3), Vector3i(1, 0, 1), Vector3i(31, 0, 15), Vector3i(17, 0, 0), Vector3i(31, 0, -2)]:
+		_tree(o + tr)
+	for b in [Vector3i(12, 0, 12), Vector3i(13, 0, 12), Vector3i(5, 0, 12), Vector3i(15, 0, 7)]:
+		_put(o + b, Blocks.BERRY_BUSH)
+	for l in [Vector3i(7, 0, 13), Vector3i(9, 0, 3), Vector3i(1, 0, 13), Vector3i(24, 0, 13), Vector3i(26, 0, 3)]:
+		_lamp(o + l)
+	for f in [Vector3i(12, 0, 1), Vector3i(13, 0, 1), Vector3i(0, 0, 7), Vector3i(0, 0, 8), Vector3i(15, 0, 13), Vector3i(16, 0, 13)]:
+		_put(o + f, Blocks.FLOWERS)
+	# Gölet: mavi su, taş kenar, çalı çit, ahşap köprü (z 6).
+	_fill(o, Vector3i(17, -1, 2), Vector3i(24, -1, 10), Blocks.STONE_BASE)
+	_fill(o, Vector3i(18, -1, 3), Vector3i(23, -1, 9), Blocks.TOY_BRICK_BLUE)
+	_walls(o, Vector3i(17, 0, 2), Vector3i(24, 0, 10), Blocks.LEAVES)
+	_fill(o, Vector3i(17, -1, 6), Vector3i(24, -1, 6), Blocks.PLANKS)
+	_fill(o, Vector3i(17, 0, 6), Vector3i(24, 0, 6), Blocks.AIR)
+	for x in range(18, 24):
+		_put(o + Vector3i(x, 0, 5), Blocks.BALCONY_RAIL)
+		_put(o + Vector3i(x, 0, 7), Blocks.BALCONY_RAIL)
+	# Fıskiyeli havuz.
+	_walls(o, Vector3i(28, 0, 6), Vector3i(32, 0, 10), Blocks.STONE)
+	_fill(o, Vector3i(29, -1, 7), Vector3i(31, -1, 9), Blocks.TOY_BRICK_BLUE)
+	_fill(o, Vector3i(30, 0, 8), Vector3i(30, 2, 8), Blocks.TRIM_WHITE)
+	_put(o + Vector3i(30, 3, 8), Blocks.GLASS)
+	_prop(o, "bank", Vector3i(28, 0, 12), Vector2i(2, 1), PI)
+	_prop(o, "bank", Vector3i(31, 0, 12), Vector2i(2, 1), PI)
+	# Kameriye: dört direk, kiremit çatı, ahşap zemin, içinde bank.
+	_fill(o, Vector3i(27, -1, -1), Vector3i(31, -1, 3), Blocks.PLANKS)
+	for c in [Vector3i(27, 0, -1), Vector3i(31, 0, -1), Vector3i(27, 0, 3), Vector3i(31, 0, 3)]:
+		_fill(o, c, c + Vector3i(0, 2, 0), Blocks.LOG)
+	_fill(o, Vector3i(26, 3, -2), Vector3i(32, 3, 4), Blocks.ROOF_TERRACOTTA)
+	_fill(o, Vector3i(28, 4, -1), Vector3i(30, 4, 3), Blocks.ROOF_TERRACOTTA)
+	_prop(o, "bank", Vector3i(28, 0, -1), Vector2i(3, 1))
+	# Dondurma büfesi.
+	_walls(o, Vector3i(17, 0, 11), Vector3i(19, 2, 13), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(17, 3, 10), Vector3i(19, 3, 14), Blocks.TOY_BRICK_RED)
+	_fill(o, Vector3i(18, 1, 13), Vector3i(18, 1, 13), Blocks.AIR)
+	_door(o, Vector3i(18, 0, 11), true, false)
+	_put(o + Vector3i(18, 2, 12), Blocks.LANTERN)
+	# Çalı çit (kuzey dışında).
+	for x in range(-1, 34):
+		if x != 8 and x != 25:
+			_put(o + Vector3i(x, 0, -3), Blocks.LEAVES)
+	for z in range(-3, 17):
+		_put(o + Vector3i(33, 0, z), Blocks.LEAVES)
