@@ -1172,8 +1172,6 @@ func _build_school(o: Vector3i) -> void:
 		_fill(o, Vector3i(20, 0, 16 + i), Vector3i(20, 3 - i, 16 + i), Blocks.TOY_BRICK_RED)
 	_fill(o, Vector3i(21, 0, 16), Vector3i(21, 3, 16), Blocks.TOY_BRICK_BLUE)
 	_fill(o, Vector3i(0, -1, 16), Vector3i(4, -1, 20), Blocks.SAND)
-	_walls(o, Vector3i(-1, 0, 15), Vector3i(5, 0, 21), Blocks.PLANKS)
-	_fill(o, Vector3i(2, 0, 21), Vector3i(2, 0, 21), Blocks.AIR)
 	for x in [0, 1, 2, 3, 4, 5, 9, 10, 11, 13, 14, 19, 20, 21, 22, 23]:
 		_put(o + Vector3i(x, 0, 12), Blocks.FLOWERS)
 	for tr in [Vector3i(24, 0, 20), Vector3i(10, 0, 20)]:
