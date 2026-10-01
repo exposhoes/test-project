@@ -350,7 +350,7 @@ func _animate_glb_talk(delta: float) -> void:
 
 
 var _gesture_left := 0.0
-const TALK_ANIMS := ["talk", "speech", "complain", "agree"]
+const TALK_ANIMS := ["talk", "speech"]
 const GESTURES := {
 	"gul": ["laugh", "clap", "dance"],
 	"sok": ["scared", "afraid"],
@@ -721,7 +721,7 @@ func _process(delta: float) -> void:
 		elif _gesture_left > 0.0:
 			_gesture_left -= delta
 		elif talking and _find_anim(TALK_ANIMS) != "":
-			# Talk animasyonu olmayan modeller (Anne, Ali) konuşurken onay/el hareketiyle konuşur.
+			# Talk animasyonu olmayan modeller (Anne, Ali) sakin bekleme duruşunda, sadece başı sallanarak konuşur.
 			_play(_find_anim(TALK_ANIMS))
 		else:
 			_play(_find_anim(["idle", "wait"]))
