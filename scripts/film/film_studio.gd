@@ -141,7 +141,7 @@ func _run(s: Dictionary) -> void:
 	elif s.has("place"):
 		var a := _actor(s["place"])
 		a.visible = true
-		a.position = FilmSets.point(s["at"])
+		a.position = _free_spot(a, FilmSets.point(s["at"]))
 		a.set_lying(s.get("lie", false))
 		if s.has("look"):
 			a.face_towards(FilmSets.point(s["look"]))
@@ -372,6 +372,24 @@ func _wait(sec: float) -> void:
 		await get_tree().process_frame
 		return
 	await get_tree().create_timer(sec).timeout
+
+
+## Noktada başka biri duruyorsa yanında boş bir yer bulur; iki karakter iç içe girmesin.
+func _free_spot(a: Actor, p: Vector3) -> Vector3:
+	var sets: FilmSets = world.generator
+	for off in [Vector3.ZERO, Vector3(0.8, 0, 0), Vector3(-0.8, 0, 0), Vector3(0, 0, 0.8), Vector3(0, 0, -0.8),
+			Vector3(0.8, 0, 0.8), Vector3(-0.8, 0, 0.8), Vector3(0.8, 0, -0.8), Vector3(-0.8, 0, -0.8)]:
+		var q: Vector3 = p + off
+		if off != Vector3.ZERO and not sets.is_air(Vector3i(q.floor()) + Vector3i(0, 0, 0)):
+			continue
+		var taken := false
+		for o: Actor in Actor.everyone:
+			if o != a and o.visible and Vector2(o.position.x - q.x, o.position.z - q.z).length() < 0.6:
+				taken = true
+				break
+		if not taken:
+			return q
+	return p
 
 
 func _actor(id: String) -> Actor:
