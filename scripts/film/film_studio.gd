@@ -266,7 +266,9 @@ func _watch_speaker(delta: float) -> void:
 	var away := _speaker._body.rotation.x == 0.0 and not _faces(facing, head, camera.global_position)
 	_away_t = _away_t + 0.25 if away else 0.0
 	# Sırtı dönükse karşı açıya geç; yürürken daha sabırlı (sürekli kesme olmasın).
-	if _away_t >= (1.25 if _speaker._moving else 0.75) or (_speaker._body.rotation.x == 0.0 and _too_steep(camera.global_position, head)) or not _shows(camera.global_position, head, _speaker):
+	# Konuşan kameraya fazla yaklaştıysa (ör. yataktan kalkıp kameraya yürüdü) yüzün içine girmesin.
+	var too_close := camera.global_position.distance_to(head) < 1.9
+	if too_close or _away_t >= (1.25 if _speaker._moving else 0.75) or (_speaker._body.rotation.x == 0.0 and _too_steep(camera.global_position, head)) or not _shows(camera.global_position, head, _speaker):
 		_away_t = 0.0
 		var fov := camera.fov
 		_frame_speaker(_speaker, true)
@@ -288,7 +290,7 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	# Yatan karakterde ayakta duran birinin göz hizasından, odayı da gösteren geniş açı.
 	var lifts := [1.1, 0.8] if lying else [0.0, 0.15, -0.1]
 	# Geniş açı: karakter ve etrafı birlikte görünsün (Mehmet istedi); yakına ancak yer yoksa.
-	var dists := [3.4, 4.2, 2.8, 2.2] if lying else [3.6, 4.4, 3.0, 2.4, 1.8]
+	var dists := [3.4, 4.2, 2.8, 2.2] if lying else [3.6, 4.4, 3.0, 2.4, 2.1]
 	var angs := [0.6, -0.6, 1.0, -1.0, 1.6, -1.6, 2.2, -2.2, 0.0, PI] if lying else [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]
 	for lift in lifts:
 		for dist in dists:
