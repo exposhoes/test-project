@@ -926,6 +926,31 @@ const LIST := [
 			{"title": "Sen cüzdan bulsan ne yapardın? Yorumlara yaz!", "t": 2.5},
 		],
 	},
+	{
+		"id": "kaleci", "name": "Bölüm 26: Dünyanın En İyi Kalecisi", "set": "saha", "time": 0.4,
+		"steps": [
+			{"place": "ali", "at": "saha.kale_sol", "look": "saha.penalti"},
+			{"place": "emir", "at": "saha.penalti", "look": "saha.kale_sol"},
+			{"place": "komsu_cocuk", "at": "saha.kenar", "look": "saha.orta"},
+			{"cam": "saha.kam_genel", "look": "saha.kale_sol", "t": 0},
+			{"say": "ali", "text": "Ben dünyanın en iyi kalecisiyim! Hiçbir top geçemez!"},
+			{"title": "Dünyanın En İyi Kalecisi", "t": 1.2},
+			{"cam": "saha.kam_kale", "look": "saha.penalti", "t": 0},
+			{"say": "emir", "text": "Hazır mısın Ali? Vuruyorum!"},
+			{"say": "ali", "text": "Vur bakalım! Gözlerim kartal gibi!"},
+			{"shake": 0.4},
+			{"say": "komsu_cocuk", "text": "Goool!"},
+			{"zoom": 0.6},
+			{"say": "ali", "text": "O sayılmaz! Güneş gözüme geldi!"},
+			{"say": "emir", "text": "Ali, hava bulutlu..."},
+			{"say": "ali", "text": "Iıı... Bulutun arkasındaki güneş geldi!"},
+			{"cam": "saha.kam_genel", "look": "saha.penalti", "t": 0},
+			{"say": "emir", "text": "Peki, bu sefer sen vur, ben kaleye geçeyim!"},
+			{"walk": "ali", "to": "saha.orta"},
+			{"say": "ali", "text": "Tamam! Ama ben kaçırırsam rüzgâr yüzünden olur!"},
+			{"title": "Sence Ali iyi bir kaleci mi? Yorumlara yaz!", "t": 2.5},
+		],
+	},
 ]
 
 
