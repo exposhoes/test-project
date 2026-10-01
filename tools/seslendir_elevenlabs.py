@@ -57,16 +57,46 @@ def ayar(kim: str) -> dict:
     return {k: v for k, v in {**a.get("varsayilan", {}), **a.get(kim, {})}.items() if k != "seed"}
 
 
+def duygu_etiketi(metin: str) -> str:
+    """eleven_v3 için replikten duygu etiketi çıkarır (gülme, şaşkınlık, heyecan...). Etiket okunmaz, tonu belirler."""
+    kucuk = metin.lower()
+    harfler = [c for c in metin if c.isalpha()]
+    if "haha" in kucuk or "hihi" in kucuk:
+        return "[laughs warmly] "
+    if len(harfler) > 3 and sum(c.isupper() for c in harfler) / len(harfler) > 0.7:
+        return "[shouting, shocked] "
+    if "?!" in metin or kucuk.startswith(("eyvah", "hiii", "aa")):
+        return "[surprised] "
+    if metin.rstrip().endswith("..."):
+        return "[thoughtful] "
+    if "!" in metin:
+        return "[cheerfully] "
+    if "?" in metin:
+        return "[curious, kindly] "
+    return "[warmly] "
+
+
+def model(kim: str) -> str:
+    """Karakterin modeli: "modeller" içinde yazılıysa o (ör. eleven_v3: gerçek duygu, gülme), yoksa genel model."""
+    return AYAR.get("modeller", {}).get(kim, AYAR.get("model", "eleven_multilingual_v2"))
+
+
 def uret(r: dict, ses_id: str, tohum: int, onceki: str = "", sonraki: str = "") -> bytes:
-    # Komşu replikler (previous_text/next_text) tonlamayı sahneye uygun ve duygulu yapar.
+    m = model(r["kim"])
+    if m == "eleven_v3":
+        # v3 duygu etiketlerini anlar; komşu replik ve ayrıntılı ses ayarı almaz.
+        govde = {"text": duygu_etiketi(r["metin"]) + r["metin"], "model_id": m, "language_code": "tr",
+                 "seed": tohum, "voice_settings": {"stability": 0.5}}
+    else:
+        # Komşu replikler (previous_text/next_text) tonlamayı sahneye uygun ve duygulu yapar.
+        govde = {"text": r["metin"], "model_id": m, "language_code": "tr", "seed": tohum,
+                 "voice_settings": ayar(r["kim"]), "previous_text": onceki, "next_text": sonraki}
     istek = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{ses_id}?output_format=mp3_44100_128",
-        data=json.dumps({"text": r["metin"], "model_id": AYAR.get("model", "eleven_multilingual_v2"), "language_code": "tr",
-                         "seed": tohum, "voice_settings": ayar(r["kim"]),
-                         "previous_text": onceki, "next_text": sonraki}).encode(),
+        data=json.dumps(govde).encode(),
         headers={"xi-api-key": anahtar(), "Content-Type": "application/json", "Accept": "audio/mpeg"},
     )
-    with urllib.request.urlopen(istek, timeout=90) as c:
+    with urllib.request.urlopen(istek, timeout=120) as c:
         return c.read()
 
 

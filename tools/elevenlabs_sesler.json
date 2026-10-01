@@ -1,14 +1,14 @@
 {
     "_aciklama":  "ElevenLabs Voice Library\u0027den her karakter için bir ses seç, Voice ID\u0027sini buraya yaz. Boş bırakılan karakter Microsoft sesiyle kalır. API anahtarı buraya DEĞİL, bilgisayarda ELEVENLABS_API_KEY ortam değişkenine yazılır.",
     "model":  "eleven_multilingual_v2",
-    "_secimler":  "emir: Teddy Twinkle (sevimli çizgi film erkek çocuğu); ali: Valf (genç, oyuncu); zeynep: Caglayan (neşeli genç kız, Türkçe); komsu_cocuk: Mithi (çocuk); anne: Elif Akın (sıcak, sakin, doğal Türk kadını); ogretmen: Alper K. (erkek; dinamik, canlı, eğitici); doktor: Akif (sıcak, sakin Türk erkeği); bakkal: Umit Gunacti (kalın, sıcak Türk erkeği)",
+    "_secimler":  "emir: Teddy Twinkle (sevimli çizgi film erkek çocuğu); ali: Valf (genç, oyuncu); zeynep: Caglayan (neşeli genç kız, Türkçe); komsu_cocuk: Mithi (çocuk); anne: Elif Akın (sıcak, sakin, doğal Türk kadını); ogretmen: Mert Aksoy (erkek; sıcak, babacan çocuk masalı anlatıcısı; eleven_v3 ile duygulu); doktor: Akif (sıcak, sakin Türk erkeği); bakkal: Umit Gunacti (kalın, sıcak Türk erkeği)",
     "sesler":  {
                    "emir":  "XjGYkUkzth8BPs29fmcV",
                    "ali":  "loY1uopAz31XyhAEhNSa",
                    "komsu_cocuk":  "MIl0Flub6Sc9KSkX2A42",
                    "zeynep":  "sJ0xHHPzz1LOio4QNlB0",
                    "anne":  "NH9bimvGxCDlyOWKzhrl",
-                   "ogretmen":  "8Xd5Bg2N5sjGBxgk04rd",
+                   "ogretmen":  "omN6HKjjOXoJGJQ9P9s3",
                    "doktor":  "skNtUvQlHhqETjfzZF1H",
                    "bakkal":  "OUMjwyTVLkTqFhscEshG"
                },
@@ -45,5 +45,8 @@
                         "anne":  215
                     },
     "perde_payi":  0.1,
-    "deneme":  4
+    "deneme":  4,
+    "modeller":  {
+                     "ogretmen":  "eleven_v3"
+                 }
 }
