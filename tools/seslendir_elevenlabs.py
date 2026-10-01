@@ -29,7 +29,6 @@ KOK = pathlib.Path(__file__).resolve().parent.parent
 SESLER_DIR = KOK / "assets" / "audio" / "voices"
 KAYIT = SESLER_DIR / "_elevenlabs.json"
 AYAR = json.loads((pathlib.Path(__file__).resolve().parent / "elevenlabs_sesler.json").read_text(encoding="utf-8"))
-SES_AYARI = AYAR.get("ayar", {"stability": 0.4, "similarity_boost": 0.8, "style": 0.45})
 HEDEF_PERDE = AYAR.get("hedef_perde", {})
 PERDE_PAYI = float(AYAR.get("perde_payi", 0.1))
 DENEME = int(AYAR.get("deneme", 4))
@@ -52,11 +51,19 @@ def kalan_hak() -> int:
     return int(s["character_limit"]) - int(s["character_count"])
 
 
-def uret(metin: str, ses_id: str, tohum: int) -> bytes:
+def ayar(kim: str) -> dict:
+    """Karakterin sabit ses ayarı (tools/elevenlabs_sesler.json > ayarlar); her bölümde aynı ses çıkması için."""
+    a = AYAR.get("ayarlar", {})
+    return {k: v for k, v in {**a.get("varsayilan", {}), **a.get(kim, {})}.items() if k != "seed"}
+
+
+def uret(r: dict, ses_id: str, tohum: int, onceki: str = "", sonraki: str = "") -> bytes:
+    # Komşu replikler (previous_text/next_text) tonlamayı sahneye uygun ve duygulu yapar.
     istek = urllib.request.Request(
         f"https://api.elevenlabs.io/v1/text-to-speech/{ses_id}?output_format=mp3_44100_128",
-        data=json.dumps({"text": metin, "model_id": AYAR.get("model", "eleven_multilingual_v2"), "language_code": "tr",
-                         "seed": tohum, "voice_settings": SES_AYARI}).encode(),
+        data=json.dumps({"text": r["metin"], "model_id": AYAR.get("model", "eleven_multilingual_v2"), "language_code": "tr",
+                         "seed": tohum, "voice_settings": ayar(r["kim"]),
+                         "previous_text": onceki, "next_text": sonraki}).encode(),
         headers={"xi-api-key": anahtar(), "Content-Type": "application/json", "Accept": "audio/mpeg"},
     )
     with urllib.request.urlopen(istek, timeout=90) as c:
@@ -93,13 +100,13 @@ def perde(veri: bytes) -> float:
     return float(np.median(f0)) if f0 else 0.0
 
 
-def sabit_uret(r: dict, ses_id: str) -> tuple[bytes, float, int]:
+def sabit_uret(r: dict, ses_id: str, onceki: str = "", sonraki: str = "") -> tuple[bytes, float, int]:
     """Repliği üretir; hedef perde tanımlıysa hedefe en yakın denemeyi seçer. (ses, perde, deneme sayısı)"""
     hedef = float(HEDEF_PERDE.get(r["kim"], 0))
     taban = int(hashlib.sha1((r["bolum"] + str(r["satir"])).encode()).hexdigest()[:6], 16)
     en_iyi = None
     for d in range(DENEME if hedef else 1):
-        veri = uret(r["metin"], ses_id, taban + d * 101)
+        veri = uret(r, ses_id, taban + d * 101, onceki, sonraki)
         p = perde(veri) if hedef else 0.0
         fark = abs(p - hedef) / hedef if hedef and p else (0.0 if not hedef else 9.0)
         if en_iyi is None or fark < en_iyi[3]:
@@ -155,7 +162,10 @@ def main() -> None:
         try:
             uretilen = []
             for r, ses_id in eksik:
-                veri, p, deneme = sabit_uret(r, ses_id)
+                i = satirlar.index(r)
+                onceki = satirlar[i - 1]["metin"] if i > 0 else ""
+                sonraki = satirlar[i + 1]["metin"] if i + 1 < len(satirlar) else ""
+                veri, p, deneme = sabit_uret(r, ses_id, onceki, sonraki)
                 uretilen.append((r, ses_id, veri))
                 print("   %s/%02d %-8s perde=%3.0f Hz, %d deneme: %s" % (bolum, r["satir"], r["kim"], p, deneme, r["metin"][:36]))
         except urllib.error.HTTPError as hata:
