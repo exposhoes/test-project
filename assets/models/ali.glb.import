@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://c8q1pmhwvddgu"
-path="res://.godot/imported/anne.glb-1b310c8e96e6217841eda72a503bb786.scn"
+uid="uid://bs6lct30ii0th"
+path="res://.godot/imported/ali.glb-491306062e85125cf46fb873bdf09fab.scn"
 
 [deps]
 
-source_file="res://assets/models/anne.glb"
-dest_files=["res://.godot/imported/anne.glb-1b310c8e96e6217841eda72a503bb786.scn"]
+source_file="res://assets/models/ali.glb"
+dest_files=["res://.godot/imported/ali.glb-491306062e85125cf46fb873bdf09fab.scn"]
 
 [params]
 
