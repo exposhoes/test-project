@@ -250,7 +250,7 @@ func _watch_speaker(delta: float) -> void:
 	var facing := Vector3(-sin(_speaker.rotation.y), 0, -cos(_speaker.rotation.y))
 	var away := not _speaker._moving and _speaker._body.rotation.x == 0.0 and not _faces(facing, head, camera.global_position)
 	_away_t = _away_t + 0.25 if away else 0.0
-	if _away_t >= 0.75 or not _shows(camera.global_position, head, _speaker):
+	if _away_t >= 0.75 or (_speaker._body.rotation.x == 0.0 and _too_steep(camera.global_position, head)) or not _shows(camera.global_position, head, _speaker):
 		_away_t = 0.0
 		var fov := camera.fov
 		_frame_speaker(_speaker, true)
@@ -265,11 +265,12 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	var head := a.position + Vector3(0, 1.45, 0)
 	var facing := Vector3(-sin(a.rotation.y), 0, -cos(a.rotation.y))
 	var lying := a._body.rotation.x != 0.0
-	if not force and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
+	if not force and (lying or not _too_steep(camera.global_position, head)) and _shows(camera.global_position, head, a) and (lying or _faces(facing, head, camera.global_position)):
 		return
 	var sets: FilmSets = world.generator
-	for lift in [0.25, 0.9]:
-		for dist in [2.4, 1.9, 3.2, 1.5, 1.2]:
+	# Dizi gibi: göz hizası (hafif yukarıdan), 3/4 açı, orta-yakın plan. Tepeden çekim yok.
+	for lift in [0.0, 0.15, -0.1]:
+		for dist in [2.2, 1.8, 2.8, 1.5]:
 			for ang in [0.45, -0.45, 0.0, 0.8, -0.8, 1.2, -1.2]:
 				if a._moving and dist < 1.9:
 					continue  # yürüyenin yoluna kamera koyma, içinden geçer
@@ -282,6 +283,12 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	# Hiç boş nokta yoksa en azından kafaya dön.
 	_look = head
 	camera.look_at(head)
+
+
+## Kamera başa çok yukarıdan ya da aşağıdan mı bakıyor (25 dereceden dik).
+func _too_steep(cam: Vector3, head: Vector3) -> bool:
+	var d := head - cam
+	return absf(atan2(d.y, Vector2(d.x, d.z).length())) > deg_to_rad(25.0)
 
 
 func _faces(facing: Vector3, head: Vector3, cam: Vector3) -> bool:
