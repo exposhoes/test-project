@@ -31,6 +31,10 @@ SESLER = {
 VARSAYILAN = ("tr-TR-AhmetNeural", "+0Hz", "+0%")
 
 
+# Tüm karakterlere eklenen hız (Mehmet "konuşmaları hızlandır" dedi).
+GENEL_HIZ = 15
+
+
 def _hz(v: str) -> int:
     return int(v.replace("Hz", ""))
 
@@ -54,7 +58,7 @@ def duygu(metin: str, perde: str, hiz: str) -> tuple[str, str]:
         p, h = p + 12, h + 8
     if metin.rstrip().endswith("...") or "eyvah" in kucuk or "üzgün" in kucuk:
         p, h = p - 8, h - 10
-    return f"{p:+d}Hz", f"{h:+d}%"
+    return f"{p:+d}Hz", f"{h + GENEL_HIZ:+d}%"
 
 
 async def main() -> None:
