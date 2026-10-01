@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bnvd08q472ua"
-path="res://.godot/imported/emir_stylized_minifigure_3d_model_normal.jpg-c490286c86ad0c02cae0fa1293cee5da.ctex"
+uid="uid://c1u7dr6i0sebi"
+path="res://.godot/imported/ali_tripo_node_78b55cb7-52ef-4d8d-a602-792dbe5f1b0f_Normal_Bake.jpg-c9475dc7525ba68d06cc9310cfe13429.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "c9f88936d4c5e7c6b5631807a11fdab2"
+"md5": "c88243962b125c8870ae763f579b156d"
 }
 
 [deps]
 
-source_file="res://assets/models/emir_stylized_minifigure_3d_model_normal.jpg"
-dest_files=["res://.godot/imported/emir_stylized_minifigure_3d_model_normal.jpg-c490286c86ad0c02cae0fa1293cee5da.ctex"]
+source_file="res://assets/models/ali_tripo_node_78b55cb7-52ef-4d8d-a602-792dbe5f1b0f_Normal_Bake.jpg"
+dest_files=["res://.godot/imported/ali_tripo_node_78b55cb7-52ef-4d8d-a602-792dbe5f1b0f_Normal_Bake.jpg-c9475dc7525ba68d06cc9310cfe13429.ctex"]
 
 [params]
 

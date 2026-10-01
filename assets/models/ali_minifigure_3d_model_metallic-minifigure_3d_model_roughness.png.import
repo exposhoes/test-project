@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bnvd08q472ua"
-path="res://.godot/imported/emir_stylized_minifigure_3d_model_normal.jpg-c490286c86ad0c02cae0fa1293cee5da.ctex"
+uid="uid://c0t3g3dmmsfo4"
+path="res://.godot/imported/ali_minifigure_3d_model_metallic-minifigure_3d_model_roughness.png-78112c6ca1ce5d7f9d50bd11e05598a1.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "c9f88936d4c5e7c6b5631807a11fdab2"
+"md5": "61ea31f8f3f37108bfb1f356a930c1a5"
 }
 
 [deps]
 
-source_file="res://assets/models/emir_stylized_minifigure_3d_model_normal.jpg"
-dest_files=["res://.godot/imported/emir_stylized_minifigure_3d_model_normal.jpg-c490286c86ad0c02cae0fa1293cee5da.ctex"]
+source_file="res://assets/models/ali_minifigure_3d_model_metallic-minifigure_3d_model_roughness.png"
+dest_files=["res://.godot/imported/ali_minifigure_3d_model_metallic-minifigure_3d_model_roughness.png-78112c6ca1ce5d7f9d50bd11e05598a1.ctex"]
 
 [params]
 
