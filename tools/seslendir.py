@@ -23,7 +23,7 @@ SESLER = {
     "ali":         ("tr-TR-EmelNeural",  "+35Hz", "+12%"),  # ince erkek çocuk sesi (Mehmet istedi), biraz farklı
     "komsu_cocuk": ("tr-TR-EmelNeural",  "+55Hz", "+3%"),   # erkek çocuk
     "zeynep":      ("tr-TR-EmelNeural",  "+60Hz", "+5%"),   # kız çocuk
-    "anne":        ("tr-TR-EmelNeural",  "-8Hz",  "-10%"),  # yumuşak, sakin anne sesi
+    "anne":        ("tr-TR-EmelNeural",  "-20Hz", "+8%"),   # olgun anne sesi: biraz kalın, canlı ve hızlı (Mehmet istedi)
     "ogretmen":    ("tr-TR-EmelNeural",  "-5Hz",  "+10%"),  # kadın, canlı ve hızlı (Mehmet istedi)
     "doktor":      ("tr-TR-AhmetNeural", "+0Hz",  "-3%"),   # erkek
     "bakkal":      ("tr-TR-AhmetNeural", "-15Hz", "-8%"),   # yaşlı erkek

@@ -213,6 +213,12 @@ func _build_glb() -> bool:
 	model.scale = Vector3.ONE * k
 	model.position = Vector3(-box.get_center().x * k, -box.position.y * k, -box.get_center().z * k)
 	model.rotation.y = float(data.get("glb_turn", PI))
+	# Model dokuları uzaktan ve eğik açıdan da net görünsün.
+	for m: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+		for i in m.mesh.get_surface_count():
+			var mat := m.mesh.surface_get_material(i) as BaseMaterial3D
+			if mat:
+				mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	var players := model.find_children("*", "AnimationPlayer", true, false)
 	if not players.is_empty():
 		_anim = players[0]
