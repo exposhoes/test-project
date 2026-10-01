@@ -43,7 +43,7 @@ const ACTORS := {
 			[Vector3(0.54, 0.14, 0.54), Vector3(0, 1.72, 0.02), Color("111111")],
 		],
 		"face": [0.46, Vector3(0, 1.43, -0.25)], "hair": Color("111111"), "eyes": Color("2a1a10")},
-	"emir": {"name": "Emir", "color": Color("ffd23f"), "mouth_x": 0.05, "mouth_h": 0.125,
+	"emir": {"name": "Emir", "color": Color("ffd23f"), "mouth_x": 0.05, "mouth_h": 0.125, "glb_turn": PI * 1.5,
 		"parts": [
 			[Vector3(0.22, 0.6, 0.24), Vector3(-0.13, 0.3, 0), Color("2f4f8f")],   # kot pantolon
 			[Vector3(0.22, 0.6, 0.24), Vector3(0.13, 0.3, 0), Color("2f4f8f")],
