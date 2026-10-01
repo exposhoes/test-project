@@ -252,9 +252,10 @@ func _watch_speaker(delta: float) -> void:
 	_watch_t = 0.0
 	var head := _speaker.head_position() if down else _speaker.position + Vector3(0, 1.45, 0)
 	var facing := Vector3(-sin(_speaker.rotation.y), 0, -cos(_speaker.rotation.y))
-	var away := not _speaker._moving and _speaker._body.rotation.x == 0.0 and not _faces(facing, head, camera.global_position)
+	var away := _speaker._body.rotation.x == 0.0 and not _faces(facing, head, camera.global_position)
 	_away_t = _away_t + 0.25 if away else 0.0
-	if _away_t >= 0.75 or (_speaker._body.rotation.x == 0.0 and _too_steep(camera.global_position, head)) or not _shows(camera.global_position, head, _speaker):
+	# Sırtı dönükse karşı açıya geç; yürürken daha sabırlı (sürekli kesme olmasın).
+	if _away_t >= (1.25 if _speaker._moving else 0.75) or (_speaker._body.rotation.x == 0.0 and _too_steep(camera.global_position, head)) or not _shows(camera.global_position, head, _speaker):
 		_away_t = 0.0
 		var fov := camera.fov
 		_frame_speaker(_speaker, true)
