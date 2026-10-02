@@ -32,6 +32,7 @@ const SETS := {
 	"benzinlik": Vector3i(84, GROUND + 1, 65),
 	"sahil": Vector3i(101, GROUND + 1, 0),
 	"metro": Vector3i(4, GROUND + 1 - 7, -22),
+	"havalimani": Vector3i(-20, GROUND + 1, -80),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -365,6 +366,17 @@ const POINTS := {
 		"kam_dis": Vector3(9.0, 2.5, -2.0),
 		"kam_market": Vector3(15.0, 2.3, 11.0),
 	},
+	"havalimani": {
+		"giris": Vector3(20.5, 0, 12.5),
+		"kontuar_on": Vector3(6.5, 0, 7.5),
+		"bekleme": Vector3(30.5, 0, 6.5),
+		"apron": Vector3(20.5, 0, -4.5),
+		"pist": Vector3(30.5, 0, -14.5),
+		"kule_dibi": Vector3(44.5, 0, 6.5),
+		"kam_genel": Vector3(20.0, 12.0, 32.0),
+		"kam_ic": Vector3(38.0, 4.0, 12.0),
+		"kam_pist": Vector3(60.0, 6.0, -4.0),
+	},
 	"metro": {
 		"peron": Vector3(12.5, 0, 2.5),
 		"peron_kuzey": Vector3(16.5, 0, 11.5),
@@ -420,6 +432,7 @@ func _init() -> void:
 	_seaside()
 	_tram()
 	_metro()
+	_airport(SETS["havalimani"])
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -479,7 +492,7 @@ func _tree_spot(g: Vector2i) -> bool:
 	if lx < 3 or lx > 12 or lz < 3 or lz > 12:
 		return false
 	# Setlerin ve önlerindeki yolun çevresi boş kalsın.
-	if g.x > CITY_MIN.x - 8 and g.x < SEA_X1 + 8 and g.y > CITY_MIN.y - 8 and g.y < CITY_MAX.y + 8:
+	if g.x > CITY_MIN.x - 8 and g.x < SEA_X1 + 8 and g.y > -112 and g.y < CITY_MAX.y + 8:
 		return false
 	return (hash(g) % 23) == 0
 
@@ -2642,3 +2655,61 @@ func _metro_stairs(x0: int, dir: int, z0: int) -> void:
 	_put(o + Vector3i(px, 1, z0 - 1), Blocks.STONE)
 	_put(o + Vector3i(px, 2, z0 - 1), Blocks.STONE)
 	_decor(o, "metro_m", Vector3(px + 0.5, 3.7, z0 - 0.5), PI / 2 if dir > 0 else -PI / 2)
+
+
+## Havalimanı (şehrin güneyi, köşe x -20, z -80): camlı terminal (x 0..40, z 0..14; check-in kontuarları,
+## bagaj bandı, bekleme salonu; cephede yazısız logo ve uçak simgesi), apron, ışıklı pist (z -18..-11),
+## kontrol kulesi, yolcu uçağı, jet ve helikopter.
+func _airport(o: Vector3i) -> void:
+	# Şehirden terminale meydan.
+	_fill(o, Vector3i(0, -1, 15), Vector3i(40, -1, 24), Blocks.SIDEWALK)
+	_fill(o, Vector3i(18, -1, 25), Vector3i(23, -1, 30), Blocks.SIDEWALK)
+	# Terminal.
+	_walls(o, Vector3i(0, 0, 0), Vector3i(40, 6, 14), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(1, -1, 1), Vector3i(39, -1, 13), Blocks.STONE_BASE)
+	_fill(o, Vector3i(1, 1, 14), Vector3i(39, 5, 14), Blocks.GLASS)
+	_fill(o, Vector3i(1, 1, 0), Vector3i(39, 5, 0), Blocks.GLASS)
+	_fill(o, Vector3i(0, 7, 0), Vector3i(40, 7, 14), Blocks.TRIM_WHITE)
+	for x in range(4, 40, 6):
+		for z in [4, 10]:
+			_put(o + Vector3i(x, 6, z), Blocks.CEILING_LIGHT)
+	for x in [19, 20, 21]:
+		_door(o, Vector3i(x, 0, 14), true, false)
+		_door(o, Vector3i(x, 0, 0), true, false)
+	_decor(o, "havalimani_logo", Vector3(21.0, 8.4, 15.06), 0.0)
+	_fill(o, Vector3i(18, 7, 14), Vector3i(23, 9, 14), Blocks.TRIM_WHITE)
+	# Check-in kontuarları ve bagaj bandı.
+	for x in [3, 7, 11, 15]:
+		_prop(o, "kasa", Vector3i(x, 0, 10), Vector2i(2, 1))
+		_prop(o, "bagaj_bandi", Vector3i(x, 0, 12), Vector2i(2, 1))
+	# Bekleme salonu.
+	for z in [3, 9]:
+		for x in range(25, 38, 2):
+			_prop(o, "bekleme_koltugu", Vector3i(x, 0, z), Vector2i(2, 1), PI if z == 9 else 0.0)
+	_prop(o, "bitki", Vector3i(23, 0, 1), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(39, 0, 13), Vector2i(1, 1))
+	_prop(o, "otomat", Vector3i(39, 0, 6), Vector2i(1, 1), -PI / 2)
+	_prop(o, "su_sebili", Vector3i(39, 0, 8), Vector2i(1, 1), -PI / 2)
+	# Apron ve pist.
+	_fill(o, Vector3i(-2, -1, -10), Vector3i(48, -1, -1), Blocks.CONCRETE)
+	_fill(o, Vector3i(-40, -1, -18), Vector3i(100, -1, -11), Blocks.ASPHALT)
+	for x in range(-38, 100, 6):
+		_fill(o, Vector3i(x, -1, -15), Vector3i(x + 2, -1, -14), Blocks.SNOW)
+		_put(o + Vector3i(x, 0, -19), Blocks.LANTERN)
+		if x < -4 or x > 50:
+			_put(o + Vector3i(x, 0, -10), Blocks.LANTERN)
+	_prop(o, "ucak", Vector3i(2, 0, -12), Vector2i(14, 12), PI / 2)
+	_prop(o, "jet", Vector3i(24, 0, -9), Vector2i(8, 6), PI / 2)
+	# Helikopter pisti.
+	_fill(o, Vector3i(34, -1, -9), Vector3i(40, -1, -3), Blocks.TOY_BRICK_YELLOW)
+	_fill(o, Vector3i(35, -1, -8), Vector3i(39, -1, -4), Blocks.CONCRETE)
+	_prop(o, "helikopter", Vector3i(36, 0, -8), Vector2i(3, 5))
+	# Kontrol kulesi.
+	_fill(o, Vector3i(45, 0, 1), Vector3i(47, 14, 3), Blocks.CONCRETE)
+	_door(o, Vector3i(46, 0, 3), true, true, true)
+	_walls(o, Vector3i(44, 15, 0), Vector3i(48, 17, 4), Blocks.GLASS)
+	_fill(o, Vector3i(45, 15, 1), Vector3i(47, 17, 3), Blocks.AIR)
+	_fill(o, Vector3i(43, 14, -1), Vector3i(49, 14, 5), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(43, 18, -1), Vector3i(49, 18, 5), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(46, 19, 2), Vector3i(46, 21, 2), Blocks.STONE)
+	_put(o + Vector3i(46, 22, 2), Blocks.TOY_BRICK_RED)
