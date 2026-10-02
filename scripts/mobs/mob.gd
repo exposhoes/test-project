@@ -88,7 +88,71 @@ func _ready() -> void:
 	_build_model(h, w)
 
 
+## Tripo'dan gelen model (assets/models/mob_<id>.glb) varsa köşeli parçalar yerine o kullanılır;
+## yürürken "walk", dururken "idle"/"wait", vururken saldırı animasyonu oynar.
+var _anim: AnimationPlayer
+var _anim_walk := ""
+var _anim_idle := ""
+var _anim_attack := ""
+
+
+func _build_glb(h: float) -> bool:
+	var path := "res://assets/models/mob_%s.glb" % mob_id
+	if not ResourceLoader.exists(path):
+		return false
+	var model: Node3D = load(path).instantiate()
+	var holder := Node3D.new()
+	holder.add_child(model)
+	add_child(holder)
+	var box := AABB()
+	var first := true
+	for mi: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+		var b: AABB = mi.global_transform * mi.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	var k := h / maxf(box.size.y, 0.001)
+	model.scale = Vector3.ONE * k
+	model.position = Vector3(-box.get_center().x * k, -box.position.y * k, -box.get_center().z * k)
+	holder.rotation.y = float(data.get("glb_turn", PI))
+	var players := model.find_children("*", "AnimationPlayer", true, false)
+	if not players.is_empty():
+		_anim = players[0]
+		for n: StringName in _anim.get_animation_list():
+			var low := String(n).to_lower()
+			if low.begins_with("walk") or low.begins_with("idle") or low.begins_with("wait") or low.begins_with("run"):
+				_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+			Actor._strip_root_motion(_anim.get_animation(n))
+		_anim_walk = _first_anim(["walk", "run"])
+		_anim_idle = _first_anim(["idle", "wait"])
+		_anim_attack = _first_anim(["attack", "slash", "chop", "box_01", "hit"])
+		if _anim_idle != "":
+			_anim.play(_anim_idle)
+	return true
+
+
+func _first_anim(prefixes: Array) -> String:
+	for p: String in prefixes:
+		for n: StringName in _anim.get_animation_list():
+			if String(n).to_lower().begins_with(p):
+				return String(n)
+	return ""
+
+
+## Hıza göre yürüme/durma animasyonu; saldırı animasyonu bitene kadar ona dokunmaz.
+func _update_anim() -> void:
+	if _anim == null:
+		return
+	if _anim.is_playing() and _anim.current_animation == _anim_attack and _anim_attack != "":
+		return
+	var moving := Vector2(velocity.x, velocity.z).length() > 0.3
+	var want := _anim_walk if moving else _anim_idle
+	if want != "" and _anim.current_animation != want:
+		_anim.play(want, 0.2)
+
+
 func _build_model(h: float, w: float) -> void:
+	if _build_glb(h):
+		return
 	if data.has("parts"):
 		for part in data["parts"]:
 			_box(part[0], part[1], part[2], part[3] if part.size() > 3 else "")
@@ -407,6 +471,8 @@ func _physics_process(delta: float) -> void:
 			if dist < ATTACK_RANGE + data["width"] / 2.0 + data.get("reach", 0.0) and _attack_timer <= 0.0 and target.has_method("hurt"):
 				_attack_timer = ATTACK_COOLDOWN
 				target.hurt(data.get("damage", DEFAULT_DAMAGE), global_position)
+				if _anim and _anim_attack != "":
+					_anim.play(_anim_attack, 0.1)
 				_on_hit(target)
 		else:
 			speed *= 0.5
@@ -425,6 +491,7 @@ func _physics_process(delta: float) -> void:
 	if dir != Vector3.ZERO:
 		rotation.y = atan2(-dir.x, -dir.z)
 	move_and_slide()
+	_update_anim()
 
 
 func _wander(delta: float) -> Vector3:
