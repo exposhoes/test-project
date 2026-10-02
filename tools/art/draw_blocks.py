@@ -226,12 +226,11 @@ def glass(rng):
         for t, c in ((0, f1), (1, f2)):
             px[i, t] = c; px[t, i] = c
             px[i, N - 1 - t] = f2 if t == 0 else f1; px[N - 1 - t, i] = f2 if t == 0 else f1
-    for k in range(7):  # streaks
-        px[5 + k, 12 - k] = hl
-        px[6 + k, 12 - k] = hl
-        px[9 + k, 17 - k] = hx("ffffff", 140)
-    for k in range(4):
-        px[22 + k, 27 - k] = hx("ffffff", 140)
+    # Parlama çizgileri her blokta aynı yerde tekrarlanıp camı desenli gösteriyordu (2026-10-02, Mehmet);
+    # yerine hafif mavi saydam dolgu.
+    for y in range(2, N - 2):
+        for x in range(2, N - 2):
+            px[x, y] = hx("dff2fa", 40)
     return img
 
 
