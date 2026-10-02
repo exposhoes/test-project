@@ -235,6 +235,8 @@ func set_explore() -> void:
 	_hotbar.visible = false
 	_name_label.visible = false
 	_quest_label.visible = false
+	touch.hidden_actions = ["break_block", "place_block", "inventory"]
+	touch.queue_redraw()
 	_show_pause_buttons()
 
 

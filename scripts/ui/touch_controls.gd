@@ -16,6 +16,8 @@ const BUTTONS := [
 
 var move_vector := Vector2.ZERO
 var hud: Hud
+## Gizlenen düğmelerin eylemleri (Şehri Gez: Kır, Koy, Çanta yok).
+var hidden_actions: Array = []
 
 var _joy_finger := -1
 var _joy_origin := Vector2.ZERO
@@ -60,6 +62,8 @@ func _input(event: InputEvent) -> void:
 
 func _on_press(finger: int, pos: Vector2) -> void:
 	for b in BUTTONS:
+		if b["action"] in hidden_actions:
+			continue
 		if pos.distance_to(_button_center(b)) <= b["radius"]:
 			_finger_actions[finger] = b["action"]
 			Input.action_press(b["action"])
@@ -106,6 +110,8 @@ func _button_center(b: Dictionary) -> Vector2:
 func _draw() -> void:
 	var font := get_theme_default_font()
 	for b in BUTTONS:
+		if b["action"] in hidden_actions:
+			continue
 		var pressed: bool = _finger_actions.values().has(b["action"])
 		var center := _button_center(b)
 		draw_circle(center, b["radius"], Color(1, 1, 1, 0.35 if pressed else 0.18))

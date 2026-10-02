@@ -32,20 +32,24 @@ func _draw() -> void:
 	var font := get_theme_default_font()
 	if dim:
 		draw_rect(Rect2(Vector2.ZERO, size), Color(0.03, 0.03, 0.06, 0.75))
-	var total_h := _buttons.size() * (BUTTON_SIZE.y + GAP) - GAP
-	var y := size.y / 2.0 - total_h / 2.0 + 60.0
+	# Çok düğme varsa (kısa ekran) düğmeler kısalır; başlık ekranın üstünden taşmasın.
+	var n := maxi(_buttons.size(), 1)
+	var bh := minf(BUTTON_SIZE.y, (size.y - 230.0 + GAP) / n - GAP)
+	bh = maxf(bh, 44.0)
+	var total_h := n * (bh + GAP) - GAP
+	var y := maxf(size.y / 2.0 - total_h / 2.0 + 60.0, 210.0)
 	var cx := size.x * center_ratio
 	_centered(font, title, 72, y - 140, Color.WHITE, 10)
 	if subtitle != "":
 		_centered(font, subtitle, 22, y - 90, Color(1, 1, 1, 0.8), 5)
 	for b in _buttons:
-		var r := Rect2(Vector2(cx - BUTTON_SIZE.x / 2.0, y), BUTTON_SIZE)
+		var r := Rect2(Vector2(cx - BUTTON_SIZE.x / 2.0, y), Vector2(BUTTON_SIZE.x, bh))
 		b["rect"] = r
 		var danger: bool = b.get("style", "") == "danger"
 		draw_rect(r, Color(0.55, 0.15, 0.15, 0.85) if danger else Color(0.2, 0.45, 0.25, 0.9))
 		draw_rect(r, Color(1, 1, 1, 0.7), false, 3.0)
 		_centered(font, b["label"], 30, r.position.y + r.size.y / 2.0 + 11, Color.WHITE, 4)
-		y += BUTTON_SIZE.y + GAP
+		y += bh + GAP
 
 
 func _centered(font: Font, text: String, font_size: int, baseline: float, color: Color, outline: int) -> void:
