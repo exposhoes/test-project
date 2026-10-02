@@ -23,7 +23,7 @@ const STEEL := Color("9ea7ad")
 
 static func height(id: String) -> float:
 	id = id.get_slice("@", 0)
-	if id.begins_with("araba_"):
+	if id.begins_with("araba_") or id == "polis_araci":
 		return HEIGHTS["araba"]
 	return HEIGHTS.get(id, 1.0)
 
@@ -380,10 +380,11 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, Vector3(0.5, 0.35, 0.065), Vector3(w / 2, 2.9, 0.351), Color("d94b4b"))
 			for s in [[Vector3(0.45, 0.04, 0.04), Vector3(0, 0, 0.25)], [Vector3(0.45, 0.04, 0.04), Vector3(0, 0, 0.7)], [Vector3(0.04, 0.04, 0.45), Vector3(-0.22, 0, 0.47)], [Vector3(0.04, 0.04, 0.45), Vector3(0.22, 0, 0.47)]]:
 				_box(r, s[0], Vector3(w / 2, 2.7, 0.0) + s[1], Color("f27a1a"))
-		"araba", "ambulans", "araba_mavi", "araba_sari", "araba_beyaz", "araba_siyah", "araba_yesil":
+		"araba", "ambulans", "polis_araci", "araba_mavi", "araba_sari", "araba_beyaz", "araba_siyah", "araba_yesil":
 			# Önü +Z. Gövde, kabin, camlar, tekerlekler, farlar, stoplar.
 			var amb := id == "ambulans"
-			var c: Color = Color("f4f4f4") if amb else _tone(id, CAR_TONES.get(id, Color("c62828")))
+			var pol := id == "polis_araci"
+			var c: Color = Color("f4f4f4") if amb or pol else _tone(id, CAR_TONES.get(id, Color("c62828")))
 			_box(r, Vector3(w - 0.2, 0.55, d - 0.15), Vector3(w / 2, 0.55, d / 2), c)  # alt gövde
 			var cab_l := d * (0.7 if amb else 0.5)
 			var cab_z := d * (0.42 if amb else 0.45)
@@ -400,6 +401,11 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				_box(r, Vector3(0.3, 0.14, 0.04), Vector3(sx, 0.65, d - 0.07), Color("fff3b0"))  # far
 				_box(r, Vector3(0.3, 0.12, 0.04), Vector3(sx, 0.65, 0.07), Color("d32f2f"))  # stop
 			_box(r, Vector3(w - 0.5, 0.12, 0.04), Vector3(w / 2, 0.45, d - 0.07), Color("bdbdbd"))  # tampon
+			if pol:
+				for sx in [0.09, w - 0.09]:
+					_box(r, Vector3(0.03, 0.2, d * 0.85), Vector3(sx, 0.65, d / 2), Color("1e4fa8"))
+				_box(r, Vector3(0.3, 0.14, 0.25), Vector3(w / 2 - 0.17, 1.47, cab_z), Color("2e6fd8"))
+				_box(r, Vector3(0.3, 0.14, 0.25), Vector3(w / 2 + 0.17, 1.47, cab_z), Color("d32f2f"))
 			if amb:
 				_box(r, Vector3(0.03, 0.15, d * 0.8), Vector3(0.09, 0.8, d / 2), Color("d32f2f"))
 				_box(r, Vector3(0.03, 0.15, d * 0.8), Vector3(w - 0.09, 0.8, d / 2), Color("d32f2f"))
