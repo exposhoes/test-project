@@ -389,6 +389,7 @@ func _init() -> void:
 	_build_cinema(SETS["sinema"])
 	_build_library(SETS["kutuphane"])
 	_build_gas_station(SETS["benzinlik"])
+	_furnish_new_buildings()
 	_additions()
 	_street_furniture()
 	_street_furniture_2()
@@ -2091,6 +2092,120 @@ func _build_gas_station(o: Vector3i) -> void:
 	_fill(o, Vector3i(16, 0, 2), Vector3i(16, 1, 2), Blocks.TOY_BRICK_BLUE)
 	_lamp(o + Vector3i(-1, 0, 12))
 	_lamp(o + Vector3i(17, 0, 0))
+
+
+## Yeni yapıların iç döşemesi (itfaiye, veteriner, karakol, belediye, sinema, kütüphane, benzinlik):
+## yapıların kabuğu ve ana eşyaları kendi _build_* fonksiyonlarında; buradakiler odaları dolduran eklerdir.
+## Duvar süsleri iç yüzeye konur: kabuk duvarı x=0 ise yüzey 1.0 (süs 1.03), x=N ise yüzey N (süs N-0.03).
+func _furnish_new_buildings() -> void:
+	# İtfaiye: garajda hortum dolabı, kask askılığı, alet tezgâhı, şehir haritası; yatakhanede komodinler,
+	# dinlenme koltuğu, televizyon, dolaplar.
+	var o: Vector3i = SETS["itfaiye"]
+	_prop(o, "yangin_hortumu", Vector3i(8, 0, 5), Vector2i(1, 1), -PI / 2)
+	_prop(o, "kask_askisi", Vector3i(8, 0, 13), Vector2i(1, 2), -PI / 2)
+	_prop(o, "alet_tezgahi", Vector3i(1, 0, 5), Vector2i(1, 3), PI / 2)
+	_prop(o, "koli", Vector3i(1, 0, 12), Vector2i(1, 1))
+	_decor(o, "harita", Vector3(1.03, 2.3, 10.0), PI / 2)
+	_decor(o, "duvar_saati", Vector3(8.97, 2.8, 3.0), -PI / 2)
+	for x in [3, 5]:
+		_prop(o, "komodin", Vector3i(x, 5, 15), Vector2i(1, 1))
+	_prop(o, "koltuk", Vector3i(1, 5, 4), Vector2i(1, 3), PI / 2)
+	_prop(o, "tv", Vector3i(8, 5, 5), Vector2i(1, 2), -PI / 2)
+	_prop(o, "ogrenci_dolabi", Vector3i(8, 5, 12), Vector2i(1, 2), -PI / 2)
+	_prop(o, "bitki", Vector3i(8, 5, 15), Vector2i(1, 1))
+	_decor(o, "sofra", Vector3(3.0, 5.8, 7.5), 0.0)
+	_decor(o, "tablo", Vector3(1.03, 7.2, 11.0), PI / 2)
+	_decor(o, "duvar_saati", Vector3(8.97, 7.6, 7.0), -PI / 2)
+	# Veteriner: beklemede sıra koltuk, sebil, mama rafı; muayenede ilaç dolabı, tartı, serum askısı.
+	o = SETS["veteriner"]
+	_prop(o, "bekleme_koltugu", Vector3i(6, 0, 11), Vector2i(3, 1), PI)
+	_prop(o, "su_sebili", Vector3i(1, 0, 7), Vector2i(1, 1))
+	_prop(o, "market_rafi", Vector3i(7, 0, 7), Vector2i(2, 1), 0.0)
+	_decor(o, "tablo", Vector3(1.03, 2.3, 9.0), PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(10.97, 2.3, 10.5), -PI / 2)
+	_prop(o, "ilac_dolabi", Vector3i(7, 0, 1), Vector2i(1, 1))
+	_prop(o, "tarti", Vector3i(2, 0, 5), Vector2i(1, 1), PI)
+	_prop(o, "serum_askisi", Vector3i(6, 0, 3), Vector2i(1, 1))
+	_prop(o, "sandalye", Vector3i(7, 0, 5), Vector2i(1, 1), PI)
+	_prop(o, "cop_kutusu", Vector3i(9, 0, 5), Vector2i(1, 1))
+	_decor(o, "duvar_saati", Vector3(5.5, 2.6, 1.03), 0.0)
+	# Karakol: bekleme koltukları, dosya kitaplığı, polis dolapları, harita ve pano, danışmada bilgisayar.
+	o = SETS["karakol"]
+	_prop(o, "bekleme_koltugu", Vector3i(3, 0, 7), Vector2i(3, 1), PI)
+	_prop(o, "kitaplik", Vector3i(1, 0, 4), Vector2i(1, 2), PI / 2)
+	_prop(o, "ogrenci_dolabi", Vector3i(13, 0, 6), Vector2i(1, 2), -PI / 2)
+	_prop(o, "su_sebili", Vector3i(1, 0, 7), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(9, 0, 1), Vector2i(1, 1))
+	_decor(o, "bilgisayar", Vector3(7.5, 0.8, 4.5), 0.0)
+	_decor(o, "harita", Vector3(1.03, 2.4, 2.5), PI / 2)
+	_decor(o, "pano", Vector3(13.97, 2.2, 3.0), -PI / 2)
+	# Belediye: toplantı masasına ek sandalyeler, bekleme koltukları, vitrin, kitaplık, pano ve harita;
+	# başkan odasına misafir sandalyeleri, berjer, vitrin, kitaplık, ikinci toplantı masası.
+	o = SETS["belediye"]
+	for x in range(7, 14, 2):
+		_prop(o, "sandalye", Vector3i(x, 0, 10), Vector2i(1, 1))
+		_prop(o, "sandalye", Vector3i(x, 0, 13), Vector2i(1, 1), PI)
+	_prop(o, "bekleme_koltugu", Vector3i(1, 0, 9), Vector2i(1, 3), PI / 2)
+	_prop(o, "su_sebili", Vector3i(1, 0, 13), Vector2i(1, 1), PI / 2)
+	_prop(o, "kitaplik", Vector3i(3, 0, 17), Vector2i(3, 1), PI)
+	_prop(o, "vitrin", Vector3i(18, 0, 10), Vector2i(1, 2), -PI / 2)
+	_prop(o, "saksi", Vector3i(18, 0, 7), Vector2i(1, 1))
+	_decor(o, "bilgisayar", Vector3(16.5, 0.8, 8.5), PI)
+	_decor(o, "pano", Vector3(8.0, 2.2, 17.97), PI)
+	_decor(o, "harita", Vector3(1.03, 2.5, 10.5), PI / 2)
+	for x in [14, 16]:
+		_prop(o, "sandalye", Vector3i(x, 5, 10), Vector2i(1, 1))
+	_prop(o, "berjer", Vector3i(6, 5, 9), Vector2i(1, 1), -PI / 2)
+	_prop(o, "abajur", Vector3i(1, 5, 8), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(18, 5, 8), Vector2i(1, 1))
+	_prop(o, "vitrin", Vector3i(18, 5, 10), Vector2i(1, 2), -PI / 2)
+	_prop(o, "kitaplik", Vector3i(6, 5, 17), Vector2i(4, 1), PI)
+	_prop(o, "yemek_masasi", Vector3i(7, 5, 13), Vector2i(3, 2))
+	for x in [7, 8, 9]:
+		_prop(o, "sandalye", Vector3i(x, 5, 12), Vector2i(1, 1))
+		_prop(o, "sandalye", Vector3i(x, 5, 15), Vector2i(1, 1), PI)
+	_decor(o, "harita", Vector3(1.03, 7.3, 11.5), PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(18.97, 7.3, 14.0), -PI / 2)
+	# Sinema: lobide mısır makinesi, atıştırmalık standı, bekleme koltukları, halı; salonda çöp kutuları.
+	o = SETS["sinema"]
+	_prop(o, "misir_makinesi", Vector3i(9, 0, 1), Vector2i(1, 1))
+	_prop(o, "stant", Vector3i(4, 0, 2), Vector2i(2, 1), 0.0)
+	_prop(o, "bekleme_koltugu", Vector3i(3, 0, 5), Vector2i(3, 1), PI)
+	_prop(o, "cop_kutusu", Vector3i(9, 0, 5), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(14, 0, 5), Vector2i(1, 1))
+	_decor(o, "salon_halisi", Vector3(7.5, 0, 3.0), 0.0)
+	_decor(o, "tablo_kucuk", Vector3(1.03, 2.3, 2.0), PI / 2)
+	_prop(o, "cop_kutusu", Vector3i(1, 0, 7), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(14, 0, 7), Vector2i(1, 1))
+	# Halk kütüphanesi: okuma berjeri, harita ve pano; üst katta okuma koltuğu ve abajur.
+	o = SETS["kutuphane"]
+	_prop(o, "berjer", Vector3i(1, 0, 8), Vector2i(1, 1), PI / 2)
+	_decor(o, "harita", Vector3(1.03, 2.4, 5.5), PI / 2)
+	_decor(o, "pano", Vector3(13.97, 2.2, 3.0), -PI / 2)
+	_prop(o, "koltuk", Vector3i(8, 5, 13), Vector2i(3, 1), PI)
+	_prop(o, "abajur", Vector3i(13, 5, 13), Vector2i(1, 1))
+	_decor(o, "harita", Vector3(13.97, 7.2, 6.0), -PI / 2)
+	# Benzinlik marketi: sepetler ve saat.
+	o = SETS["benzinlik"]
+	_prop(o, "sepetlik", Vector3i(11, 0, 10), Vector2i(1, 1))
+	_decor(o, "duvar_saati", Vector3(13.0, 2.6, 13.97), PI)
+	# Emir'in evi, ikinci tur: salonda ikinci berjer ve tablolar; mutfakta çöp kutusu; banyoda çamaşır
+	# sepeti; çamaşır odasında raf, kurutmalık ve sepet; üst kat oyun köşesinde halı, pufler, sehpa, oyuncaklar.
+	o = SETS["ev"]
+	_prop(o, "berjer", Vector3i(10, 0, 2), Vector2i(1, 1), PI / 2)
+	_decor(o, "tablo", Vector3(12.5, 2.4, 0.03), 0.0)
+	_decor(o, "tablo_kucuk", Vector3(15.0, 2.4, 0.03), 0.0)
+	_prop(o, "cop_kutusu", Vector3i(8, 0, 2), Vector2i(1, 1))
+	_prop(o, "cop_kutusu@f5f5f5", Vector3i(2, 0, -9), Vector2i(1, 1))
+	_prop(o, "kiler_rafi", Vector3i(-8, 0, -7), Vector2i(1, 2), PI / 2)
+	_prop(o, "havluluk", Vector3i(-5, 0, -9), Vector2i(1, 1))
+	_prop(o, "cop_kutusu@4fa3d9", Vector3i(-6, 0, -9), Vector2i(1, 1))
+	_prop(o, "oyuncak_kutusu", Vector3i(-8, 5, -9), Vector2i(1, 1))
+	_prop(o, "sehpa", Vector3i(-6, 5, -7), Vector2i(3, 1))
+	_prop(o, "puf@e84a8a", Vector3i(-3, 5, -6), Vector2i(1, 1))
+	_prop(o, "puf@4fa3d9", Vector3i(-7, 5, -6), Vector2i(1, 1))
+	_decor(o, "oda_halisi", Vector3(-4.5, 5, -6.0), 0.0)
+	_decor(o, "tablo", Vector3(-4.5, 7.2, -8.97), 0.0)
 
 
 ## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
