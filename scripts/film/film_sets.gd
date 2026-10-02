@@ -2250,6 +2250,21 @@ func _furnish_new_buildings() -> void:
 	_prop(o, "bitki", Vector3i(105, 0, 65), Vector2i(1, 1))
 	_prop(o, "bitki", Vector3i(105, 0, 75), Vector2i(1, 1))
 	_prop(o, "cop_kutusu", Vector3i(108, 0, 65), Vector2i(1, 1))
+	# Metro peronları (zemin y -8, eşyalar -7): bilet makineleri, otomat, sıra koltuklar, çöp kutuları,
+	# duvarlarda hat haritası ve pano.
+	_prop(o, "bilet_makinesi", Vector3i(14, -7, -21), Vector2i(1, 1))
+	_prop(o, "otomat", Vector3i(27, -7, -21), Vector2i(1, 1))
+	_prop(o, "bekleme_koltugu", Vector3i(16, -7, -21), Vector2i(3, 1), 0.0)
+	_prop(o, "cop_kutusu", Vector3i(20, -7, -21), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(33, -7, -21), Vector2i(1, 1))
+	_decor(o, "harita", Vector3(17.5, -5.2, -20.97), 0.0)
+	_decor(o, "pano", Vector3(25.0, -5.2, -20.97), 0.0)
+	_prop(o, "bilet_makinesi", Vector3i(28, -7, -9), Vector2i(1, 1), PI)
+	_prop(o, "bekleme_koltugu", Vector3i(15, -7, -9), Vector2i(3, 1), PI)
+	_prop(o, "cop_kutusu", Vector3i(13, -7, -9), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(33, -7, -9), Vector2i(1, 1))
+	_decor(o, "harita", Vector3(16.5, -5.2, -8.03), PI)
+	_decor(o, "pano", Vector3(8.0, -5.2, -8.03), PI)
 
 
 ## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
