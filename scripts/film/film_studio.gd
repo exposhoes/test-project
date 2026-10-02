@@ -52,6 +52,9 @@ var _title := Label.new()
 const LOGO_ONLY := true
 const LOGO_PATH := "res://assets/textures/logo/emircraft_logo.png"
 var _logo := TextureRect.new()
+## Kapanış logosunun iki yanında zil ve beğen simgeleri (kanal tanıtımı, "icons": true).
+const ICON_PATHS := ["res://assets/textures/logo/simge_begen.png", "res://assets/textures/logo/simge_zil.png"]
+var _icons: Array[TextureRect] = []
 var _bars: Array[ColorRect] = []
 var _look := Vector3.ZERO
 var _cam_tween: Tween
@@ -193,9 +196,14 @@ func _run(s: Dictionary) -> void:
 		play_sfx("baslik")
 		_hide_dialogue()
 		_show_title(s["title"])
+		if s.get("icons", false):
+			_show_icons()
 		await _wait(s.get("t", 2.0))
 		_title.visible = false
 		_logo.visible = false
+		for ic in _icons:
+			ic.queue_free()
+		_icons.clear()
 	elif s.has("place"):
 		var a := _actor(s["place"])
 		a.visible = true
@@ -732,6 +740,31 @@ func _show_title(text: String) -> void:
 		text = "EmirCRAFT"
 	_title.text = text
 	_title.visible = true
+
+
+## Logonun solunda beğen, sağında zil; küçükten büyüyerek gelir ve hafifçe sallanır.
+func _show_icons() -> void:
+	for i in ICON_PATHS.size():
+		if not ResourceLoader.exists(ICON_PATHS[i]):
+			continue
+		var ic := TextureRect.new()
+		ic.texture = load(ICON_PATHS[i])
+		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ic.anchor_left = 0.02 if i == 0 else 0.86
+		ic.anchor_right = ic.anchor_left + 0.12
+		ic.anchor_top = 0.08
+		ic.anchor_bottom = 0.28
+		_ui.add_child(ic)
+		ic.resized.connect(func() -> void: ic.pivot_offset = ic.size / 2.0)
+		ic.scale = Vector2.ZERO
+		var tw := ic.create_tween()
+		tw.tween_interval(0.25 * i)
+		tw.tween_property(ic, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tw.tween_property(ic, "rotation", 0.15, 0.25)
+		tw.tween_property(ic, "rotation", -0.15, 0.25)
+		tw.tween_property(ic, "rotation", 0.0, 0.25)
+		_icons.append(ic)
 
 
 func _hide_dialogue() -> void:
