@@ -390,6 +390,9 @@ func _init() -> void:
 	_build_library(SETS["kutuphane"])
 	_build_gas_station(SETS["benzinlik"])
 	_furnish_new_buildings()
+	_additions()
+	_street_furniture()
+	_street_furniture_2()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -1350,7 +1353,7 @@ func _build_school(o: Vector3i) -> void:
 		_prop(o, "sandalye", Vector3i(x, 0, -4), Vector2i(1, 1), PI)
 	_fill(o, Vector3i(24, 0, -8), Vector3i(24, 1, -6), Blocks.BOOKSHELF)
 	_prop(o, "bitki", Vector3i(24, 0, -2), Vector2i(1, 1))
-	_decor(o, "tablo", Vector3(21.5, 2.4, -8.97), 0.0)
+	_decor(o, "tablo", Vector3(21.5, 2.4, -7.97), 0.0)
 	# Müdür odası.
 	_prop(o, "ogretmen_masasi", Vector3i(10, 0, -7), Vector2i(2, 1))
 	_prop(o, "koltuk", Vector3i(12, 0, -8), Vector2i(2, 1))
@@ -1378,7 +1381,7 @@ func _build_school(o: Vector3i) -> void:
 	_prop(o, "oyuncak_kutusu", Vector3i(14, 5, -3), Vector2i(1, 1))
 	# Resim odasının duvarlarında çocukların resimleri (yazısız).
 	for x in [2.0, 5.0, 9.0, 12.0]:
-		_decor(o, "tablo_kucuk", Vector3(x, 6.8, -8.97), 0.0)
+		_decor(o, "tablo_kucuk", Vector3(x, 6.8, -7.97), 0.0)
 	# Kütüphane.
 	_fill(o, Vector3i(24, 5, -8), Vector3i(24, 6, 10), Blocks.BOOKSHELF)
 	_fill(o, Vector3i(22, 5, -7), Vector3i(22, 6, -3), Blocks.BOOKSHELF)
@@ -1405,11 +1408,20 @@ func _build_school(o: Vector3i) -> void:
 	_fill(o, Vector3i(-13, -1, -7), Vector3i(-3, -1, 10), Blocks.CONCRETE)
 	_walls(o, Vector3i(-12, -1, -6), Vector3i(-4, -1, 9), Blocks.SNOW)
 	_fill(o, Vector3i(-12, -1, 1), Vector3i(-4, -1, 2), Blocks.SNOW)
-	_fill(o, Vector3i(-11, -1, -5), Vector3i(-5, -1, 0), Blocks.CONCRETE)
-	_fill(o, Vector3i(-11, -1, 3), Vector3i(-5, -1, 8), Blocks.CONCRETE)
+	_fill(o, Vector3i(-11, -1, -5), Vector3i(-5, -1, 0), Blocks.ASPHALT)
+	_fill(o, Vector3i(-11, -1, 3), Vector3i(-5, -1, 8), Blocks.ASPHALT)
+	# Kırmızı boyalı potaaltı alanları ve orta yuvarlak.
+	_fill(o, Vector3i(-9, -1, -5), Vector3i(-7, -1, -2), Blocks.TOY_BRICK_RED)
+	_fill(o, Vector3i(-9, -1, 5), Vector3i(-7, -1, 8), Blocks.TOY_BRICK_RED)
+	_fill(o, Vector3i(-9, -1, 0), Vector3i(-7, -1, 0), Blocks.TOY_BRICK_BLUE)
+	_fill(o, Vector3i(-9, -1, 3), Vector3i(-7, -1, 3), Blocks.TOY_BRICK_BLUE)
 	_prop(o, "basket_potasi", Vector3i(-8, 0, -7), Vector2i(1, 1))
 	_prop(o, "basket_potasi", Vector3i(-8, 0, 10), Vector2i(1, 1), PI)
 	_prop(o, "bank", Vector3i(-2, 0, -2), Vector2i(1, 3), -PI / 2)
+	# Çatıda güneş panelleri.
+	for x in range(1, 24, 4):
+		_fill(o, Vector3i(x, 10, -7), Vector3i(x + 2, 10, -5), Blocks.TOY_BRICK_BLUE)
+		_fill(o, Vector3i(x, 10, 5), Vector3i(x + 2, 10, 8), Blocks.TOY_BRICK_BLUE)
 	# Çit (önde iki giriş).
 	for x in range(-14, 26):
 		if x != 7 and x != 16 and x != 17:
@@ -1848,7 +1860,7 @@ func _build_vet(o: Vector3i) -> void:
 	_prop(o, "kopek", Vector3i(3, 0, 9), Vector2i(1, 1), PI / 2)
 	_prop(o, "bitki", Vector3i(1, 0, 11), Vector2i(1, 1))
 	_prop(o, "bitki", Vector3i(10, 0, 11), Vector2i(1, 1))
-	_decor(o, "tablo", Vector3(0.03, 2.3, 9.0), PI / 2)
+	_decor(o, "tablo", Vector3(1.03, 2.3, 9.0), PI / 2)
 	_decor(o, "duvar_saati", Vector3(6.0, 2.6, 6.97), PI)
 	# Muayene odası ve kafesler.
 	_prop(o, "muayene_masasi", Vector3i(4, 0, 2), Vector2i(2, 1))
@@ -1945,7 +1957,7 @@ func _build_town_hall(o: Vector3i) -> void:
 	_prop(o, "bitki", Vector3i(18, 0, 17), Vector2i(1, 1))
 	_prop(o, "kitaplik", Vector3i(1, 0, 15), Vector2i(1, 2), PI / 2)
 	_decor(o, "tablo", Vector3(9.5, 2.5, 17.97), PI)
-	_decor(o, "tablo_kucuk", Vector3(0.03, 2.4, 12.0), PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(1.03, 2.4, 12.0), PI / 2)
 	# Merdiven (x 14..18, z 16..17).
 	for k in 5:
 		_fill(o, Vector3i(14 + k, 0, 16), Vector3i(14 + k, k, 17), Blocks.PLANKS)
@@ -2045,7 +2057,7 @@ func _build_library(o: Vector3i) -> void:
 	for z in [3, 4]:
 		_prop(o, "sandalye", Vector3i(9, 5, z), Vector2i(1, 1), PI / 2)
 		_prop(o, "sandalye", Vector3i(12, 5, z), Vector2i(1, 1), -PI / 2)
-	_decor(o, "tablo", Vector3(0.03, 7.3, 6.0), PI / 2)
+	_decor(o, "tablo", Vector3(1.03, 7.3, 6.0), PI / 2)
 	_lamp(o + Vector3i(-1, 0, -2))
 	_lamp(o + Vector3i(15, 0, -2))
 
@@ -2176,3 +2188,154 @@ func _furnish_new_buildings() -> void:
 	o = SETS["benzinlik"]
 	_prop(o, "sepetlik", Vector3i(11, 0, 10), Vector2i(1, 1))
 	_decor(o, "duvar_saati", Vector3(13.0, 2.6, 13.97), PI)
+
+
+## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
+## hastane helipadı ve ikinci ambulans, Emir'in bahçesinde köpek kulübesi ve süs havuzu,
+## bakkal önünde otomat ve geri dönüşüm kutuları, oyun alanının arkasında trambolin, tırmanma
+## duvarı, örümcek ağı ve evcil hayvan alanı, sahada yedek kulübeleri, tribün ve skor tabelası,
+## caminin minarelerinde gece ışıkları.
+func _additions() -> void:
+	# Hastane: çatıda helipad (sarı halka, beyaz H), önde ikinci ambulans park yeri.
+	var h: Vector3i = SETS["hastane"]
+	_fill(h, Vector3i(2, 4, -5), Vector3i(10, 4, 7), Blocks.CONCRETE)
+	_walls(h, Vector3i(3, 4, -3), Vector3i(9, 4, 5), Blocks.TOY_BRICK_YELLOW)
+	for c in [Vector3i(5, 4, -1), Vector3i(5, 4, 0), Vector3i(5, 4, 1), Vector3i(5, 4, 2), Vector3i(5, 4, 3),
+			Vector3i(7, 4, -1), Vector3i(7, 4, 0), Vector3i(7, 4, 1), Vector3i(7, 4, 2), Vector3i(7, 4, 3), Vector3i(6, 4, 1)]:
+		_put(h + c, Blocks.SNOW)
+	_fill(h, Vector3i(13, -1, 11), Vector3i(15, -1, 16), Blocks.ASPHALT)
+	_fill(h, Vector3i(13, -1, 11), Vector3i(13, -1, 16), Blocks.ROAD_LINE)
+	_prop(h, "ambulans", Vector3i(14, 0, 11), Vector2i(2, 4), PI)
+	# Emir'in evi: köpek kulübesi ve köpek, süs havuzu.
+	var e: Vector3i = SETS["ev"]
+	_walls(e, Vector3i(22, 0, 7), Vector3i(23, 1, 8), Blocks.PLANKS)
+	_put(e + Vector3i(22, 0, 8), Blocks.AIR)
+	_fill(e, Vector3i(22, 2, 7), Vector3i(23, 2, 8), Blocks.ROOF_TERRACOTTA)
+	_prop(e, "kopek", Vector3i(22, 0, 9), Vector2i(1, 1))
+	_fill(e, Vector3i(13, -1, 12), Vector3i(16, -1, 14), Blocks.STONE_BASE)
+	_fill(e, Vector3i(14, -1, 13), Vector3i(15, -1, 13), Blocks.TOY_BRICK_BLUE)
+	_put(e + Vector3i(13, 0, 12), Blocks.FLOWERS)
+	_put(e + Vector3i(16, 0, 14), Blocks.FLOWERS)
+	# Bakkal önü: atıştırmalık otomatı, mavi-sarı-yeşil geri dönüşüm kutuları.
+	var b: Vector3i = SETS["bakkal"]
+	_prop(b, "otomat", Vector3i(10, 0, 11), Vector2i(1, 1))
+	for k in 3:
+		_prop(b, "cop_kutusu@" + ["2e6fd8", "f2c12e", "3f9f4f"][k], Vector3i(-1 + k, 0, 12), Vector2i(1, 1))
+	# Oyun alanının arkası: trambolin, tırmanma duvarı, örümcek ağı, evcil hayvan alanı.
+	var g: Vector3i = SETS["oyun"]
+	_fill(g, Vector3i(0, -1, 12), Vector3i(15, -1, 22), Blocks.SAND)
+	_prop(g, "trambolin", Vector3i(1, 0, 13), Vector2i(3, 3))
+	var holds := [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_YELLOW, Blocks.TOY_BRICK_BLUE]
+	for y in 4:
+		for x in range(6, 10):
+			_put(g + Vector3i(x, y, 21), holds[posmod(x + y, 3)] if (x + y) % 2 == 0 else Blocks.PLANKS)
+	for y in range(0, 4):
+		_put(g + Vector3i(12 - y, y, 14 + y), Blocks.BALCONY_RAIL)
+		_put(g + Vector3i(12 + y, y, 14 + y), Blocks.BALCONY_RAIL)
+	_fill(g, Vector3i(12, 4, 17), Vector3i(12, 4, 17), Blocks.TOY_BRICK_RED)
+	_walls(g, Vector3i(0, 0, 18), Vector3i(4, 0, 22), Blocks.FENCE_WHITE)
+	_put(g + Vector3i(4, 0, 20), Blocks.AIR)
+	_prop(g, "kopek", Vector3i(2, 0, 20), Vector2i(1, 1), PI / 2)
+	_prop(g, "bank", Vector3i(6, 0, 18), Vector2i(2, 1))
+	# Futbol sahası: iki yedek kulübesi, tribün ve skor tabelası.
+	var f: Vector3i = SETS["saha"]
+	for x0 in [4, 14]:
+		_fill(f, Vector3i(x0, 0, -3), Vector3i(x0 + 4, 2, -3), Blocks.PLANKS)
+		_fill(f, Vector3i(x0, 0, -3), Vector3i(x0, 2, -2), Blocks.PLANKS)
+		_fill(f, Vector3i(x0 + 4, 0, -3), Vector3i(x0 + 4, 2, -2), Blocks.PLANKS)
+		_fill(f, Vector3i(x0, 3, -3), Vector3i(x0 + 4, 3, -1), Blocks.TOY_BRICK_BLUE)
+		_fill(f, Vector3i(x0 + 1, 0, -2), Vector3i(x0 + 3, 0, -2), Blocks.DARK_PLANKS)
+	for k in 3:
+		_fill(f, Vector3i(2, k, 17 + k), Vector3i(20, k, 17 + k), [Blocks.TOY_BRICK_RED, Blocks.SNOW, Blocks.TOY_BRICK_RED][k])
+	_fill(f, Vector3i(16, 3, 20), Vector3i(20, 5, 20), Blocks.ASPHALT)
+	for c in [Vector3i(17, 4, 19), Vector3i(19, 4, 19)]:
+		_put(f + c, Blocks.TOY_BRICK_YELLOW)
+	_fill(f, Vector3i(18, 0, 20), Vector3i(18, 2, 20), Blocks.STONE)
+	# Cami: minare uçlarında ve kubbe çevresinde gece ışıkları.
+	var m := Vector3i(-6, Y0, -54)
+	for mx in [-2, 17]:
+		var t := m + Vector3i(mx, 0, 13)
+		for d in [Vector3i(1, 15, 0), Vector3i(-1, 15, 0), Vector3i(0, 15, 1), Vector3i(0, 15, -1), Vector3i(0, 23, 0)]:
+			_put(t + d, Blocks.LANTERN)
+	for d in [Vector3i(1, 8, 1), Vector3i(14, 8, 1), Vector3i(1, 8, 12), Vector3i(14, 8, 12), Vector3i(7, 16, 6)]:
+		_put(m + d, Blocks.LANTERN)
+
+
+## Sokak düzenlemeleri ve kent donatısı: okul ve hastane önünde zebra geçitleri ve trafik ışıkları,
+## caddelerde otobüs durakları (camlı, çatılı, banklı; tabelada yalnız hat numarası rengi), mavi bisiklet
+## yolu, Emir'in evi ve oyun alanı önünde hız kesiciler, köşelerde geri dönüşüm kutuları, rögar kapakları.
+func _street_furniture() -> void:
+	var o := Vector3i(0, Y0, 0)
+	# Zebra geçitleri (cadde z 25..28 üzerinde) ve iki yanında trafik ışıkları.
+	for cx in [58, -34, 2]:
+		for z in range(25, 29):
+			for x in range(cx, cx + 4):
+				if z % 2 == 1:
+					_put(o + Vector3i(x, -1, z), Blocks.SNOW)
+		_prop(o, "trafik_isigi", Vector3i(cx - 1, 0, 23), Vector2i(1, 1))
+		_prop(o, "trafik_isigi", Vector3i(cx + 4, 0, 30), Vector2i(1, 1), PI)
+	# Bisiklet yolu: kuzey caddenin güney kaldırımında mavi şerit.
+	for x in range(CITY_MIN.x, CITY_MAX.x + 1):
+		if not _near_street(x) and _blocks.get(o + Vector3i(x, -1, 23), -1) == Blocks.SIDEWALK:
+			_put(o + Vector3i(x, -1, 23), Blocks.TOY_BRICK_BLUE)
+	# Hız kesiciler: sarı-siyah şeritler.
+	for bx in [-6, 12, 86]:
+		for z in range(25, 29):
+			_put(o + Vector3i(bx, -1, z), Blocks.TOY_BRICK_YELLOW if z % 2 == 0 else Blocks.ASPHALT)
+	# Otobüs durakları.
+	for st in [[Vector3i(20, 0, 29), 0], [Vector3i(-50, 0, 29), 1], [Vector3i(45, 0, -20), 2], [Vector3i(20, 0, 62), 0]]:
+		_bus_stop(st[0], st[1])
+	# Geri dönüşüm kutuları ve rögar kapakları.
+	for p in [Vector3i(-12, 0, 22), Vector3i(31, 0, 22), Vector3i(-12, 0, -19), Vector3i(31, 0, -19), Vector3i(73, 0, 22), Vector3i(73, 0, 31)]:
+		for k in 3:
+			_prop(o, "cop_kutusu@" + ["2e6fd8", "f2c12e", "3f9f4f"][k], p + Vector3i(k, 0, 0), Vector2i(1, 1))
+	for x in range(CITY_MIN.x + 9, CITY_MAX.x, 23):
+		if not _near_street(x):
+			for az: int in AVENUES_Z:
+				_put(o + Vector3i(x, -1, az + 1), Blocks.STONE_BASE)
+
+
+## Sokakların ikinci turu: tek yön okları, gazete büfeleri, simgeli yön tabelaları, kamelyalar, çalılar.
+func _street_furniture_2() -> void:
+	var o := Vector3i(0, Y0, 0)
+	# Tek yön okları (beyaz, asfalt üstünde): hastane çevresindeki sokakta kuzeye doğru.
+	for z0 in [-8, 6]:
+		var c := Vector3i(-14, -1, z0)
+		for k in 4:
+			_put(o + c + Vector3i(0, 0, k), Blocks.SNOW)
+		_put(o + c + Vector3i(-1, 0, 2), Blocks.SNOW)
+		_put(o + c + Vector3i(1, 0, 2), Blocks.SNOW)
+	# Gazete büfeleri.
+	for p in [Vector3i(40, 0, 29), Vector3i(-28, 0, -20)]:
+		_walls(o, p, p + Vector3i(2, 2, 1), Blocks.TOY_BRICK_BLUE)
+		_fill(o, p + Vector3i(0, 1, 0), p + Vector3i(2, 1, 0), Blocks.GLASS)
+		_fill(o, p + Vector3i(-1, 3, -1), p + Vector3i(3, 3, 2), Blocks.TOY_BRICK_YELLOW)
+	# Yön tabelaları (yazısız simgeler): hastane kırmızı artı, okul sarı kitap, cami hilal yerine yeşil kubbe.
+	for sg in [[Vector3i(-14, 0, 22), Blocks.TOY_BRICK_RED], [Vector3i(29, 0, 22), Blocks.TOY_BRICK_YELLOW], [Vector3i(2, 0, -19), Blocks.TOY_BRICK_BLUE]]:
+		var p: Vector3i = sg[0]
+		_fill(o, p, p + Vector3i(0, 2, 0), Blocks.STONE)
+		_fill(o, p + Vector3i(0, 3, 0), p + Vector3i(2, 3, 0), Blocks.SNOW)
+		_put(o + p + Vector3i(1, 3, 0), sg[1])
+		_put(o + p + Vector3i(3, 3, 0), sg[1])
+	# Kamelyalar: dört direk, kiremit çatı, ortada bank.
+	for p in [Vector3i(-40, 0, 47), Vector3i(22, 0, 47)]:
+		for d in [Vector3i(0, 0, 0), Vector3i(3, 0, 0), Vector3i(0, 0, 3), Vector3i(3, 0, 3)]:
+			_fill(o, p + d, p + d + Vector3i(0, 2, 0), Blocks.LOG)
+		_fill(o, p + Vector3i(-1, 3, -1), p + Vector3i(4, 3, 4), Blocks.ROOF_TERRACOTTA)
+		_put(o + p + Vector3i(1, 4, 1), Blocks.ROOF_TERRACOTTA)
+		_put(o + p + Vector3i(2, 4, 2), Blocks.ROOF_TERRACOTTA)
+		_prop(o, "bank", p + Vector3i(1, 0, 1), Vector2i(2, 1))
+		_prop(o, "yemek_masasi", p + Vector3i(1, 0, 2), Vector2i(2, 1))
+
+
+## Otobüs durağı (köşesi p, x boyunca 4 blok): arka cam, çatı, bank, renkli hat tabelası direği.
+func _bus_stop(p: Vector3i, line: int) -> void:
+	var o := Vector3i(0, Y0, 0)
+	_fill(o, p + Vector3i(0, 0, 1), p + Vector3i(3, 2, 1), Blocks.GLASS)
+	_fill(o, p + Vector3i(0, 3, -1), p + Vector3i(3, 3, 1), Blocks.TOY_BRICK_RED if line == 0 else (Blocks.TOY_BRICK_BLUE if line == 1 else Blocks.TOY_BRICK_YELLOW))
+	_put(o + p + Vector3i(0, 0, -1), Blocks.STONE)
+	_put(o + p + Vector3i(0, 1, -1), Blocks.STONE)
+	_put(o + p + Vector3i(0, 2, -1), Blocks.STONE)
+	_prop(o, "bank", p + Vector3i(1, 0, 0), Vector2i(2, 1), PI)
+	_fill(o, p + Vector3i(4, 0, 0), p + Vector3i(4, 2, 0), Blocks.STONE)
+	_put(o + p + Vector3i(4, 3, 0), [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_BLUE, Blocks.TOY_BRICK_YELLOW][line])
