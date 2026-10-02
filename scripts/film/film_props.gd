@@ -992,6 +992,7 @@ const DECOR_SIZE := {
 	"ray": Vector3(8.0, 0.08, 1.2), "metro_m": Vector3(1.2, 1.2, 0.1), "havalimani_logo": Vector3(4.0, 1.6, 0.1), "tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
 	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "buyuk_saat": Vector3(2.2, 2.2, 0.1), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 	"pano": Vector3(1.8, 1.1, 0.04), "harita": Vector3(1.5, 1.0, 0.03), "sofra": Vector3(1.6, 0.12, 0.7),
+	"ucus_tabelasi": Vector3(2.6, 1.5, 0.08),
 }
 
 
@@ -1110,6 +1111,15 @@ static func build_decor(id: String) -> Node3D:
 				_box(root, Vector3(0.08, 0.11, 0.08), Vector3(sx + 0.22, 0.055, -0.15), Color("bfe3f2"))
 			_box(root, Vector3(0.12, 0.2, 0.12), Vector3(0, 0.1, -0.05), Color("7fc4e8"))
 			_box(root, Vector3(0.1, 0.08, 0.06), Vector3(0, 0.04, 0.2), Color("d94b4b"))
+		"ucus_tabelasi":
+			# Yazısız uçuş bilgi ekranı: koyu pano, satır satır sarı/beyaz çizgiler ve yeşil/kırmızı durum ışıkları.
+			_box(root, size, Vector3.ZERO, Color("20262b"))
+			for k in 6:
+				var ry := size.y / 2 - 0.2 - k * 0.22
+				_box(root, Vector3(0.3, 0.1, 0.01), Vector3(-size.x / 2 + 0.3, ry, 0.045), Color("ffd23f"))
+				_box(root, Vector3(1.1 - (k % 3) * 0.2, 0.1, 0.01), Vector3(-0.15 - (k % 3) * 0.1, ry, 0.045), Color("f5f5f5"))
+				_box(root, Vector3(0.35, 0.1, 0.01), Vector3(size.x / 2 - 0.65, ry, 0.045), Color("f5f5f5"))
+				_box(root, Vector3(0.12, 0.1, 0.01), Vector3(size.x / 2 - 0.2, ry, 0.045), Color("e53935") if k == 2 else Color("43a047"))
 		_:
 			_box(root, size, Vector3(0, size.y / 2, 0), WOOD)
 	return root

@@ -2278,6 +2278,29 @@ func _furnish_new_buildings() -> void:
 	_prop(o, "cop_kutusu", Vector3i(33, -7, -9), Vector2i(1, 1))
 	_decor(o, "harita", Vector3(16.5, -5.2, -8.03), PI)
 	_decor(o, "pano", Vector3(8.0, -5.2, -8.03), PI)
+	# Havalimanı terminali: kafe köşesi (vitrin, kasa, masalar), mağaza standları, uçuş tabelaları,
+	# dünya haritası, saksılar, çöp kutuları.
+	o = SETS["havalimani"]
+	_prop(o, "pasta_vitrini", Vector3i(11, 0, 1), Vector2i(3, 1), 0.0)
+	_prop(o, "kasa", Vector3i(14, 0, 1), Vector2i(1, 1), 0.0)
+	_prop(o, "icecek_dolabi", Vector3i(15, 0, 1), Vector2i(1, 1), 0.0)
+	_table4(o, Vector3i(11, 0, 5))
+	_table4(o, Vector3i(15, 0, 5))
+	_decor(o, "sofra", Vector3(12.0, 0.8, 5.5), 0.0)
+	_decor(o, "sofra", Vector3(16.0, 0.8, 5.5), 0.0)
+	_prop(o, "stant", Vector3i(2, 0, 3), Vector2i(3, 1), 0.0)
+	_prop(o, "stant", Vector3i(6, 0, 3), Vector2i(3, 1), 0.0)
+	_prop(o, "market_rafi", Vector3i(1, 0, 1), Vector2i(4, 1), 0.0)
+	_prop(o, "sepetlik", Vector3i(6, 0, 1), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(18, 0, 1), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(22, 0, 13), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(1, 0, 13), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(17, 0, 13), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(24, 0, 6), Vector2i(1, 1))
+	_decor(o, "ucus_tabelasi", Vector3(39.97, 4.0, 4.0), -PI / 2)
+	_decor(o, "ucus_tabelasi", Vector3(1.03, 4.0, 8.0), PI / 2)
+	_decor(o, "harita", Vector3(39.97, 2.3, 10.5), -PI / 2)
+	_decor(o, "duvar_saati", Vector3(1.03, 4.2, 11.0), PI / 2)
 
 
 ## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
