@@ -468,6 +468,9 @@ func play_sfx(name: String) -> void:
 ## Arka plan müziği ("neseli", "gerilim", "duygusal"); "" müziği durdurur.
 func play_music(name: String) -> void:
 	var st := _audio("music", name) if name != "" and not fast else null
+	# Bölüme özel müzik henüz indirilmediyse varsayılan neşeli müzik çalsın.
+	if st == null and name != "" and not fast:
+		st = _audio("music", "neseli")
 	if st == null:
 		_music.stop()
 		return
