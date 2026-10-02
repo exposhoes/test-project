@@ -51,6 +51,11 @@ func speak(actor_id: String, text: String, episode_id: String, line: int) -> boo
 	return true
 
 
+## Çalan repliğin süresi (saniye); ses yoksa 0.
+func length() -> float:
+	return _player.stream.get_length() if _player.playing and _player.stream else 0.0
+
+
 func speaking() -> bool:
 	return _player.playing or (_voice_id != "" and DisplayServer.tts_is_speaking())
 

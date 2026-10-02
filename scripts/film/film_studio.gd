@@ -226,7 +226,9 @@ func _run(s: Dictionary) -> void:
 		if s.get("t", 0.0) > 0:
 			await _wait(s["t"])
 	elif s.has("say"):
-		_hold_cam = s.get("keep_cam", false)
+		_hold_cam = s.get("keep_cam", false) or s.has("cuts")
+		if s.has("cuts"):
+			_run_cuts(s["cuts"], s["text"])
 		await _say(s["say"], s["text"])
 		_hold_cam = false
 	elif s.has("walk"):
@@ -274,6 +276,26 @@ func _run(s: Dictionary) -> void:
 		tw.tween_property(camera, "position", base, 0.05)
 		if not fast:
 			await tw.finished
+
+
+## Replik sürerken anlatılan yerlere kesme: "cuts": [[oran, kamera, bakış], ...]; oran 0-1,
+## repliğin sesinin o noktasında kamera o yere geçer (ör. "Tramvay, park, AVM" derken her birini göster).
+func _run_cuts(cuts: Array, text: String) -> void:
+	await get_tree().process_frame
+	var total := voice.length()
+	if total <= 0.0:
+		total = maxf(READ_MIN, text.length() * READ_PER_CHAR)
+	var done := 0.0
+	for c: Array in cuts:
+		var at := float(c[0]) * total
+		var target := FilmSets.point(c[2])
+		if not fast:
+			await _wait(maxf(0.0, at - done))
+		done = at
+		world.update_center(target)
+		while not fast and not world.is_meshed_at(target):
+			await get_tree().process_frame
+		_move_camera(FilmSets.point(c[1]), target + Vector3(0, LOOK_HEIGHT, 0), 0.0)
 
 
 func _say(id: String, text: String) -> void:

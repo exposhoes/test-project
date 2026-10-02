@@ -86,21 +86,25 @@ const LIST := [
 			# 6. Hastane.
 			{"sfx": "vuup"},
 			{"hide": "bakkal"},
-			{"hide": "ali"},
 			{"place": "doktor", "at": "hastane.kapi_onu", "look": "hastane.dis"},
 			{"place": "emir", "at": "hastane.dis", "look": "hastane.kapi_onu"},
+			# Doktor "Dikkatli oynayın çocuklar" diyor: Ali ve Zeynep de Emir'in yanında.
+			{"place": "ali", "at": Vector3(-34.6, 11, 14.8), "look": "hastane.kapi_onu"},
+			{"place": "zeynep", "at": Vector3(-32.4, 11, 14.8), "look": "hastane.kapi_onu"},
 			{"cam": Vector3(-29.5, 13.0, 12.5), "look": Vector3(-33.5, 11.0, 12.5), "t": 0},  # yandan, yakın ve sabit
 			{"say": "emir", "text": "Dizimizi kanatınca Doktor Amca bizi hemen iyileştirir.", "keep_cam": true},
 			{"say": "doktor", "text": "Dikkatli oynayın çocuklar. Ama korkmayın, ben buradayım!", "keep_cam": true},
 			# 7. Şehir turu: hızlı geçişler (Emir sesi üstte).
 			{"hide": "doktor"},
 			{"hide": "emir"},
+			{"hide": "ali"},
+			{"hide": "zeynep"},
 			{"sfx": "tramvay"},
 			{"cam": Vector3(2.0, 15.0, 33.0), "look": Vector3(10.0, 12.0, 26.0), "t": 0},
-			{"say": "emir", "text": "Şehrimizde daha neler var neler! Tramvay, kocaman bir park, alışveriş merkezi...", "keep_cam": true},
-			{"sfx": "vuup"},
-			{"cam": "park.kam_park_genel", "look": "park.havuz", "t": 0},
-			{"wait": 2.0},
+			# Emir saydıkça kamera o yere geçer: tramvay, park, alışveriş merkezi.
+			{"say": "emir", "text": "Şehrimizde daha neler var neler! Tramvay, kocaman bir park, alışveriş merkezi...",
+				"cuts": [[0.55, "park.kam_park_genel", "park.havuz"], [0.78, "avm.kam_genel", "avm.giris"]]},
+			{"wait": 1.0},
 			# Yan karakterler (konuşmadan, el sallayarak): itfaiyeci, polis, bahçede Fındık.
 			{"sfx": "vuup"},
 			{"place": "itfaiyeci", "at": "itfaiye.giris", "look": "itfaiye.kam_dis"},
@@ -120,15 +124,13 @@ const LIST := [
 			{"sfx": "hav"},
 			{"wait": 1.8},
 			{"hide": "findik"},
-			{"sfx": "vuup"},
-			{"cam": "avm.kam_genel", "look": "avm.giris", "t": 0},
-			{"wait": 1.2},
 			{"sfx": "ucak"},
 			{"cam": "havalimani.kam_pist", "look": "havalimani.pist", "t": 0},
-			{"say": "emir", "text": "Uçakların kalktığı bir havalimanı, hatta masmavi bir deniz bile var!", "keep_cam": true},
+			# "masmavi bir deniz" derken sahile geçer.
+			{"say": "emir", "text": "Uçakların kalktığı bir havalimanı, hatta masmavi bir deniz bile var!",
+				"cuts": [[0.55, "sahil.kam_fener", "sahil.plaj"]]},
 			{"sfx": "sahil"},
-			{"cam": "sahil.kam_fener", "look": "sahil.plaj", "t": 0},
-			{"wait": 1.2},
+			{"wait": 1.0},
 			# 8. Kapanış: sahil.
 			{"place": "emir", "at": "sahil.plaj", "look": "sahil.kam_genel"},
 			{"place": "ali", "at": Vector3(107.0, 11, 9.5), "look": "sahil.kam_genel"},
