@@ -58,6 +58,7 @@ enum {
 	BALCONY_RAIL,
 	FENCE_WHITE,
 	TILE_BATH,
+	WATER,
 }
 
 ## Yüz yönleri: +X, -X, +Y, -Y, +Z, -Z
@@ -118,11 +119,13 @@ const DEFS := {
 	BALCONY_RAIL: {"name": "Balkon Korkuluğu", "top": "trim_white", "side": "balcony_rail", "bottom": "trim_white", "transparent": true},
 	FENCE_WHITE: {"name": "Beyaz Çit", "top": "fence_white", "side": "fence_white", "bottom": "fence_white", "transparent": true},
 	TILE_BATH: {"name": "Banyo Fayansı", "all": "tile_bath"},
+	WATER: {"name": "Su", "all": "water"},
 }
 
 ## Görsel gelene kadar kullanılan geçici renkler (doku adı -> renk).
 const PLACEHOLDER_COLORS := {
 	"grass_top": Color("5da83a"),
+	"water": Color("3d8fd1"),
 	"grass_side": Color("7a5230"),
 	"dirt": Color("7a5230"),
 	"stone": Color("7d7d7d"),

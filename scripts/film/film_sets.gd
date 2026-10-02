@@ -392,6 +392,7 @@ func _init() -> void:
 	_additions()
 	_street_furniture()
 	_street_furniture_2()
+	_river()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -2123,22 +2124,20 @@ func _additions() -> void:
 	_prop(b, "otomat", Vector3i(10, 0, 11), Vector2i(1, 1))
 	for k in 3:
 		_prop(b, "cop_kutusu@" + ["2e6fd8", "f2c12e", "3f9f4f"][k], Vector3i(-1 + k, 0, 12), Vector2i(1, 1))
-	# Oyun alanının arkası: trambolin, tırmanma duvarı, örümcek ağı, evcil hayvan alanı.
+	# Oyun alanının arkası (nehre kadar, z 12..15): trambolin, tırmanma duvarı, örümcek ağı, evcil hayvan alanı.
 	var g: Vector3i = SETS["oyun"]
-	_fill(g, Vector3i(0, -1, 12), Vector3i(15, -1, 22), Blocks.SAND)
-	_prop(g, "trambolin", Vector3i(1, 0, 13), Vector2i(3, 3))
+	_fill(g, Vector3i(0, -1, 11), Vector3i(15, -1, 15), Blocks.SAND)
+	_prop(g, "trambolin", Vector3i(0, 0, 12), Vector2i(3, 3))
 	var holds := [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_YELLOW, Blocks.TOY_BRICK_BLUE]
 	for y in 4:
-		for x in range(6, 10):
-			_put(g + Vector3i(x, y, 21), holds[posmod(x + y, 3)] if (x + y) % 2 == 0 else Blocks.PLANKS)
+		for x in range(4, 7):
+			_put(g + Vector3i(x, y, 15), holds[posmod(x + y, 3)] if (x + y) % 2 == 0 else Blocks.PLANKS)
 	for y in range(0, 4):
-		_put(g + Vector3i(12 - y, y, 14 + y), Blocks.BALCONY_RAIL)
-		_put(g + Vector3i(12 + y, y, 14 + y), Blocks.BALCONY_RAIL)
-	_fill(g, Vector3i(12, 4, 17), Vector3i(12, 4, 17), Blocks.TOY_BRICK_RED)
-	_walls(g, Vector3i(0, 0, 18), Vector3i(4, 0, 22), Blocks.FENCE_WHITE)
-	_put(g + Vector3i(4, 0, 20), Blocks.AIR)
-	_prop(g, "kopek", Vector3i(2, 0, 20), Vector2i(1, 1), PI / 2)
-	_prop(g, "bank", Vector3i(6, 0, 18), Vector2i(2, 1))
+		_put(g + Vector3i(9 - y, y, 13), Blocks.BALCONY_RAIL)
+		_put(g + Vector3i(9 + y, y, 13), Blocks.BALCONY_RAIL)
+	_walls(g, Vector3i(12, 0, 11), Vector3i(15, 0, 15), Blocks.FENCE_WHITE)
+	_put(g + Vector3i(12, 0, 13), Blocks.AIR)
+	_prop(g, "kopek", Vector3i(14, 0, 13), Vector2i(1, 1), -PI / 2)
 	# Futbol sahası: iki yedek kulübesi, tribün ve skor tabelası.
 	var f: Vector3i = SETS["saha"]
 	for x0 in [4, 14]:
@@ -2220,7 +2219,7 @@ func _street_furniture_2() -> void:
 		_put(o + p + Vector3i(1, 3, 0), sg[1])
 		_put(o + p + Vector3i(3, 3, 0), sg[1])
 	# Kamelyalar: dört direk, kiremit çatı, ortada bank.
-	for p in [Vector3i(-40, 0, 47), Vector3i(22, 0, 47)]:
+	for p in [Vector3i(-28, 0, 42)]:
 		for d in [Vector3i(0, 0, 0), Vector3i(3, 0, 0), Vector3i(0, 0, 3), Vector3i(3, 0, 3)]:
 			_fill(o, p + d, p + d + Vector3i(0, 2, 0), Blocks.LOG)
 		_fill(o, p + Vector3i(-1, 3, -1), p + Vector3i(4, 3, 4), Blocks.ROOF_TERRACOTTA)
@@ -2241,3 +2240,76 @@ func _bus_stop(p: Vector3i, line: int) -> void:
 	_prop(o, "bank", p + Vector3i(1, 0, 0), Vector2i(2, 1), PI)
 	_fill(o, p + Vector3i(4, 0, 0), p + Vector3i(4, 2, 0), Blocks.STONE)
 	_put(o + p + Vector3i(4, 3, 0), [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_BLUE, Blocks.TOY_BRICK_YELLOW][line])
+
+
+## Kuzey caddesinin güneyinde kıvrılarak doğuya akan nehir (z 46..56); batı ucunda su değirmeni. Sokaklar köprüyle geçer:
+## x -15'te taş kemer köprü, x 28'de kuleli asma köprü, x 76'da tahta köprü; ayrıca x 50'de
+## yaya için tahta köprü. Kıyıda çakıl yürüyüş yolu, ahşap iskeleler, banklar ve su değirmeni.
+func river_center(x: int) -> int:
+	return 51 + roundi(2.0 * sin(x / 9.0))
+
+
+func _river() -> void:
+	var o := Vector3i(0, Y0, 0)
+	for x in range(CITY_MIN.x - 8, CITY_MAX.x + 1):
+		var c := river_center(x)
+		var street := _near_street(x)
+		for z in range(c - 2, c + 2):
+			_put(o + Vector3i(x, -2, z), Blocks.WATER)
+			if street:
+				continue
+			_put(o + Vector3i(x, -1, z), Blocks.AIR)
+			_put(o + Vector3i(x, 0, z), Blocks.AIR)
+		_put(o + Vector3i(x, -3, c - 2), Blocks.SAND)
+		if not street:
+			_put(o + Vector3i(x, -1, c - 3), Blocks.GRAVEL)
+			_put(o + Vector3i(x, -1, c + 2), Blocks.GRAVEL)
+			_put(o + Vector3i(x, -2, c - 3), Blocks.STONE_BASE)
+			_put(o + Vector3i(x, -2, c + 2), Blocks.STONE_BASE)
+	# Köprü korkulukları: sokak kenarları boyunca.
+	for i in STREETS_X.size():
+		var sx: int = STREETS_X[i]
+		for x in range(sx - 2, sx + 6):
+			var c := river_center(x)
+			var rail: int = [Blocks.STONE_BASE, Blocks.BALCONY_RAIL, Blocks.FENCE_WHITE][i]
+			_put(o + Vector3i(x, 0, c - 3), rail)
+			_put(o + Vector3i(x, 0, c + 2), rail)
+		var c0 := river_center(sx)
+		if i == 0:
+			# Taş kemer: suyun içinde kemer ayakları.
+			for x in [sx - 2, sx + 5]:
+				_fill(o, Vector3i(x, -2, c0 - 2), Vector3i(x, -2, c0 + 1), Blocks.STONE_BASE)
+		elif i == 1:
+			# Asma köprü: iki yanda kule ve çapraz halatlar.
+			for z in [c0 - 3, c0 + 2]:
+				for x in [sx - 2, sx + 5]:
+					_fill(o, Vector3i(x, 1, z), Vector3i(x, 7, z), Blocks.TRIM_WHITE)
+				for k in 3:
+					_put(o + Vector3i(sx - 1 + k, 6 - k * 2, z), Blocks.BALCONY_RAIL)
+					_put(o + Vector3i(sx + 4 - k, 6 - k * 2, z), Blocks.BALCONY_RAIL)
+	# Yaya köprüsü (tahta) x 50..51.
+	for x in [50, 51]:
+		var c := river_center(x)
+		for z in range(c - 2, c + 2):
+			_put(o + Vector3i(x, -1, z), Blocks.PLANKS)
+	for z in range(river_center(50) - 3, river_center(50) + 3):
+		_put(o + Vector3i(49, 0, z), Blocks.FENCE_WHITE)
+		_put(o + Vector3i(52, 0, z), Blocks.FENCE_WHITE)
+	# Ahşap iskeleler ve banklar.
+	for x0 in [-50, 4, 62]:
+		var c := river_center(x0)
+		_fill(o, Vector3i(x0, -1, c - 2), Vector3i(x0 + 1, -1, c - 1), Blocks.PLANKS)
+		_prop(o, "bank", Vector3i(x0 - 2, 0, c - 4), Vector2i(2, 1))
+	# Su değirmeni (şehrin batı ucu, x -70..-65, nehrin güney kıyısında): taş ev, tahta çark.
+	var mx := -68
+	var mc := river_center(mx)
+	var mz := mc - 8
+	_walls(o, Vector3i(mx - 3, 0, mz), Vector3i(mx + 2, 3, mz + 4), Blocks.COBBLESTONE)
+	_door(o, Vector3i(mx - 1, 0, mz), true, true, true)
+	for st in 3:
+		_fill(o, Vector3i(mx - 4, 4 + st, mz - 1 + st), Vector3i(mx + 3, 4 + st, mz + 5 - st), Blocks.ROOF_TERRACOTTA)
+	for a in 12:
+		var an := a * TAU / 12
+		_put(o + Vector3i(mx + roundi(cos(an) * 2.5), 1 + roundi(sin(an) * 2.5), mc - 2), Blocks.DARK_PLANKS)
+	_fill(o, Vector3i(mx, -1, mc - 2), Vector3i(mx, 3, mc - 2), Blocks.LOG)
+	_fill(o, Vector3i(mx - 3, 1, mc - 2), Vector3i(mx + 3, 1, mc - 2), Blocks.DARK_PLANKS)
