@@ -8,9 +8,8 @@ const DEFS := {
 	Blocks.BOOKSHELF: {"texture": "res://assets/textures/models/bookshelf.png", "size": 1.0, "front": "all"},
 	Blocks.CHEST: {"texture": "res://assets/textures/models/chest.png", "size": 0.88, "front": "one"},
 	Blocks.FURNACE: {"texture": "res://assets/textures/models/furnace.png", "size": 1.0, "front": "one"},
-	# Fener: her yandan görünür, küçük, yanan (hafif ışıma), altı kapalı.
-	Blocks.LANTERN: {"texture": "res://assets/textures/models/lantern.png", "size": 0.62, "front": "all",
-		"cutout": true, "bottom": true, "glow": 0.35, "hang": true},
+	# Fener: dokusuz, sade bloklardan (koyu metal çerçeve, yanan sarı iç); tavana asılır.
+	Blocks.LANTERN: {"plain": true, "size": 0.5, "front": "all", "hang": true},
 	# Altı açık masa: siyah arka plan şeffaf ("cutout"), alt yüz yok, blok yüksekliğinin %80'i.
 	Blocks.CRAFTING_TABLE: {"texture": "res://assets/textures/models/crafting_table.png", "size": 1.0,
 		"front": "one", "cutout": true, "height": 0.8},
@@ -43,6 +42,9 @@ static func create(id: int, pos: Vector3i, is_open: Callable) -> Node3D:
 		mask = 1 << 2  # her yan kapalıysa +Z
 	var root := Node3D.new()
 	root.name = "Model"
+	if DEFS[id].get("plain", false):
+		_plain_lantern(root, float(DEFS[id]["size"]), DEFS[id].get("hang", false) and not is_open.call(pos + Vector3i.UP))
+		return root
 	var mi := MeshInstance3D.new()
 	mi.mesh = _mesh(id, mask)
 	mi.scale.y = DEFS[id].get("height", 1.0)
@@ -113,3 +115,35 @@ static func _face(st: SurfaceTool, n: Vector3, region: int, size: float) -> void
 		st.set_normal(n)
 		st.set_uv(corners[k][1])
 		st.add_vertex(corners[k][0])
+
+
+## Dokusuz fener: yanan iç kutu, koyu metal üst/alt kapak ve köşe çubukları, asılıysa zincir.
+static func _plain_lantern(root: Node3D, size: float, hang: bool) -> void:
+	var metal := StandardMaterial3D.new()
+	metal.albedo_color = Color("2e2f33")
+	metal.roughness = 0.6
+	var glow := StandardMaterial3D.new()
+	glow.albedo_color = Color("ffd35a")
+	glow.emission_enabled = true
+	glow.emission = Color("ffb733")
+	glow.emission_energy_multiplier = 1.2
+	var y0 := (1.0 - size - 0.1) if hang else 0.0
+	var h := size
+	var add := func(sz: Vector3, at: Vector3, mat: Material) -> void:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = sz
+		mi.mesh = bm
+		mi.material_override = mat
+		mi.position = at
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		root.add_child(mi)
+	var c := Vector3(0.5, y0, 0.5)
+	add.call(Vector3(size * 0.8, h * 0.8, size * 0.8), c + Vector3(0, h * 0.5, 0), glow)
+	add.call(Vector3(size, h * 0.1, size), c + Vector3(0, h * 0.05, 0), metal)
+	add.call(Vector3(size, h * 0.1, size), c + Vector3(0, h * 0.95, 0), metal)
+	for sx: float in [-1.0, 1.0]:
+		for sz: float in [-1.0, 1.0]:
+			add.call(Vector3(0.05, h, 0.05), c + Vector3(sx * size * 0.45, h * 0.5, sz * size * 0.45), metal)
+	if hang:
+		add.call(Vector3(0.05, 1.0 - (y0 + h), 0.05), c + Vector3(0, (y0 + h + 1.0) * 0.5 - y0, 0), metal)
