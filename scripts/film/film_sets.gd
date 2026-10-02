@@ -2188,6 +2188,23 @@ func _furnish_new_buildings() -> void:
 	o = SETS["benzinlik"]
 	_prop(o, "sepetlik", Vector3i(11, 0, 10), Vector2i(1, 1))
 	_decor(o, "duvar_saati", Vector3(13.0, 2.6, 13.97), PI)
+	# Emir'in evi, ikinci tur: salonda ikinci berjer ve tablolar; mutfakta çöp kutusu; banyoda çamaşır
+	# sepeti; çamaşır odasında raf, kurutmalık ve sepet; üst kat oyun köşesinde halı, pufler, sehpa, oyuncaklar.
+	o = SETS["ev"]
+	_prop(o, "berjer", Vector3i(10, 0, 2), Vector2i(1, 1), PI / 2)
+	_decor(o, "tablo", Vector3(12.5, 2.4, 0.03), 0.0)
+	_decor(o, "tablo_kucuk", Vector3(15.0, 2.4, 0.03), 0.0)
+	_prop(o, "cop_kutusu", Vector3i(8, 0, 2), Vector2i(1, 1))
+	_prop(o, "cop_kutusu@f5f5f5", Vector3i(2, 0, -9), Vector2i(1, 1))
+	_prop(o, "kiler_rafi", Vector3i(-8, 0, -7), Vector2i(1, 2), PI / 2)
+	_prop(o, "havluluk", Vector3i(-5, 0, -9), Vector2i(1, 1))
+	_prop(o, "cop_kutusu@4fa3d9", Vector3i(-6, 0, -9), Vector2i(1, 1))
+	_prop(o, "oyuncak_kutusu", Vector3i(-8, 5, -9), Vector2i(1, 1))
+	_prop(o, "sehpa", Vector3i(-6, 5, -7), Vector2i(3, 1))
+	_prop(o, "puf@e84a8a", Vector3i(-3, 5, -6), Vector2i(1, 1))
+	_prop(o, "puf@4fa3d9", Vector3i(-7, 5, -6), Vector2i(1, 1))
+	_decor(o, "oda_halisi", Vector3(-4.5, 5, -6.0), 0.0)
+	_decor(o, "tablo", Vector3(-4.5, 7.2, -8.97), 0.0)
 
 
 ## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
