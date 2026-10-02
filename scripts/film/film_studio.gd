@@ -42,6 +42,8 @@ var _panel := MenuPanel.new()
 var _ui := Control.new()
 ## Videolarda altyazı kutusu gösterilsin mi.
 const SHOW_SUBTITLES := false
+## Replikte "keep_cam": true ise kamera konuşanı aramaz, sahnenin açısında kalır (ör. arkadan çekim).
+var _hold_cam := false
 var _box := PanelContainer.new()
 var _name_label := Label.new()
 var _text_label := Label.new()
@@ -211,7 +213,9 @@ func _run(s: Dictionary) -> void:
 		if s.get("t", 0.0) > 0:
 			await _wait(s["t"])
 	elif s.has("say"):
+		_hold_cam = s.get("keep_cam", false)
 		await _say(s["say"], s["text"])
+		_hold_cam = false
 	elif s.has("walk"):
 		var a := _actor(s["walk"])
 		var speed := 0.0 if fast else 2.2
@@ -290,7 +294,7 @@ func _say(id: String, text: String) -> void:
 ## Replik boyunca konuşanı izler: yürürse kamera başını takip eder, kadrajdan çıkar
 ## ya da biri önünü kapatırsa yeni bir açıya keser. Boş ekran kalmasın.
 func _watch_speaker(delta: float) -> void:
-	if fast or _speaker == null or not is_instance_valid(_speaker) or not _box.visible:
+	if fast or _hold_cam or _speaker == null or not is_instance_valid(_speaker) or not _box.visible:
 		return
 	if _cam_tween and _cam_tween.is_running():
 		return
@@ -320,7 +324,7 @@ func _watch_speaker(delta: float) -> void:
 ## Konuşan karşı yüzünü kadrajda göstersin: görünmüyorsa ya da sırtı dönükse,
 ## yüzünün önünde boş ve görüşü açık bir yere kamerayı keser.
 func _frame_speaker(a: Actor, force := false) -> void:
-	if fast:
+	if fast or _hold_cam:
 		return
 	var lying := a._body.rotation.x != 0.0
 	var head := a.head_position() if lying else a.position + Vector3(0, 1.45, 0)
