@@ -584,6 +584,11 @@ func _decor(o: Vector3i, id: String, at: Vector3, turn: float) -> void:
 
 
 func _put(p: Vector3i, id: int) -> void:
+	# Çiçek bloğu (yeşil çerçeveli kutu) Mehmet'in hoşuna gitmedi (2026-10-02): yerine saksıda çiçek.
+	if id == Blocks.FLOWERS:
+		_blocks.erase(p)
+		_prop(Vector3i.ZERO, "saksi", p, Vector2i(1, 1))
+		return
 	_blocks[p] = id
 
 
