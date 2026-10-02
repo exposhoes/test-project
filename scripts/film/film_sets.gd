@@ -389,6 +389,7 @@ func _init() -> void:
 	_build_cinema(SETS["sinema"])
 	_build_library(SETS["kutuphane"])
 	_build_gas_station(SETS["benzinlik"])
+	_additions()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -2087,3 +2088,74 @@ func _build_gas_station(o: Vector3i) -> void:
 	_fill(o, Vector3i(16, 0, 2), Vector3i(16, 1, 2), Blocks.TOY_BRICK_BLUE)
 	_lamp(o + Vector3i(-1, 0, 12))
 	_lamp(o + Vector3i(17, 0, 0))
+
+
+## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
+## hastane helipadı ve ikinci ambulans, Emir'in bahçesinde köpek kulübesi ve süs havuzu,
+## bakkal önünde otomat ve geri dönüşüm kutuları, oyun alanının arkasında trambolin, tırmanma
+## duvarı, örümcek ağı ve evcil hayvan alanı, sahada yedek kulübeleri, tribün ve skor tabelası,
+## caminin minarelerinde gece ışıkları.
+func _additions() -> void:
+	# Hastane: çatıda helipad (sarı halka, beyaz H), önde ikinci ambulans park yeri.
+	var h: Vector3i = SETS["hastane"]
+	_fill(h, Vector3i(2, 4, -5), Vector3i(10, 4, 7), Blocks.CONCRETE)
+	_walls(h, Vector3i(3, 4, -3), Vector3i(9, 4, 5), Blocks.TOY_BRICK_YELLOW)
+	for c in [Vector3i(5, 4, -1), Vector3i(5, 4, 0), Vector3i(5, 4, 1), Vector3i(5, 4, 2), Vector3i(5, 4, 3),
+			Vector3i(7, 4, -1), Vector3i(7, 4, 0), Vector3i(7, 4, 1), Vector3i(7, 4, 2), Vector3i(7, 4, 3), Vector3i(6, 4, 1)]:
+		_put(h + c, Blocks.SNOW)
+	_fill(h, Vector3i(13, -1, 11), Vector3i(15, -1, 16), Blocks.ASPHALT)
+	_fill(h, Vector3i(13, -1, 11), Vector3i(13, -1, 16), Blocks.ROAD_LINE)
+	_prop(h, "ambulans", Vector3i(14, 0, 11), Vector2i(2, 4), PI)
+	# Emir'in evi: köpek kulübesi ve köpek, süs havuzu.
+	var e: Vector3i = SETS["ev"]
+	_walls(e, Vector3i(22, 0, 7), Vector3i(23, 1, 8), Blocks.PLANKS)
+	_put(e + Vector3i(22, 0, 8), Blocks.AIR)
+	_fill(e, Vector3i(22, 2, 7), Vector3i(23, 2, 8), Blocks.ROOF_TERRACOTTA)
+	_prop(e, "kopek", Vector3i(22, 0, 9), Vector2i(1, 1))
+	_fill(e, Vector3i(13, -1, 12), Vector3i(16, -1, 14), Blocks.STONE_BASE)
+	_fill(e, Vector3i(14, -1, 13), Vector3i(15, -1, 13), Blocks.TOY_BRICK_BLUE)
+	_put(e + Vector3i(13, 0, 12), Blocks.FLOWERS)
+	_put(e + Vector3i(16, 0, 14), Blocks.FLOWERS)
+	# Bakkal önü: atıştırmalık otomatı, mavi-sarı-yeşil geri dönüşüm kutuları.
+	var b: Vector3i = SETS["bakkal"]
+	_prop(b, "otomat", Vector3i(10, 0, 11), Vector2i(1, 1))
+	for k in 3:
+		_prop(b, "cop_kutusu@" + ["2e6fd8", "f2c12e", "3f9f4f"][k], Vector3i(-1 + k, 0, 12), Vector2i(1, 1))
+	# Oyun alanının arkası: trambolin, tırmanma duvarı, örümcek ağı, evcil hayvan alanı.
+	var g: Vector3i = SETS["oyun"]
+	_fill(g, Vector3i(0, -1, 12), Vector3i(15, -1, 22), Blocks.SAND)
+	_prop(g, "trambolin", Vector3i(1, 0, 13), Vector2i(3, 3))
+	var holds := [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_YELLOW, Blocks.TOY_BRICK_BLUE]
+	for y in 4:
+		for x in range(6, 10):
+			_put(g + Vector3i(x, y, 21), holds[posmod(x + y, 3)] if (x + y) % 2 == 0 else Blocks.PLANKS)
+	for y in range(0, 4):
+		_put(g + Vector3i(12 - y, y, 14 + y), Blocks.BALCONY_RAIL)
+		_put(g + Vector3i(12 + y, y, 14 + y), Blocks.BALCONY_RAIL)
+	_fill(g, Vector3i(12, 4, 17), Vector3i(12, 4, 17), Blocks.TOY_BRICK_RED)
+	_walls(g, Vector3i(0, 0, 18), Vector3i(4, 0, 22), Blocks.FENCE_WHITE)
+	_put(g + Vector3i(4, 0, 20), Blocks.AIR)
+	_prop(g, "kopek", Vector3i(2, 0, 20), Vector2i(1, 1), PI / 2)
+	_prop(g, "bank", Vector3i(6, 0, 18), Vector2i(2, 1))
+	# Futbol sahası: iki yedek kulübesi, tribün ve skor tabelası.
+	var f: Vector3i = SETS["saha"]
+	for x0 in [4, 14]:
+		_fill(f, Vector3i(x0, 0, -3), Vector3i(x0 + 4, 2, -3), Blocks.PLANKS)
+		_fill(f, Vector3i(x0, 0, -3), Vector3i(x0, 2, -2), Blocks.PLANKS)
+		_fill(f, Vector3i(x0 + 4, 0, -3), Vector3i(x0 + 4, 2, -2), Blocks.PLANKS)
+		_fill(f, Vector3i(x0, 3, -3), Vector3i(x0 + 4, 3, -1), Blocks.TOY_BRICK_BLUE)
+		_fill(f, Vector3i(x0 + 1, 0, -2), Vector3i(x0 + 3, 0, -2), Blocks.DARK_PLANKS)
+	for k in 3:
+		_fill(f, Vector3i(2, k, 17 + k), Vector3i(20, k, 17 + k), [Blocks.TOY_BRICK_RED, Blocks.SNOW, Blocks.TOY_BRICK_RED][k])
+	_fill(f, Vector3i(9, 3, 20), Vector3i(13, 5, 20), Blocks.ASPHALT)
+	for c in [Vector3i(10, 4, 19), Vector3i(12, 4, 19)]:
+		_put(f + c, Blocks.TOY_BRICK_YELLOW)
+	_fill(f, Vector3i(11, 0, 20), Vector3i(11, 2, 20), Blocks.STONE)
+	# Cami: minare uçlarında ve kubbe çevresinde gece ışıkları.
+	var m := Vector3i(-6, Y0, -54)
+	for mx in [-2, 17]:
+		var t := m + Vector3i(mx, 0, 13)
+		for d in [Vector3i(1, 15, 0), Vector3i(-1, 15, 0), Vector3i(0, 15, 1), Vector3i(0, 15, -1), Vector3i(0, 23, 0)]:
+			_put(t + d, Blocks.LANTERN)
+	for d in [Vector3i(1, 8, 1), Vector3i(14, 8, 1), Vector3i(1, 8, 12), Vector3i(14, 8, 12), Vector3i(7, 16, 6)]:
+		_put(m + d, Blocks.LANTERN)

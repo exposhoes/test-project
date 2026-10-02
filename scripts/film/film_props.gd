@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "pompa": 1.8, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "otomat": 1.9, "trambolin": 0.8, "pompa": 1.8, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 	"serum_askisi": 1.9, "ilac_dolabi": 2.0, "paravan": 1.8, "tarti": 1.3, "bekleme_koltugu": 0.9,
 	"su_sebili": 1.4, "stant": 1.3, "sepetlik": 0.8,
@@ -566,6 +566,21 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				_box(r, Vector3(0.1, 0.25, 0.12), Vector3(sx, h * 0.4, d / 2 + d * 0.28), Color("d32f2f"))
 				_box(r, Vector3(0.04, 0.5, 0.04), Vector3(sx, h * 0.18, d / 2 + d * 0.3), Color("1b1b1b"))
 			_box(r, Vector3(w * 0.8, 0.1, d * 0.7), Vector3(w / 2, 0.05, d / 2), Color("9e9e9e"))
+		"otomat":
+			# Atıştırmalık otomatı: kırmızı gövde, camlı vitrin içinde renkli paketler, tuş paneli.
+			_box(r, Vector3(w - 0.1, h, d - 0.2), Vector3(w / 2, h / 2, d / 2 - 0.05), Color("c62828"))
+			_box(r, Vector3(w * 0.6, h * 0.65, 0.02), Vector3(w * 0.38, h * 0.6, d - 0.24), Color(0.8, 0.9, 0.95, 1))
+			for k in 4:
+				for j in 3:
+					_box(r, Vector3(w * 0.14, 0.12, 0.06), Vector3(w * 0.18 + j * w * 0.2, h * 0.35 + k * h * 0.13, d - 0.3), [Color("ffd23f"), Color("2e86c1"), Color("27ae60"), Color("e67e22")][(j + k) % 4])
+			_box(r, Vector3(w * 0.18, h * 0.3, 0.03), Vector3(w * 0.8, h * 0.6, d - 0.24), Color("2b2b2b"))
+			_box(r, Vector3(w * 0.5, 0.15, 0.03), Vector3(w * 0.38, h * 0.12, d - 0.24), Color("1b1b1b"))
+		"trambolin":
+			for a in 8:
+				var an := a * TAU / 8
+				_box(r, Vector3(0.08, 0.6, 0.08), Vector3(w / 2 + cos(an) * w * 0.45, 0.3, d / 2 + sin(an) * d * 0.45), Color("9ea7ad"))
+			_box(r, Vector3(w * 0.95, 0.1, d * 0.95), Vector3(w / 2, 0.62, d / 2), Color("2e6fd8"))
+			_box(r, Vector3(w * 0.75, 0.11, d * 0.75), Vector3(w / 2, 0.63, d / 2), Color("1b1b1b"))
 		"saksi":
 			_box(r, Vector3(0.45, 0.4, 0.45), Vector3(w / 2, 0.2, d / 2), Color("b5562f"))
 			_box(r, Vector3(0.6, 0.45, 0.6), Vector3(w / 2, 0.65, d / 2), Color("3f8f3a"))
