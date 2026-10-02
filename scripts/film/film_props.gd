@@ -739,7 +739,7 @@ const DECOR_SIZE := {
 	"poster": Vector3(0.9, 1.2, 0.03), "duvar_saati": Vector3(0.5, 0.5, 0.06),
 	"futbol_topu": Vector3(0.35, 0.35, 0.35), "oda_halisi": Vector3(2.2, 0.02, 1.6),
 	"tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
-	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
+	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "buyuk_saat": Vector3(2.2, 2.2, 0.1), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 }
 
 
@@ -806,6 +806,14 @@ static func build_decor(id: String) -> Node3D:
 			_box(root, Vector3(0.05, 0.12, 0.05), Vector3(0, 0.06, -0.14), Color("3a3a3a"))
 			_box(root, Vector3(0.45, 0.02, 0.15), Vector3(0, 0.01, 0.1), Color("2b2b2b"))
 			_box(root, Vector3(0.06, 0.02, 0.09), Vector3(0.3, 0.01, 0.1), Color("2b2b2b"))
+		"buyuk_saat":
+			_box(root, size, Vector3.ZERO, Color("c9a64a"))
+			_box(root, Vector3(size.x - 0.25, size.y - 0.25, 0.02), Vector3(0, 0, 0.05), Color("fbf7ec"))
+			for k in 12:
+				var a := k * TAU / 12
+				_box(root, Vector3(0.1, 0.1, 0.02), Vector3(cos(a) * 0.85, sin(a) * 0.85, 0.07), Color("2b2b2b"))
+			_box(root, Vector3(0.08, 0.7, 0.02), Vector3(0, 0.3, 0.08), Color("2b2b2b"))
+			_box(root, Vector3(0.5, 0.08, 0.02), Vector3(0.22, 0, 0.09), Color("2b2b2b"))
 		"oda_halisi":
 			_box(root, size, Vector3(0, 0.01, 0), Color("6fb3e0"))
 			_box(root, Vector3(1.6, 0.022, 1.0), Vector3(0, 0.012, 0), Color("a9d6f2"))

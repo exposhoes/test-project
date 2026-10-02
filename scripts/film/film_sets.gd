@@ -26,6 +26,7 @@ const SETS := {
 	"itfaiye": Vector3i(-26, GROUND + 1, 2),
 	"veteriner": Vector3i(-60, GROUND + 1, 5),
 	"karakol": Vector3i(-42, GROUND + 1, 65),
+	"belediye": Vector3i(-6, GROUND + 1, 65),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -312,6 +313,18 @@ const POINTS := {
 		"kam_ic": Vector3(12.5, 2.4, 1.5),
 		"kam_hucre": Vector3(11.5, 2.4, 7.2),
 	},
+	"belediye": {
+		"meydan": Vector3(5.5, 0, 2.5),
+		"bank_on": Vector3(4.5, 0, 4.0),
+		"giris": Vector3(9.5, 0, 5.2),
+		"kapi_ici": Vector3(9.5, 0, 8.0),
+		"salon": Vector3(9.5, 0, 8.6),
+		"baskan": Vector3(15.5, 5, 13.0),
+		"kam_genel": Vector3(9.5, 9.0, -14.0),
+		"kam_dis": Vector3(15.0, 3.0, -6.0),
+		"kam_salon": Vector3(3.0, 2.5, 9.0),
+		"kam_baskan": Vector3(12.0, 7.4, 9.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -336,6 +349,7 @@ func _init() -> void:
 	_build_fire_station(SETS["itfaiye"])
 	_build_vet(SETS["veteriner"])
 	_build_police(SETS["karakol"])
+	_build_town_hall(SETS["belediye"])
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -1761,3 +1775,59 @@ func _build_police(o: Vector3i) -> void:
 	_fill(o, Vector3i(1, 0, -1), Vector3i(1, 5, -1), Blocks.TRIM_WHITE)
 	_fill(o, Vector3i(2, 4, -1), Vector3i(3, 5, -1), Blocks.TOY_BRICK_RED)
 	_lamp(o + Vector3i(14, 0, -4))
+
+
+## Belediye / muhtarlık (meydan z 0..5, bina x 0..19 z 6..18, iki kat; kapı güneyde meydana):
+## ortada saat kulesi, meydanda banklar, çiçek tarhları ve fıskiye; içeride toplantı salonu,
+## üst katta başkan odası.
+func _build_town_hall(o: Vector3i) -> void:
+	# Meydan.
+	_fill(o, Vector3i(0, -1, 0), Vector3i(19, -1, 5), Blocks.COBBLESTONE)
+	for x in [2, 6, 13, 17]:
+		_prop(o, "bank", Vector3i(x, 0, 4), Vector2i(2, 1), PI)
+	_fill(o, Vector3i(8, 0, 1), Vector3i(11, 0, 3), Blocks.STONE_BASE)
+	_fill(o, Vector3i(9, 0, 2), Vector3i(10, 0, 2), Blocks.GLASS)
+	for x in [0, 1, 18, 19]:
+		_put(o + Vector3i(x, 0, 1), Blocks.FLOWERS)
+	# Bina.
+	_shell(o, Vector2i(0, 6), Vector2i(19, 18), 2, Blocks.FACADE_CREAM, Blocks.DARK_PLANKS)
+	_door(o, Vector3i(9, 0, 6), true, true, true)
+	_door(o, Vector3i(10, 0, 6), true, false)
+	for x in [8, 11]:
+		_fill(o, Vector3i(x, 0, 5), Vector3i(x, 4, 5), Blocks.TRIM_WHITE)  # sütunlar
+	_fill(o, Vector3i(7, 4, 5), Vector3i(12, 4, 5), Blocks.TRIM_WHITE)
+	# Saat kulesi.
+	_walls(o, Vector3i(7, 10, 10), Vector3i(12, 18, 14), Blocks.FACADE_CREAM)
+	_fill(o, Vector3i(7, 19, 10), Vector3i(12, 19, 14), Blocks.TRIM_WHITE)
+	for st in 3:
+		_fill(o, Vector3i(7 + st, 20 + st, 10 + st), Vector3i(12 - st, 20 + st, 14 - st), Blocks.ROOF_TERRACOTTA)
+	_decor(o, "buyuk_saat", Vector3(9.98, 16.0, 9.94), PI)
+	_fill(o, Vector3i(19, 10, 6), Vector3i(19, 10, 6), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(10, 23, 12), Vector3i(10, 25, 12), Blocks.TRIM_WHITE)  # bayrak direği
+	_fill(o, Vector3i(11, 24, 12), Vector3i(12, 25, 12), Blocks.TOY_BRICK_RED)
+	# Zemin: toplantı salonu (uzun masa), danışma, saksılar, tablolar.
+	_prop(o, "yemek_masasi", Vector3i(6, 0, 11), Vector2i(8, 2))
+	for x in range(6, 14, 2):
+		_prop(o, "sandalye", Vector3i(x, 0, 10), Vector2i(1, 1))
+		_prop(o, "sandalye", Vector3i(x, 0, 13), Vector2i(1, 1), PI)
+	_prop(o, "ogretmen_masasi", Vector3i(15, 0, 8), Vector2i(3, 1), PI)
+	_prop(o, "bitki", Vector3i(1, 0, 7), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(18, 0, 17), Vector2i(1, 1))
+	_prop(o, "kitaplik", Vector3i(1, 0, 15), Vector2i(1, 2), PI / 2)
+	_decor(o, "tablo", Vector3(9.5, 2.5, 17.97), PI)
+	_decor(o, "tablo_kucuk", Vector3(0.03, 2.4, 12.0), PI / 2)
+	# Merdiven (x 14..18, z 16..17).
+	for k in 5:
+		_fill(o, Vector3i(14 + k, 0, 16), Vector3i(14 + k, k, 17), Blocks.PLANKS)
+	_fill(o, Vector3i(14, 4, 16), Vector3i(17, 4, 17), Blocks.AIR)
+	# Üst kat: başkan odası.
+	_prop(o, "ogretmen_masasi", Vector3i(14, 5, 12), Vector2i(3, 1))
+	_decor(o, "bilgisayar", Vector3(15.5, 5.8, 12.5), 0.0)
+	_prop(o, "koltuk", Vector3i(15, 5, 14), Vector2i(1, 1), PI)
+	_prop(o, "koltuk", Vector3i(2, 5, 8), Vector2i(3, 1))
+	_prop(o, "sehpa", Vector3i(2, 5, 10), Vector2i(3, 1))
+	_prop(o, "kitaplik", Vector3i(1, 5, 14), Vector2i(1, 3), PI / 2)
+	_decor(o, "salon_halisi", Vector3(3.5, 5, 10.5), 0.0)
+	_decor(o, "tablo", Vector3(15.5, 7.4, 17.97), PI)
+	_lamp(o + Vector3i(-1, 0, 0))
+	_lamp(o + Vector3i(20, 0, 0))
