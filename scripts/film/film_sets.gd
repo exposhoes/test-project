@@ -2147,10 +2147,10 @@ func _additions() -> void:
 		_fill(f, Vector3i(x0 + 1, 0, -2), Vector3i(x0 + 3, 0, -2), Blocks.DARK_PLANKS)
 	for k in 3:
 		_fill(f, Vector3i(2, k, 17 + k), Vector3i(20, k, 17 + k), [Blocks.TOY_BRICK_RED, Blocks.SNOW, Blocks.TOY_BRICK_RED][k])
-	_fill(f, Vector3i(9, 3, 20), Vector3i(13, 5, 20), Blocks.ASPHALT)
-	for c in [Vector3i(10, 4, 19), Vector3i(12, 4, 19)]:
+	_fill(f, Vector3i(16, 3, 20), Vector3i(20, 5, 20), Blocks.ASPHALT)
+	for c in [Vector3i(17, 4, 19), Vector3i(19, 4, 19)]:
 		_put(f + c, Blocks.TOY_BRICK_YELLOW)
-	_fill(f, Vector3i(11, 0, 20), Vector3i(11, 2, 20), Blocks.STONE)
+	_fill(f, Vector3i(18, 0, 20), Vector3i(18, 2, 20), Blocks.STONE)
 	# Cami: minare uçlarında ve kubbe çevresinde gece ışıkları.
 	var m := Vector3i(-6, Y0, -54)
 	for mx in [-2, 17]:
