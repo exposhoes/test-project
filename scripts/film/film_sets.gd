@@ -390,6 +390,7 @@ func _init() -> void:
 	_build_library(SETS["kutuphane"])
 	_build_gas_station(SETS["benzinlik"])
 	_additions()
+	_street_furniture()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -2159,3 +2160,50 @@ func _additions() -> void:
 			_put(t + d, Blocks.LANTERN)
 	for d in [Vector3i(1, 8, 1), Vector3i(14, 8, 1), Vector3i(1, 8, 12), Vector3i(14, 8, 12), Vector3i(7, 16, 6)]:
 		_put(m + d, Blocks.LANTERN)
+
+
+## Sokak düzenlemeleri ve kent donatısı: okul ve hastane önünde zebra geçitleri ve trafik ışıkları,
+## caddelerde otobüs durakları (camlı, çatılı, banklı; tabelada yalnız hat numarası rengi), mavi bisiklet
+## yolu, Emir'in evi ve oyun alanı önünde hız kesiciler, köşelerde geri dönüşüm kutuları, rögar kapakları.
+func _street_furniture() -> void:
+	var o := Vector3i(0, Y0, 0)
+	# Zebra geçitleri (cadde z 25..28 üzerinde) ve iki yanında trafik ışıkları.
+	for cx in [58, -34, 2]:
+		for z in range(25, 29):
+			for x in range(cx, cx + 4):
+				if z % 2 == 1:
+					_put(o + Vector3i(x, -1, z), Blocks.SNOW)
+		_prop(o, "trafik_isigi", Vector3i(cx - 1, 0, 23), Vector2i(1, 1))
+		_prop(o, "trafik_isigi", Vector3i(cx + 4, 0, 30), Vector2i(1, 1), PI)
+	# Bisiklet yolu: kuzey caddenin güney kaldırımında mavi şerit.
+	for x in range(CITY_MIN.x, CITY_MAX.x + 1):
+		if not _near_street(x) and _blocks.get(o + Vector3i(x, -1, 23), -1) == Blocks.SIDEWALK:
+			_put(o + Vector3i(x, -1, 23), Blocks.TOY_BRICK_BLUE)
+	# Hız kesiciler: sarı-siyah şeritler.
+	for bx in [-6, 12, 86]:
+		for z in range(25, 29):
+			_put(o + Vector3i(bx, -1, z), Blocks.TOY_BRICK_YELLOW if z % 2 == 0 else Blocks.ASPHALT)
+	# Otobüs durakları.
+	for st in [[Vector3i(20, 0, 29), 0], [Vector3i(-50, 0, 29), 1], [Vector3i(45, 0, -20), 2], [Vector3i(20, 0, 62), 0]]:
+		_bus_stop(st[0], st[1])
+	# Geri dönüşüm kutuları ve rögar kapakları.
+	for p in [Vector3i(-12, 0, 22), Vector3i(31, 0, 22), Vector3i(-12, 0, -19), Vector3i(31, 0, -19), Vector3i(73, 0, 22), Vector3i(73, 0, 31)]:
+		for k in 3:
+			_prop(o, "cop_kutusu@" + ["2e6fd8", "f2c12e", "3f9f4f"][k], p + Vector3i(k, 0, 0), Vector2i(1, 1))
+	for x in range(CITY_MIN.x + 9, CITY_MAX.x, 23):
+		if not _near_street(x):
+			for az: int in AVENUES_Z:
+				_put(o + Vector3i(x, -1, az + 1), Blocks.STONE_BASE)
+
+
+## Otobüs durağı (köşesi p, x boyunca 4 blok): arka cam, çatı, bank, renkli hat tabelası direği.
+func _bus_stop(p: Vector3i, line: int) -> void:
+	var o := Vector3i(0, Y0, 0)
+	_fill(o, p + Vector3i(0, 0, 1), p + Vector3i(3, 2, 1), Blocks.GLASS)
+	_fill(o, p + Vector3i(0, 3, -1), p + Vector3i(3, 3, 1), Blocks.TOY_BRICK_RED if line == 0 else (Blocks.TOY_BRICK_BLUE if line == 1 else Blocks.TOY_BRICK_YELLOW))
+	_put(o + p + Vector3i(0, 0, -1), Blocks.STONE)
+	_put(o + p + Vector3i(0, 1, -1), Blocks.STONE)
+	_put(o + p + Vector3i(0, 2, -1), Blocks.STONE)
+	_prop(o, "bank", p + Vector3i(1, 0, 0), Vector2i(2, 1), PI)
+	_fill(o, p + Vector3i(4, 0, 0), p + Vector3i(4, 2, 0), Blocks.STONE)
+	_put(o + p + Vector3i(4, 3, 0), [Blocks.TOY_BRICK_RED, Blocks.TOY_BRICK_BLUE, Blocks.TOY_BRICK_YELLOW][line])
