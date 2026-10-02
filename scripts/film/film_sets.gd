@@ -24,6 +24,7 @@ const SETS := {
 	"zeynep_ev": Vector3i(58, GROUND + 1, 36),
 	"ogretmen_ev": Vector3i(-60, GROUND + 1, 36),
 	"itfaiye": Vector3i(-26, GROUND + 1, 2),
+	"veteriner": Vector3i(-60, GROUND + 1, 5),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -283,6 +284,19 @@ const POINTS := {
 		"kam_garaj": Vector3(6.5, 2.3, 15.0),
 		"kam_yatakhane": Vector3(7.5, 7.3, 15.0),
 	},
+	"veteriner": {
+		"giris": Vector3(5.5, 0, 14.0),
+		"kapi_ici": Vector3(5.5, 0, 10.8),
+		"bekleme": Vector3(2.5, 0, 9.5),
+		"danisma_on": Vector3(8.5, 0, 9.0),
+		"muayene": Vector3(4.5, 0, 3.5),
+		"muayene_veteriner": Vector3(4.5, 0, 1.6),
+		"kafesler": Vector3(9.5, 0, 3.5),
+		"kam_genel": Vector3(-2.0, 6.0, 26.0),
+		"kam_dis": Vector3(9.0, 3.0, 18.5),
+		"kam_bekleme": Vector3(9.5, 2.3, 11.0),
+		"kam_muayene": Vector3(7.5, 2.4, 6.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -305,6 +319,7 @@ func _init() -> void:
 		_build_family_house(SETS[h], FAMILY_HOUSES[h], FAMILY_SOFA[h])
 	_family_extras()
 	_build_fire_station(SETS["itfaiye"])
+	_build_vet(SETS["veteriner"])
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -1652,3 +1667,40 @@ func _family_extras() -> void:
 	_prop(t, "kitaplik", Vector3i(8, 5, 8), Vector2i(1, 2), PI / 2)
 	_prop(t, "kitaplik", Vector3i(7, 0, 6), Vector2i(1, 2), -PI / 2)
 	_decor(t, "tablo", Vector3(1.03, 7.2, 4.5), PI / 2)
+
+
+## Veteriner kliniği (dış x 0..11, z 0..12; kapı kuzeyde caddeye): bekleme salonu ve danışma,
+## arkada muayene odası (muayene masası, ilaç rafı) ve kafesler; önde köpek ve kedi, pati tabelası.
+func _build_vet(o: Vector3i) -> void:
+	_shell(o, Vector2i(0, 0), Vector2i(11, 12), 1, Blocks.PLASTER, Blocks.TILE_BATH)
+	_door(o, Vector3i(5, 0, 12), true, true, true)
+	_awning(o, 2, 9, 3, 13, Blocks.TOY_BRICK_BLUE)
+	# Pati tabelası (yazısız): ayak yastığı ve dört parmak.
+	for c in [Vector3i(5, 5, 13), Vector3i(6, 5, 13), Vector3i(4, 6, 13), Vector3i(5, 7, 13), Vector3i(6, 7, 13), Vector3i(7, 6, 13)]:
+		_put(o + c, Blocks.TOY_BRICK_BLUE)
+	_iwall(o, Vector3i(1, 0, 6), Vector3i(10, 0, 6))
+	_door(o, Vector3i(4, 0, 6), true)
+	# Bekleme ve danışma.
+	for z in [8, 9, 10]:
+		_prop(o, "sandalye", Vector3i(1, 0, z), Vector2i(1, 1), PI / 2)
+	_prop(o, "kasa", Vector3i(9, 0, 8), Vector2i(1, 1), -PI / 2)
+	_prop(o, "mutfak_tezgahi", Vector3i(10, 0, 7), Vector2i(1, 3), -PI / 2)
+	_prop(o, "kopek", Vector3i(3, 0, 9), Vector2i(1, 1), PI / 2)
+	_prop(o, "bitki", Vector3i(1, 0, 11), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(10, 0, 11), Vector2i(1, 1))
+	_decor(o, "tablo", Vector3(0.03, 2.3, 9.0), PI / 2)
+	_decor(o, "duvar_saati", Vector3(6.0, 2.6, 6.97), PI)
+	# Muayene odası ve kafesler.
+	_prop(o, "muayene_masasi", Vector3i(4, 0, 2), Vector2i(2, 1))
+	_prop(o, "kedi", Vector3i(4, 1, 2), Vector2i(1, 1))
+	_prop(o, "market_rafi", Vector3i(1, 0, 1), Vector2i(1, 4), PI / 2)
+	_prop(o, "lavabo", Vector3i(6, 0, 1), Vector2i(1, 1))
+	_prop(o, "kafes", Vector3i(8, 0, 1), Vector2i(3, 1))
+	_prop(o, "kafes", Vector3i(10, 0, 2), Vector2i(1, 3), -PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(3.0, 2.3, 1.03), 0.0)
+	# Önde kaldırım, çiçekler, bağlı köpek.
+	_fill(o, Vector3i(0, -1, 13), Vector3i(11, -1, 16), Blocks.SIDEWALK)
+	for x in [1, 2, 9, 10]:
+		_put(o + Vector3i(x, 0, 13), Blocks.FLOWERS)
+	_prop(o, "kopek", Vector3i(8, 0, 15), Vector2i(1, 1), PI)
+	_put(o + Vector3i(11, 2, 13), Blocks.LANTERN)

@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
@@ -520,6 +520,33 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, Vector3(w - 0.1, 0.9, 0.04), Vector3(w / 2, 1.5, 0.03), Color("6d6d6d"))  # alet panosu
 			for k in int(w * 4):
 				_box(r, Vector3(0.06, 0.3, 0.04), Vector3(0.2 + k * 0.25, 1.5, 0.07), [Color("d32f2f"), Color("f2b705"), Color("2e6fd8")][k % 3])
+		"kafes":
+			# Hayvan kafesleri: iki katlı, ızgaralı kapaklar.
+			_box(r, Vector3(w - 0.05, h, d - 0.1), Vector3(w / 2, h / 2, d / 2 - 0.05), Color("dfe3e6"))
+			for k in 2:
+				var y := 0.25 + k * 0.5
+				_box(r, Vector3(w - 0.15, 0.4, 0.02), Vector3(w / 2, y, d - 0.08), Color("4a4f55"))
+				for j in int(w * 6):
+					_box(r, Vector3(0.03, 0.38, 0.03), Vector3(0.1 + j * (w - 0.2) / maxf(1.0, w * 6 - 1), y, d - 0.06), Color("b0b6bb"))
+		"kopek", "kedi":
+			# Köşeli dost: gövde, baş, kulaklar, kuyruk, bacaklar. Önü +Z.
+			var dog := id == "kopek"
+			var c: Color = Color("c8935a") if dog else Color("8a8f94")
+			var s := 1.0 if dog else 0.6
+			_box(r, Vector3(0.35 * s, 0.3 * s, 0.7 * s), Vector3(w / 2, 0.45 * s, d / 2), c)
+			_box(r, Vector3(0.3 * s, 0.3 * s, 0.3 * s), Vector3(w / 2, 0.68 * s, d / 2 + 0.42 * s), c)
+			_box(r, Vector3(0.14 * s, 0.1 * s, 0.12 * s), Vector3(w / 2, 0.62 * s, d / 2 + 0.6 * s), c.lightened(0.2))
+			_box(r, Vector3(0.05 * s, 0.05 * s, 0.02), Vector3(w / 2, 0.65 * s, d / 2 + 0.67 * s), Color("1b1b1b"))
+			for ex in [-0.08, 0.08]:
+				_box(r, Vector3(0.05 * s, 0.05 * s, 0.02), Vector3(w / 2 + ex * s, 0.75 * s, d / 2 + 0.57 * s + 0.01), Color("1b1b1b"))
+				_box(r, Vector3(0.08 * s, (0.15 if dog else 0.12) * s, 0.06 * s), Vector3(w / 2 + ex * 1.4 * s, (0.86 if not dog else 0.8) * s, d / 2 + 0.4 * s), c.darkened(0.25 if dog else 0.0))
+			for p in [Vector2(-0.12, -0.25), Vector2(0.12, -0.25), Vector2(-0.12, 0.25), Vector2(0.12, 0.25)]:
+				_box(r, Vector3(0.08 * s, 0.3 * s, 0.08 * s), Vector3(w / 2 + p.x * s, 0.15 * s, d / 2 + p.y * s), c.darkened(0.1))
+			_box(r, Vector3(0.06 * s, 0.06 * s, 0.3 * s), Vector3(w / 2, 0.6 * s, d / 2 - 0.45 * s), c)
+		"muayene_masasi":
+			_box(r, Vector3(w - 0.1, 0.1, d - 0.2), Vector3(w / 2, 0.85, d / 2), Color("c9d1d6"))
+			_box(r, Vector3(0.1, 0.8, 0.1), Vector3(w / 2, 0.4, d / 2), Color("8a9298"))
+			_box(r, Vector3(0.6, 0.05, 0.6), Vector3(w / 2, 0.03, d / 2), Color("8a9298"))
 		"saksi":
 			_box(r, Vector3(0.45, 0.4, 0.45), Vector3(w / 2, 0.2, d / 2), Color("b5562f"))
 			_box(r, Vector3(0.6, 0.45, 0.6), Vector3(w / 2, 0.65, d / 2), Color("3f8f3a"))
