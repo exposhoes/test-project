@@ -30,6 +30,7 @@ const SETS := {
 	"sinema": Vector3i(37, GROUND + 1, 65),
 	"kutuphane": Vector3i(56, GROUND + 1, 65),
 	"benzinlik": Vector3i(84, GROUND + 1, 65),
+	"sahil": Vector3i(101, GROUND + 1, 0),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -55,6 +56,8 @@ const FAMILY_POINTS := {
 ## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
 const CITY_MIN := Vector2i(-64, -56)
 const CITY_MAX := Vector2i(100, 84)
+## Sahil: kordon x 101..103, kum 104..113, deniz 114..SEA_X1.
+const SEA_X1 := 170
 
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
@@ -361,6 +364,18 @@ const POINTS := {
 		"kam_dis": Vector3(9.0, 2.5, -2.0),
 		"kam_market": Vector3(15.0, 2.3, 11.0),
 	},
+	"sahil": {
+		"kordon": Vector3(1.5, 0, 18.5),
+		"plaj": Vector3(7.5, 0, 9.5),
+		"kafe_masa": Vector3(6.5, 0, -12.5),
+		"iskele": Vector3(17.5, 0, 30.5),
+		"emir_tekne": Vector3(15.5, 0, 31.5),
+		"akvaryum": Vector3(7.5, 0, 70.5),
+		"kam_genel": Vector3(-6.0, 9.0, 4.0),
+		"kam_dis": Vector3(1.5, 2.5, 22.0),
+		"kam_iskele": Vector3(10.5, 3.0, 26.0),
+		"kam_fener": Vector3(14.0, 4.0, -26.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -394,6 +409,7 @@ func _init() -> void:
 	_street_furniture()
 	_street_furniture_2()
 	_river()
+	_seaside()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -453,7 +469,7 @@ func _tree_spot(g: Vector2i) -> bool:
 	if lx < 3 or lx > 12 or lz < 3 or lz > 12:
 		return false
 	# Setlerin ve önlerindeki yolun çevresi boş kalsın.
-	if g.x > CITY_MIN.x - 8 and g.x < CITY_MAX.x + 8 and g.y > CITY_MIN.y - 8 and g.y < CITY_MAX.y + 8:
+	if g.x > CITY_MIN.x - 8 and g.x < SEA_X1 + 8 and g.y > CITY_MIN.y - 8 and g.y < CITY_MAX.y + 8:
 		return false
 	return (hash(g) % 23) == 0
 
@@ -2366,7 +2382,7 @@ func river_center(x: int) -> int:
 
 func _river() -> void:
 	var o := Vector3i(0, Y0, 0)
-	for x in range(CITY_MIN.x - 8, CITY_MAX.x + 1):
+	for x in range(CITY_MIN.x - 8, 114):
 		var c := river_center(x)
 		var street := _near_street(x)
 		for z in range(c - 2, c + 2):
@@ -2428,3 +2444,85 @@ func _river() -> void:
 		_put(o + Vector3i(mx + roundi(cos(an) * 2.5), 1 + roundi(sin(an) * 2.5), mc - 2), Blocks.DARK_PLANKS)
 	_fill(o, Vector3i(mx, -1, mc - 2), Vector3i(mx, 3, mc - 2), Blocks.LOG)
 	_fill(o, Vector3i(mx - 3, 1, mc - 2), Vector3i(mx + 3, 1, mc - 2), Blocks.DARK_PLANKS)
+
+
+## Deniz kıyısı (şehrin doğusu): palmiyeli kordon, plaj, marina, deniz feneri, plaj kafesi, akvaryum.
+func _seaside() -> void:
+	var o := Vector3i(0, Y0, 0)
+	var z0 := CITY_MIN.y - 8
+	var z1 := CITY_MAX.y + 8
+	_fill(o, Vector3i(114, -4, z0), Vector3i(SEA_X1, -1, z1), Blocks.WATER)
+	_fill(o, Vector3i(114, -5, z0), Vector3i(SEA_X1, -5, z1), Blocks.SAND)
+	for z in range(z0, z1 + 1):
+		var river := absi(z - river_center(110) + 0) <= 2
+		_fill(o, Vector3i(101, -1, z), Vector3i(103, -1, z), Blocks.SIDEWALK)
+		_put(o + Vector3i(100, 0, z), Blocks.TRIM_WHITE if posmod(z, 2) == 0 else Blocks.AIR)
+		if not river:
+			_fill(o, Vector3i(104, -2, z), Vector3i(113, -1, z), Blocks.SAND)
+	# Kordon: palmiyeler ve fenerler.
+	for z in range(z0 + 4, z1, 8):
+		_palm(o + Vector3i(101, 0, z))
+		_lamp(o + Vector3i(103, 0, z + 4))
+		_prop(o, "bank", Vector3i(102, 0, z + 2), Vector2i(1, 1), PI / 2)
+	# Plaj: şezlong, şemsiye, havlu.
+	for z in range(-50, 82, 5):
+		if (z > -24 and z < 2) or (z > 18 and z < 42) or (z > 44 and z < 60) or z > 62:
+			continue
+		_prop(o, "semsiye", Vector3i(107, 0, z), Vector2i(1, 1))
+		_prop(o, "sezlong", Vector3i(108, 0, z), Vector2i(1, 2), PI / 2)
+		_prop(o, "sezlong", Vector3i(105, 0, z), Vector2i(1, 2), PI / 2)
+		_prop(o, "havlu", Vector3i(111, 0, z), Vector2i(1, 2))
+	# Plaj kafesi (x 104..110, z -20..-15) ve dışarıda masalar, dondurma arabası.
+	_walls(o, Vector3i(104, 0, -20), Vector3i(110, 3, -16), Blocks.PLANKS)
+	_fill(o, Vector3i(105, 1, -16), Vector3i(109, 2, -16), Blocks.GLASS)
+	_door(o, Vector3i(107, 0, -16), true, true, true)
+	_fill(o, Vector3i(104, 4, -20), Vector3i(110, 4, -16), Blocks.DARK_PLANKS)
+	_awning(o, 104, 110, 3, -15, Blocks.TOY_BRICK_RED)
+	_prop(o, "kasa", Vector3i(105, 0, -19), Vector2i(2, 1))
+	_prop(o, "pasta_vitrini", Vector3i(107, 0, -19), Vector2i(2, 1))
+	_prop(o, "icecek_dolabi", Vector3i(109, 0, -19), Vector2i(1, 1))
+	_table4(o, Vector3i(105, 0, -12))
+	_table4(o, Vector3i(109, 0, -12))
+	_prop(o, "semsiye", Vector3i(108, 0, -9), Vector2i(1, 1))
+	_prop(o, "dondurma_arabasi", Vector3i(111, 0, -16), Vector2i(1, 1))
+	# Marina: iskeleler, tekneler, yelkenli ve Emir'in sürat teknesi.
+	for z in [24, 30, 36]:
+		_fill(o, Vector3i(110, -1, z), Vector3i(126, -1, z + 1), Blocks.PLANKS)
+		for x in range(112, 127, 4):
+			_put(o + Vector3i(x, 0, z), Blocks.LOG)
+	_prop(o, "tekne", Vector3i(116, 0, 26), Vector2i(4, 2), PI / 2)
+	_prop(o, "yelkenli", Vector3i(121, 0, 26), Vector2i(4, 2), PI / 2)
+	_prop(o, "surat_teknesi", Vector3i(114, 0, 32), Vector2i(3, 2), PI / 2)
+	_prop(o, "tekne", Vector3i(120, 0, 32), Vector2i(4, 2), PI / 2)
+	_prop(o, "yelkenli", Vector3i(116, 0, 38), Vector2i(4, 2), PI / 2)
+	# Kırmızı-beyaz deniz feneri (kayalık adacıkta).
+	_fill(o, Vector3i(126, -4, -44), Vector3i(134, -1, -36), Blocks.COBBLESTONE)
+	for y in 14:
+		var b := Blocks.TOY_BRICK_RED if (y / 2) % 2 == 0 else Blocks.TRIM_WHITE
+		_walls(o, Vector3i(129, y, -41), Vector3i(131, y, -39), b)
+	_fill(o, Vector3i(128, 14, -42), Vector3i(132, 14, -38), Blocks.TRIM_WHITE)
+	_walls(o, Vector3i(129, 15, -41), Vector3i(131, 16, -39), Blocks.GLASS)
+	_put(o + Vector3i(130, 15, -40), Blocks.LANTERN)
+	_fill(o, Vector3i(129, 17, -41), Vector3i(131, 17, -39), Blocks.TOY_BRICK_RED)
+	_put(o + Vector3i(130, 18, -40), Blocks.TOY_BRICK_RED)
+	# Akvaryum: büyük camlı bina, içte duvar boyu su tankları.
+	_walls(o, Vector3i(104, 0, 64), Vector3i(113, 5, 78), Blocks.TRIM_WHITE)
+	for z in range(65, 78):
+		_fill(o, Vector3i(104, 1, z), Vector3i(104, 4, z), Blocks.GLASS)
+	_fill(o, Vector3i(105, 1, 64), Vector3i(112, 4, 64), Blocks.GLASS)
+	_fill(o, Vector3i(104, 6, 64), Vector3i(113, 6, 78), Blocks.TRIM_WHITE)
+	_door(o, Vector3i(104, 0, 70), false, true, true)
+	_fill(o, Vector3i(110, 0, 66), Vector3i(112, 4, 76), Blocks.WATER)
+	_fill(o, Vector3i(109, 0, 66), Vector3i(109, 4, 76), Blocks.GLASS)
+	_fill(o, Vector3i(105, 0, 77), Vector3i(108, 3, 77), Blocks.WATER)
+	_fill(o, Vector3i(105, 0, 76), Vector3i(108, 3, 76), Blocks.GLASS)
+	_prop(o, "bank", Vector3i(106, 0, 72), Vector2i(2, 1))
+
+
+## Palmiye: ince gövde, tepede dört yöne sarkan yapraklar.
+func _palm(p: Vector3i) -> void:
+	_fill(Vector3i.ZERO, p, p + Vector3i(0, 5, 0), Blocks.LOG)
+	_put(p + Vector3i(0, 6, 0), Blocks.LEAVES)
+	for d in [Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1)]:
+		_put(p + Vector3i(0, 6, 0) + d, Blocks.LEAVES)
+		_put(p + Vector3i(0, 5, 0) + d * 2, Blocks.LEAVES)
