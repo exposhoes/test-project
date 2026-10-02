@@ -66,7 +66,7 @@ const LIST := [
 			{"place": "zeynep", "at": "okul.top_alani", "look": "okul.okul_kapi"},
 			{"place": "ogretmen", "at": "okul.okul_kapi", "look": "okul.bahce"},
 			{"cam": "okul.kam_bahce", "look": "okul.bahce", "t": 0},
-			{"say": "emir", "text": "Burası okulumuz. Bu da Kemal Öğretmen. Dersleri hiç sıkıcı değil!"},
+			{"say": "emir", "text": "Burası okulumuz. Bu da Kemal Öğretmen. Dersleri hiç sıkıcı değil!", "cuts": [[0.3, "okul.kam_ogretmen", "okul.okul_kapi"]]},
 			{"sfx": "okul_zili"},
 			{"cam": "okul.kam_ogretmen", "look": "okul.okul_kapi", "t": 0},
 			{"gesture": "ogretmen", "kind": "selam"},

@@ -190,6 +190,10 @@ func _establishing_cam(set_id: String) -> String:
 func _run(s: Dictionary) -> void:
 	if s.has("sfx"):
 		play_sfx(s["sfx"])
+		# Sahne geçiş sesi, ağır sahne değişiminden önce başlasın diye kısa bekleme
+		# (yoksa kayıtta bazen hiç duyulmuyordu).
+		if s["sfx"] == "vuup":
+			await _wait(0.35)
 	elif s.has("music"):
 		play_music(s["music"])
 	elif s.has("title"):
