@@ -20,6 +20,8 @@ func _ready() -> void:
 	_panel.dim = false
 	_panel.center_ratio = 0.3
 	_panel.title = "EmirCRAFT"
+	if ResourceLoader.exists(FilmStudio.LOGO_PATH):
+		_panel.title_image = load(FilmStudio.LOGO_PATH)
 	layer.add_child(_panel)
 	_refresh()
 

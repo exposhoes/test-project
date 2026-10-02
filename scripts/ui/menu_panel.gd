@@ -8,6 +8,8 @@ const GAP := 18.0
 
 var title := ""
 var subtitle := ""
+## Başlık yerine çizilen görsel (ör. EmirCRAFT logosu); boşsa başlık yazısı çizilir.
+var title_image: Texture2D
 ## Karartılmış arka plan (oyun içi menüde); ana menüde arkadaki 3B sahne görünsün diye kapalı.
 var dim := true
 ## Menünün yatay merkezi (ekran genişliğine oran); ana menüde sola alınır ki yaratıklar görünsün.
@@ -39,9 +41,15 @@ func _draw() -> void:
 	var total_h := n * (bh + GAP) - GAP
 	var y := maxf(size.y / 2.0 - total_h / 2.0 + 60.0, 210.0)
 	var cx := size.x * center_ratio
-	_centered(font, title, 72, y - 140, Color.WHITE, 10)
+	if title_image:
+		var h := minf(150.0, y - 70.0)
+		var w := minf(h * title_image.get_width() / title_image.get_height(), size.x * 0.9)
+		h = w * title_image.get_height() / title_image.get_width()
+		draw_texture_rect(title_image, Rect2(Vector2(cx - w / 2.0, y - 55.0 - h), Vector2(w, h)), false)
+	else:
+		_centered(font, title, 72, y - 140, Color.WHITE, 10)
 	if subtitle != "":
-		_centered(font, subtitle, 22, y - 90, Color(1, 1, 1, 0.8), 5)
+		_centered(font, subtitle, 22, y - (22.0 if title_image else 90.0), Color(1, 1, 1, 0.8), 5)
 	for b in _buttons:
 		var r := Rect2(Vector2(cx - BUTTON_SIZE.x / 2.0, y), Vector2(BUTTON_SIZE.x, bh))
 		b["rect"] = r
