@@ -455,6 +455,12 @@ static func _audio(folder: String, name: String) -> AudioStream:
 		var path := "res://assets/audio/%s/%s.%s" % [folder, name, ext]
 		if ResourceLoader.exists(path):
 			return load(path)
+	# Yeni eklenen mp3 henüz içe aktarılmadıysa dosyadan doğrudan okunur (bilgisayarda kayıt).
+	var raw := "res://assets/audio/%s/%s.mp3" % [folder, name]
+	if FileAccess.file_exists(raw):
+		var mp3 := AudioStreamMP3.new()
+		mp3.data = FileAccess.get_file_as_bytes(raw)
+		return mp3
 	return null
 
 
