@@ -2418,7 +2418,7 @@ func _bus_stop(p: Vector3i, line: int) -> void:
 ## x -15'te taş kemer köprü, x 28'de kuleli asma köprü, x 76'da tahta köprü; ayrıca x 50'de
 ## yaya için tahta köprü. Kıyıda çakıl yürüyüş yolu, ahşap iskeleler, banklar ve su değirmeni.
 func river_center(x: int) -> int:
-	return 51 + roundi(2.0 * sin(x / 9.0))
+	return 51 + roundi(2.0 * sin(x / 14.0))
 
 
 func _river() -> void:
@@ -2426,17 +2426,18 @@ func _river() -> void:
 	for x in range(CITY_MIN.x - 8, 114):
 		var c := river_center(x)
 		var street := _near_street(x)
-		for z in range(c - 2, c + 2):
+		for z in range(c - 3, c + 2):
 			_put(o + Vector3i(x, -2, z), Blocks.WATER)
+			_put(o + Vector3i(x, -3, z), Blocks.SAND)
 			if street:
 				continue
 			_put(o + Vector3i(x, -1, z), Blocks.AIR)
 			_put(o + Vector3i(x, 0, z), Blocks.AIR)
-		_put(o + Vector3i(x, -3, c - 2), Blocks.SAND)
 		if not street:
-			_put(o + Vector3i(x, -1, c - 3), Blocks.GRAVEL)
-			_put(o + Vector3i(x, -1, c + 2), Blocks.GRAVEL)
-			_put(o + Vector3i(x, -2, c - 3), Blocks.STONE_BASE)
+			# Kıyı: yumuşak geçiş için yer yer bir sıra daha kum/çakıl.
+			_put(o + Vector3i(x, -1, c - 4), Blocks.GRAVEL if posmod(x, 3) else Blocks.SAND)
+			_put(o + Vector3i(x, -1, c + 2), Blocks.GRAVEL if posmod(x + 1, 3) else Blocks.SAND)
+			_put(o + Vector3i(x, -2, c - 4), Blocks.STONE_BASE)
 			_put(o + Vector3i(x, -2, c + 2), Blocks.STONE_BASE)
 	# Köprü korkulukları: sokak kenarları boyunca.
 	for i in STREETS_X.size():
@@ -2444,16 +2445,16 @@ func _river() -> void:
 		for x in range(sx - 2, sx + 6):
 			var c := river_center(x)
 			var rail: int = [Blocks.STONE_BASE, Blocks.BALCONY_RAIL, Blocks.FENCE_WHITE][i]
-			_put(o + Vector3i(x, 0, c - 3), rail)
+			_put(o + Vector3i(x, 0, c - 4), rail)
 			_put(o + Vector3i(x, 0, c + 2), rail)
 		var c0 := river_center(sx)
 		if i == 0:
 			# Taş kemer: suyun içinde kemer ayakları.
 			for x in [sx - 2, sx + 5]:
-				_fill(o, Vector3i(x, -2, c0 - 2), Vector3i(x, -2, c0 + 1), Blocks.STONE_BASE)
+				_fill(o, Vector3i(x, -2, c0 - 3), Vector3i(x, -2, c0 + 1), Blocks.STONE_BASE)
 		elif i == 1:
 			# Asma köprü: iki yanda kule ve çapraz halatlar.
-			for z in [c0 - 3, c0 + 2]:
+			for z in [c0 - 4, c0 + 2]:
 				for x in [sx - 2, sx + 5]:
 					_fill(o, Vector3i(x, 1, z), Vector3i(x, 7, z), Blocks.TRIM_WHITE)
 				for k in 3:
@@ -2462,16 +2463,20 @@ func _river() -> void:
 	# Yaya köprüsü (tahta) x 50..51.
 	for x in [50, 51]:
 		var c := river_center(x)
-		for z in range(c - 2, c + 2):
+		for z in range(c - 3, c + 2):
 			_put(o + Vector3i(x, -1, z), Blocks.PLANKS)
-	for z in range(river_center(50) - 3, river_center(50) + 3):
+	for z in range(river_center(50) - 4, river_center(50) + 3):
 		_put(o + Vector3i(49, 0, z), Blocks.FENCE_WHITE)
 		_put(o + Vector3i(52, 0, z), Blocks.FENCE_WHITE)
 	# Ahşap iskeleler ve banklar.
 	for x0 in [-50, 4, 62]:
 		var c := river_center(x0)
-		_fill(o, Vector3i(x0, -1, c - 2), Vector3i(x0 + 1, -1, c - 1), Blocks.PLANKS)
-		_prop(o, "bank", Vector3i(x0 - 2, 0, c - 4), Vector2i(2, 1))
+		_fill(o, Vector3i(x0, -1, c - 3), Vector3i(x0 + 1, -1, c - 1), Blocks.PLANKS)
+		_prop(o, "bank", Vector3i(x0 - 2, 0, c - 5), Vector2i(2, 1))
+		_prop(o, "balikci", Vector3i(x0, 0, c - 2), Vector2i(1, 1))
+	# Kıyıda oltayla balık tutan figürler.
+	for x0 in [-30, 20, 86]:
+		_prop(o, "balikci", Vector3i(x0, 0, river_center(x0) - 5), Vector2i(1, 1))
 	# Su değirmeni (şehrin batı ucu, x -70..-65, nehrin güney kıyısında): taş ev, tahta çark.
 	var mx := -68
 	var mc := river_center(mx)
@@ -2558,6 +2563,12 @@ func _seaside() -> void:
 	_fill(o, Vector3i(105, 0, 77), Vector3i(108, 3, 77), Blocks.WATER)
 	_fill(o, Vector3i(105, 0, 76), Vector3i(108, 3, 76), Blocks.GLASS)
 	_prop(o, "bank", Vector3i(106, 0, 72), Vector2i(2, 1))
+	# Balıklar (camın içinde, suyun önünde).
+	var fish := ["balik_sari", "balik_turuncu", "balik_mavi"]
+	for k in 11:
+		_decor(o, fish[k % 3], Vector3(109.5, 1.2 + (k * 7 % 5) * 0.6, 66.5 + k), PI / 2 if k % 2 else -PI / 2)
+	for k in 4:
+		_decor(o, fish[(k + 1) % 3], Vector3(105.5 + k, 1.0 + (k % 2) * 1.1, 76.5), 0.0 if k % 2 else PI)
 
 
 ## Palmiye: ince gövde, tepede dört yöne sarkan yapraklar.
