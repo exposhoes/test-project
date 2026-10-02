@@ -529,6 +529,7 @@ static func _face(parent: Node3D, size: Vector3, center: Vector3, name: String, 
 	qm.size = Vector2(size.x, size.z if top else size.y)
 	var m := StandardMaterial3D.new()
 	m.albedo_texture = tex
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	m.roughness = 0.6
 	qm.material = m
 	q.mesh = qm
@@ -560,6 +561,8 @@ static func _box(parent: Node3D, size: Vector3, center: Vector3, color: Color) -
 		mat.albedo_color = tint
 		mat.uv1_triplanar = true
 		mat.uv1_scale = Vector3(1.5, 1.5, 1.5)
+		# İnce desenli dokular (ahşap damarı, kumaş) uzaktan ve eğik açıdan kıpır kıpır parlamasın.
+		mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
 	mat.roughness = 0.8
 	mesh.material = mat
 	mi.mesh = mesh
