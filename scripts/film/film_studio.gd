@@ -658,8 +658,8 @@ func _build_ui() -> void:
 	_logo.set_anchors_preset(Control.PRESET_CENTER)
 	_logo.anchor_left = 0.1
 	_logo.anchor_right = 0.9
-	_logo.anchor_top = 0.3
-	_logo.anchor_bottom = 0.7
+	_logo.anchor_top = 0.06  # üst kısım: kapanışta karakterlerin yüzünü kapatmasın
+	_logo.anchor_bottom = 0.3
 	_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_logo.visible = false
