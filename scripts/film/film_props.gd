@@ -52,7 +52,19 @@ const FACING := {
 ## Eşyayı kurar; köşesi (0,0,0), tabanı size.x × size.y blok. Eşyalar parça parça köşeli
 ## bloklardan kurulur (bacak, tabla, kapak, kulp); ana rengi Mehmet'in PNG'sinin ön görünüşünden alınır.
 ## id "koltuk@3a6ea5" gibi verilirse eşya o renge boyanır (evler birbirinden farklı görünsün).
+## Aynı eşyanın ilk kurulan hali; sonrakiler bundan kopyalanır (şehir açılışını çok hızlandırır,
+## kopyalar mesh ve malzemeleri paylaşır).
+static var _templates := {}
+
+
 static func build(id: String, size: Vector2i, turn_override = null) -> Node3D:
+	var key := "%s|%s|%s" % [id, size, turn_override]
+	if not _templates.has(key):
+		_templates[key] = _build(id, size, turn_override)
+	return _templates[key].duplicate()
+
+
+static func _build(id: String, size: Vector2i, turn_override = null) -> Node3D:
 	var tint = null
 	if "@" in id:
 		tint = Color(id.get_slice("@", 1))
@@ -1080,6 +1092,13 @@ const DECOR_SIZE := {
 
 
 static func build_decor(id: String) -> Node3D:
+	var key := "decor|" + id
+	if not _templates.has(key):
+		_templates[key] = _build_decor(id)
+	return _templates[key].duplicate()
+
+
+static func _build_decor(id: String) -> Node3D:
 	var size: Vector3 = DECOR_SIZE.get(id, Vector3.ONE * 0.5)
 	var root := Node3D.new()
 	root.name = "Sus_" + id
@@ -1230,12 +1249,22 @@ static func build_decor(id: String) -> Node3D:
 ## ÖN, YAN ve ÜST görünüş. Üç parça otomatik ayrılır, arka plan saydam yapılır ve
 ## eşyanın kutusunun yüzlerine kaplanır (ön +Z, yanlar ±X, üst +Y; arka = ön).
 static var _png_cache := {}
+## Pişirilmiş görünüş dosyası: kimlik, görünüş sırası.
+const BAKED_VIEWS := "res://assets/textures/esya/gorunus/%s_%d.res"
 
 
 static func _views(id: String) -> Array:
 	var path := "res://assets/textures/esya/%s.png" % id
 	if not ResourceLoader.exists(path) and not FileAccess.file_exists(path):
 		return []
+	if not _png_cache.has(id) and ResourceLoader.exists(BAKED_VIEWS % [id, 0]):
+		# Önceden ayrılmış görünüşler (tools/esya_gorunus_pisir.gd): telefonda saniyeler kazandırır.
+		var parts: Array = []
+		var i := 0
+		while ResourceLoader.exists(BAKED_VIEWS % [id, i]):
+			parts.append(load(BAKED_VIEWS % [id, i]))
+			i += 1
+		_png_cache[id] = parts
 	if not _png_cache.has(id):
 		var img: Image = null
 		var tex = load(path)
@@ -1280,6 +1309,14 @@ static func _load_png_box(id: String, foot: Vector3) -> Node3D:
 	var path := "res://assets/textures/esya/%s.png" % id
 	if not ResourceLoader.exists(path) and not FileAccess.file_exists(path):
 		return null
+	if not _png_cache.has(id) and ResourceLoader.exists(BAKED_VIEWS % [id, 0]):
+		# Önceden ayrılmış görünüşler (tools/esya_gorunus_pisir.gd): telefonda saniyeler kazandırır.
+		var parts: Array = []
+		var i := 0
+		while ResourceLoader.exists(BAKED_VIEWS % [id, i]):
+			parts.append(load(BAKED_VIEWS % [id, i]))
+			i += 1
+		_png_cache[id] = parts
 	if not _png_cache.has(id):
 		var img: Image = null
 		var tex = load(path)
