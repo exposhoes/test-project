@@ -2356,6 +2356,145 @@ func _furnish_new_buildings() -> void:
 	_decor(o, "ucus_tabelasi", Vector3(1.03, 4.0, 8.0), PI / 2)
 	_decor(o, "harita", Vector3(39.97, 2.3, 10.5), -PI / 2)
 	_decor(o, "duvar_saati", Vector3(1.03, 4.2, 11.0), PI / 2)
+	_furnish_north_district()
+
+
+## Kuzey mahallesinin iç döşemesi (AVM, kültür merkezi, spor salonu, skatepark, amfitiyatro, kampüs).
+func _furnish_north_district() -> void:
+	# AVM zemin: teknoloji mağazasında raf, televizyonlar, stantlar; giyimde ayna, pufler, ek askılar;
+	# koridorda oturma grupları, kiosk standları, saksılar, otomat; girişte danışma.
+	var o: Vector3i = SETS["avm"]
+	_prop(o, "market_rafi", Vector3i(1, 0, 4), Vector2i(1, 4))
+	_prop(o, "tv", Vector3i(3, 0, 12), Vector2i(3, 1))
+	_prop(o, "tv", Vector3i(8, 0, 12), Vector2i(3, 1))
+	_prop(o, "stant", Vector3i(4, 0, 4), Vector2i(3, 1), 0.0)
+	_decor(o, "bilgisayar", Vector3(3.0, 1.0, 9.5), 0.0)
+	_prop(o, "ayna", Vector3i(25, 0, 9), Vector2i(1, 1), -PI / 2)
+	_prop(o, "puf@e84a8a", Vector3i(18, 0, 6), Vector2i(1, 1))
+	_prop(o, "puf@3fa9f5", Vector3i(20, 0, 6), Vector2i(1, 1))
+	_prop(o, "elbise_askisi", Vector3i(15, 0, 11), Vector2i(3, 1))
+	_prop(o, "elbise_askisi", Vector3i(21, 0, 11), Vector2i(3, 1))
+	_prop(o, "bitki", Vector3i(14, 0, 5), Vector2i(1, 1))
+	_prop(o, "bekleme_koltugu", Vector3i(4, 0, 19), Vector2i(3, 1), PI)
+	_prop(o, "bekleme_koltugu", Vector3i(15, 0, 19), Vector2i(3, 1), PI)
+	_prop(o, "saksi", Vector3i(9, 0, 19), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(20, 0, 19), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(13, 0, 19), Vector2i(1, 1))
+	_prop(o, "otomat", Vector3i(1, 0, 16), Vector2i(1, 1), PI / 2)
+	_prop(o, "stant", Vector3i(10, 0, 16), Vector2i(3, 1), 0.0)
+	_prop(o, "stant", Vector3i(22, 0, 16), Vector2i(3, 1), 0.0)
+	_prop(o, "bank", Vector3i(27, 0, 17), Vector2i(2, 1), PI)
+	_prop(o, "kasa", Vector3i(27, 0, 8), Vector2i(2, 1), PI)
+	_prop(o, "saksi", Vector3i(27, 0, 1), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(37, 0, 1), Vector2i(1, 1))
+	_decor(o, "ucus_tabelasi", Vector3(37.97, 3.0, 14.0), -PI / 2)
+	# 1. kat yemek katı: ikinci masa sırası, sofralar, içecek dolabı, saksılar, çöp kutuları.
+	for x in [4, 10, 16, 22]:
+		_table4(o, Vector3i(x, 5, 4))
+		for z in [4, 8, 12]:
+			_decor(o, "sofra", Vector3(x + 1.0, 5.8, z + 0.5), 0.0)
+	_prop(o, "icecek_dolabi", Vector3i(22, 5, 19), Vector2i(1, 1), PI)
+	_prop(o, "su_sebili", Vector3i(24, 5, 19), Vector2i(1, 1), PI)
+	_prop(o, "otomat", Vector3i(1, 5, 14), Vector2i(1, 1), PI / 2)
+	_prop(o, "cop_kutusu", Vector3i(1, 5, 10), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(27, 5, 10), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(1, 5, 1), Vector2i(1, 1))
+	_prop(o, "saksi", Vector3i(28, 5, 1), Vector2i(1, 1))
+	_prop(o, "bekleme_koltugu", Vector3i(28, 5, 19), Vector2i(3, 1), PI)
+	# 2. kat oyun salonu: oturma köşesi, mısır makinesi, bilet kasası, sinema afişleri.
+	_prop(o, "bekleme_koltugu", Vector3i(8, 10, 10), Vector2i(3, 1), 0.0)
+	_prop(o, "puf@6a3fd1", Vector3i(5, 10, 8), Vector2i(1, 1))
+	_prop(o, "puf@ff7a1a", Vector3i(13, 10, 12), Vector2i(1, 1))
+	_prop(o, "puf@3f9f4f", Vector3i(15, 10, 8), Vector2i(1, 1))
+	_prop(o, "misir_makinesi", Vector3i(19, 10, 3), Vector2i(1, 1))
+	_prop(o, "kasa", Vector3i(18, 10, 9), Vector2i(2, 1), PI / 2)
+	_prop(o, "cop_kutusu", Vector3i(20, 10, 13), Vector2i(1, 1))
+	_prop(o, "otomat", Vector3i(1, 10, 10), Vector2i(1, 1), PI / 2)
+	_decor(o, "salon_halisi", Vector3(9.5, 10, 10.5), 0.0)
+	_decor(o, "poster", Vector3(20.97, 12.0, 11.0), -PI / 2)
+	_decor(o, "poster", Vector3(20.97, 12.0, 15.0), -PI / 2)
+	# Kültür merkezi: resim atölyesinde ortak masa, boya rafı, öğrenci resimleri; müzik atölyesinde
+	# dinleyici sandalyeleri ve oturma; robotikte tezgâh ve bilgisayar; sergide bank, vitrin, saksılar.
+	o = SETS["kultur"]
+	_prop(o, "yemek_masasi", Vector3i(9, 0, 7), Vector2i(3, 2))
+	for x in [9, 10, 11]:
+		_prop(o, "sandalye", Vector3i(x, 0, 6), Vector2i(1, 1))
+		_prop(o, "sandalye", Vector3i(x, 0, 9), Vector2i(1, 1), PI)
+	_prop(o, "kiler_rafi", Vector3i(1, 0, 6), Vector2i(1, 3), PI / 2)
+	_prop(o, "bitki", Vector3i(1, 0, 14), Vector2i(1, 1))
+	_prop(o, "lavabo", Vector3i(13, 0, 15), Vector2i(1, 1), PI)
+	for z in [3.0, 12.0]:
+		_decor(o, "tablo_kucuk", Vector3(1.03, 2.3, z), PI / 2)
+	_decor(o, "pano", Vector3(14.97, 2.2, 10.0), -PI / 2)
+	for x in [18, 19, 20, 21]:
+		_prop(o, "sandalye", Vector3i(x, 0, 8), Vector2i(1, 1), PI)
+	_prop(o, "bekleme_koltugu", Vector3i(17, 0, 1), Vector2i(3, 1), 0.0)
+	_prop(o, "puf@ffd23f", Vector3i(23, 0, 6), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(27, 0, 15), Vector2i(1, 1))
+	_decor(o, "poster", Vector3(27.97, 2.0, 4.0), -PI / 2)
+	_decor(o, "duvar_saati", Vector3(16.03, 2.8, 9.0), PI / 2)
+	_prop(o, "alet_tezgahi", Vector3i(1, 5, 6), Vector2i(1, 3), PI / 2)
+	_prop(o, "ogretmen_masasi", Vector3i(11, 5, 7), Vector2i(2, 1))
+	_decor(o, "bilgisayar", Vector3(12.0, 5.8, 7.5), PI)
+	_prop(o, "sandalye", Vector3i(11, 5, 8), Vector2i(1, 1), PI)
+	_prop(o, "kiler_rafi", Vector3i(12, 5, 14), Vector2i(2, 1), PI)
+	_decor(o, "pano", Vector3(1.03, 7.2, 12.5), PI / 2)
+	_prop(o, "bank", Vector3i(19, 5, 8), Vector2i(2, 1))
+	_prop(o, "vitrin", Vector3i(16, 5, 7), Vector2i(1, 2), PI / 2)
+	_prop(o, "saksi", Vector3i(17, 5, 14), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(27, 5, 2), Vector2i(1, 1))
+	# Spor salonu: saha kenarında yedek koltukları, sebil; havuz başında şezlonglar, dolaplar, havluluk.
+	o = SETS["spor"]
+	_prop(o, "bekleme_koltugu", Vector3i(17, 0, 8), Vector2i(1, 3), -PI / 2)
+	_prop(o, "bekleme_koltugu", Vector3i(17, 0, 14), Vector2i(1, 3), -PI / 2)
+	_prop(o, "su_sebili", Vector3i(17, 0, 20), Vector2i(1, 1), -PI / 2)
+	_prop(o, "cop_kutusu", Vector3i(17, 0, 3), Vector2i(1, 1))
+	_prop(o, "ogrenci_dolabi", Vector3i(21, 0, 1), Vector2i(4, 1), 0.0)
+	for x in [27, 30, 33]:
+		_prop(o, "sezlong", Vector3i(x, 0, 2), Vector2i(1, 2), PI)
+	_prop(o, "havluluk", Vector3i(36, 0, 2), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(37, 0, 23), Vector2i(1, 1))
+	_decor(o, "duvar_saati", Vector3(1.03, 5.0, 12.0), PI / 2)
+	_decor(o, "futbol_topu", Vector3(9.5, 0, 12.5), 0.0)
+	# Skatepark: kaykaycı gençler, bisiklet, çöp kutusu, lamba.
+	o = SETS["skate"]
+	_prop(o, "ogrenci@3fa9f5", Vector3i(12, 0, 7), Vector2i(1, 1), PI / 2)
+	_prop(o, "ogrenci@ff7a1a", Vector3i(16, 0, 5), Vector2i(1, 1), -PI / 2)
+	_prop(o, "bisiklet", Vector3i(27, 0, 10), Vector2i(1, 2))
+	_prop(o, "cop_kutusu", Vector3i(0, 0, 9), Vector2i(1, 1))
+	_prop(o, "bank", Vector3i(28, 0, 4), Vector2i(1, 2), -PI / 2)
+	_lamp(o + Vector3i(-1, 0, 0))
+	_lamp(o + Vector3i(29, 0, 14))
+	# Amfitiyatro sahnesi: gitarist ve piyano.
+	o = SETS["amfi"]
+	_prop(o, "ogrenci_gitar", Vector3i(14, 1, 3), Vector2i(1, 1))
+	_prop(o, "piyano", Vector3i(10, 1, 3), Vector2i(2, 1))
+	# Kampüs: çimende banklar ve öğrenciler; konferans kürsüsü; kütüphanede her katta ikinci masa, okuma
+	# koltukları, harita; kafeteryada sofralar ve içecek dolabı.
+	o = SETS["kampus"]
+	_prop(o, "bank", Vector3i(10, 0, 6), Vector2i(2, 1))
+	_prop(o, "bank", Vector3i(22, 0, 3), Vector2i(2, 1))
+	_prop(o, "ogrenci@3fa9f5", Vector3i(12, 0, 8), Vector2i(1, 1), PI)
+	_prop(o, "ogrenci@d62828", Vector3i(21, 0, 8), Vector2i(1, 1), PI / 2)
+	_prop(o, "ogretmen_masasi", Vector3i(23, 1, 15), Vector2i(2, 1))
+	_decor(o, "tablo", Vector3(28.0, 3.5, 15.03), 0.0)
+	_decor(o, "harita", Vector3(31.97, 3.5, 22.0), -PI / 2)
+	for f in 3:
+		var y := f * STOREY
+		_table4(o, Vector3i(47, y, 17))
+		_prop(o, "bitki", Vector3i(41, y, 28), Vector2i(1, 1))
+		_decor(o, "harita", Vector3(41.03, y + 2.3, 20.0), PI / 2)
+		if f > 0:
+			_prop(o, "berjer", Vector3i(52, y, 16), Vector2i(1, 1))
+			_prop(o, "berjer", Vector3i(54, y, 16), Vector2i(1, 1))
+			_prop(o, "abajur", Vector3i(53, y, 16), Vector2i(1, 1))
+	_prop(o, "ogretmen_masasi", Vector3i(52, 0, 17), Vector2i(3, 1), PI)
+	_decor(o, "bilgisayar", Vector3(53.5, 0.8, 17.5), PI)
+	for x in [42, 46]:
+		for z in [40, 44]:
+			_decor(o, "sofra", Vector3(x + 1.0, 0.8, z + 0.5), 0.0)
+	_prop(o, "icecek_dolabi", Vector3i(59, 0, 48), Vector2i(1, 1), -PI / 2)
+	_prop(o, "saksi", Vector3i(53, 0, 47), Vector2i(1, 1))
 
 
 ## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
