@@ -28,6 +28,13 @@ var _death_screen := ColorRect.new()
 var _death_time := 0.0
 var _inventory_screen := InventoryScreen.new()
 var _pause_menu := MenuPanel.new()
+## Şehri Gez modu: can/açlık, eşya çubuğu ve görev gizli; duraklat menüsünde hızlı geçiş.
+var explore := false
+const GEZI_YERLERI := [
+	["Emir'in Evi", "ev.kapi_disi"], ["Okul", "okul.sinif_kapi"], ["Hastane", "hastane.dis"],
+	["Pazar", "pazar.giris"], ["Park", "park.bank_yani"], ["Sahil", "sahil.kordon"],
+	["Metro", "metro.peron"], ["Havalimanı", "havalimani.giris"],
+]
 
 
 func _ready() -> void:
@@ -221,8 +228,37 @@ func is_menu_open() -> bool:
 	return _inventory_screen.visible or _death_screen.visible or _pause_menu.visible
 
 
+## Gezi modunu açar: göstergeleri gizler.
+func set_explore() -> void:
+	explore = true
+	_status.visible = false
+	_hotbar.visible = false
+	_name_label.visible = false
+	_quest_label.visible = false
+	_show_pause_buttons()
+
+
+func _show_places() -> void:
+	_pause_menu.title = "Nereye gidelim?"
+	var buttons := []
+	for pl: Array in GEZI_YERLERI:
+		var target: String = pl[1]
+		buttons.append({"label": pl[0], "action": func() -> void:
+			close_pause()
+			player.teleport(FilmSets.point(target) + Vector3(0, 0.1, 0))})
+	buttons.append({"label": "Geri", "action": _show_pause_buttons})
+	_pause_menu.set_buttons(buttons)
+
+
 func _show_pause_buttons() -> void:
 	_pause_menu.title = "Duraklatıldı"
+	if explore:
+		_pause_menu.set_buttons([
+			{"label": "Oyuna Dön", "action": close_pause},
+			{"label": "Yere Git", "action": _show_places},
+			{"label": "Ana Menü", "action": func() -> void: get_parent().quit_to_menu()},
+		])
+		return
 	_pause_menu.set_buttons([
 		{"label": "Oyuna Dön", "action": close_pause},
 		{"label": "Ayarlar", "action": _show_settings},

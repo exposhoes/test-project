@@ -76,6 +76,7 @@ func _ready() -> void:
 	if explore:
 		player.saved_position = FilmSets.point("ev.kapi_disi") + Vector3(0, 0.1, 0)
 		player.survival.set_process(false)
+		player.explore = true
 	player.tamed_mob.connect(_on_tamed)
 	player.used_portal.connect(travel)
 
@@ -90,7 +91,8 @@ func _ready() -> void:
 	if not explore:
 		hud.show_quest(quests)
 	else:
-		hud.toast("Şehri Gez: mahalle, nehir, sahil, metro, havalimanı")
+		hud.set_explore()
+		hud.toast("Şehri Gez: duraklat menüsünden istediğin yere git")
 
 
 func _on_quest_completed(text: String) -> void:

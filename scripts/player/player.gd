@@ -36,6 +36,8 @@ var _gas_timer := 0.0
 var _target := {}
 var _highlight := MeshInstance3D.new()
 var _spawned := false
+## Şehri Gez modu: blok kırma/koyma kapalı (setler bozulmasın).
+var explore := false
 var _fall_peak := 0.0
 var _knockback := Vector3.ZERO
 var _highlight_mat := StandardMaterial3D.new()
@@ -143,6 +145,9 @@ func _process(delta: float) -> void:
 	if _highlight.visible:
 		_highlight.global_position = Vector3(_target["hit"]) + Vector3.ONE * 0.5
 
+	if explore:
+		_highlight.visible = false
+		return
 	# Kır'a basınca önce yaratığa vurmayı dener; basılı tutunca blok kırılır.
 	if Input.is_action_just_pressed("break_block") and attack():
 		_break_progress = 0.0
