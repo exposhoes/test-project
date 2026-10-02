@@ -391,6 +391,7 @@ func _init() -> void:
 	_build_gas_station(SETS["benzinlik"])
 	_additions()
 	_street_furniture()
+	_street_furniture_2()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -2194,6 +2195,39 @@ func _street_furniture() -> void:
 		if not _near_street(x):
 			for az: int in AVENUES_Z:
 				_put(o + Vector3i(x, -1, az + 1), Blocks.STONE_BASE)
+
+
+## Sokakların ikinci turu: tek yön okları, gazete büfeleri, simgeli yön tabelaları, kamelyalar, çalılar.
+func _street_furniture_2() -> void:
+	var o := Vector3i(0, Y0, 0)
+	# Tek yön okları (beyaz, asfalt üstünde): hastane çevresindeki sokakta kuzeye doğru.
+	for z0 in [-8, 6]:
+		var c := Vector3i(-14, -1, z0)
+		for k in 4:
+			_put(o + c + Vector3i(0, 0, k), Blocks.SNOW)
+		_put(o + c + Vector3i(-1, 0, 2), Blocks.SNOW)
+		_put(o + c + Vector3i(1, 0, 2), Blocks.SNOW)
+	# Gazete büfeleri.
+	for p in [Vector3i(8, 0, 30), Vector3i(-28, 0, -20)]:
+		_walls(o, p, p + Vector3i(2, 2, 1), Blocks.TOY_BRICK_BLUE)
+		_fill(o, p + Vector3i(0, 1, 0), p + Vector3i(2, 1, 0), Blocks.GLASS)
+		_fill(o, p + Vector3i(-1, 3, -1), p + Vector3i(3, 3, 2), Blocks.TOY_BRICK_YELLOW)
+	# Yön tabelaları (yazısız simgeler): hastane kırmızı artı, okul sarı kitap, cami hilal yerine yeşil kubbe.
+	for sg in [[Vector3i(-14, 0, 22), Blocks.TOY_BRICK_RED], [Vector3i(29, 0, 22), Blocks.TOY_BRICK_YELLOW], [Vector3i(2, 0, -19), Blocks.TOY_BRICK_BLUE]]:
+		var p: Vector3i = sg[0]
+		_fill(o, p, p + Vector3i(0, 2, 0), Blocks.STONE)
+		_fill(o, p + Vector3i(0, 3, 0), p + Vector3i(2, 3, 0), Blocks.SNOW)
+		_put(o + p + Vector3i(1, 3, 0), sg[1])
+		_put(o + p + Vector3i(3, 3, 0), sg[1])
+	# Kamelyalar: dört direk, kiremit çatı, ortada bank.
+	for p in [Vector3i(-40, 0, 47), Vector3i(22, 0, 47)]:
+		for d in [Vector3i(0, 0, 0), Vector3i(3, 0, 0), Vector3i(0, 0, 3), Vector3i(3, 0, 3)]:
+			_fill(o, p + d, p + d + Vector3i(0, 2, 0), Blocks.LOG)
+		_fill(o, p + Vector3i(-1, 3, -1), p + Vector3i(4, 3, 4), Blocks.ROOF_TERRACOTTA)
+		_put(o + p + Vector3i(1, 4, 1), Blocks.ROOF_TERRACOTTA)
+		_put(o + p + Vector3i(2, 4, 2), Blocks.ROOF_TERRACOTTA)
+		_prop(o, "bank", p + Vector3i(1, 0, 1), Vector2i(2, 1))
+		_prop(o, "yemek_masasi", p + Vector3i(1, 0, 2), Vector2i(2, 1))
 
 
 ## Otobüs durağı (köşesi p, x boyunca 4 blok): arka cam, çatı, bank, renkli hat tabelası direği.
