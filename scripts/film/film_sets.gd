@@ -541,9 +541,11 @@ func _build_house(o: Vector3i) -> void:
 	_prop(o, "camasir_makinesi", Vector3i(-7, 0, -9), Vector2i(1, 1))
 	_fill(o, Vector3i(-3, 0, -9), Vector3i(-2, 1, -9), Blocks.BOOKSHELF)
 	# Üst kat: anne-babanın yatak odası (ön blok), oyun köşesi (arka kanat).
-	for x in [3, 4]:
-		_put(o + Vector3i(x, 5, 1), Blocks.BED)
-		_put(o + Vector3i(x, 5, 2), Blocks.BED)
+	_prop(o, "cift_yatak", Vector3i(3, 5, 1), Vector2i(2, 2))
+	_prop(o, "ayna", Vector3i(8, 5, 4), Vector2i(1, 1), -PI / 2)
+	_decor(o, "tablo", Vector3(4.0, 7.2, 0.03), 0.0)
+	_decor(o, "perde", Vector3(1.5, 6.55, 6.96), PI)
+	_decor(o, "perde", Vector3(6.5, 6.55, 6.96), PI)
 	_prop(o, "komodin", Vector3i(2, 5, 0), Vector2i(1, 1))
 	_prop(o, "komodin", Vector3i(5, 5, 0), Vector2i(1, 1))
 	_prop(o, "gardirop", Vector3i(0, 5, 4), Vector2i(1, 2))
@@ -578,6 +580,16 @@ func _build_house(o: Vector3i) -> void:
 	_prop(o, "bitki", Vector3i(16, 0, 6), Vector2i(1, 1))
 	_prop(o, "bitki", Vector3i(10, 0, 0), Vector2i(1, 1))
 	_decor(o, "poster", Vector3(16.97, 1.6, 4.5), -PI / 2)
+	# Salon takımı: vitrin, abajur, tablo, perdeler, saat.
+	_prop(o, "vitrin", Vector3i(14, 0, 6), Vector2i(2, 1))
+	_prop(o, "abajur", Vector3i(14, 0, 0), Vector2i(1, 1))
+	_decor(o, "tablo_kucuk", Vector3(13.0, 2.4, 6.97), PI)
+	_decor(o, "perde", Vector3(11.5, 1.55, 6.96), PI)
+	_decor(o, "duvar_saati", Vector3(9.03, 2.7, 2.0), PI / 2)
+	# Emir'in odası ve mutfak: perdeler, tablo.
+	_decor(o, "perde", Vector3(1.5, 1.55, 6.96), PI)
+	_decor(o, "perde", Vector3(6.5, 1.55, 6.96), PI)
+	_decor(o, "tablo_kucuk", Vector3(8.97, 2.4, 3.0), -PI / 2)
 	_prop(o, "ust_dolap", Vector3i(6, 0, 0), Vector2i(3, 1))
 	_prop(o, "sandalye", Vector3i(4, 0, 3), Vector2i(1, 1), PI / 2)
 	_prop(o, "sandalye", Vector3i(6, 0, 3), Vector2i(1, 1), -PI / 2)
