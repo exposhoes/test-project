@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 	"serum_askisi": 1.9, "ilac_dolabi": 2.0, "paravan": 1.8, "tarti": 1.3, "bekleme_koltugu": 0.9,
 	"su_sebili": 1.4, "stant": 1.3, "sepetlik": 0.8,
@@ -26,7 +26,7 @@ const STEEL := Color("9ea7ad")
 
 static func height(id: String) -> float:
 	id = id.get_slice("@", 0)
-	if id.begins_with("araba_"):
+	if id.begins_with("araba_") or id == "polis_araci":
 		return HEIGHTS["araba"]
 	return HEIGHTS.get(id, 1.0)
 
@@ -383,10 +383,11 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, Vector3(0.5, 0.35, 0.065), Vector3(w / 2, 2.9, 0.351), Color("d94b4b"))
 			for s in [[Vector3(0.45, 0.04, 0.04), Vector3(0, 0, 0.25)], [Vector3(0.45, 0.04, 0.04), Vector3(0, 0, 0.7)], [Vector3(0.04, 0.04, 0.45), Vector3(-0.22, 0, 0.47)], [Vector3(0.04, 0.04, 0.45), Vector3(0.22, 0, 0.47)]]:
 				_box(r, s[0], Vector3(w / 2, 2.7, 0.0) + s[1], Color("f27a1a"))
-		"araba", "ambulans", "araba_mavi", "araba_sari", "araba_beyaz", "araba_siyah", "araba_yesil":
+		"araba", "ambulans", "polis_araci", "araba_mavi", "araba_sari", "araba_beyaz", "araba_siyah", "araba_yesil":
 			# Önü +Z. Gövde, kabin, camlar, tekerlekler, farlar, stoplar.
 			var amb := id == "ambulans"
-			var c: Color = Color("f4f4f4") if amb else _tone(id, CAR_TONES.get(id, Color("c62828")))
+			var pol := id == "polis_araci"
+			var c: Color = Color("f4f4f4") if amb or pol else _tone(id, CAR_TONES.get(id, Color("c62828")))
 			_box(r, Vector3(w - 0.2, 0.55, d - 0.15), Vector3(w / 2, 0.55, d / 2), c)  # alt gövde
 			var cab_l := d * (0.7 if amb else 0.5)
 			var cab_z := d * (0.42 if amb else 0.45)
@@ -403,6 +404,11 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				_box(r, Vector3(0.3, 0.14, 0.04), Vector3(sx, 0.65, d - 0.07), Color("fff3b0"))  # far
 				_box(r, Vector3(0.3, 0.12, 0.04), Vector3(sx, 0.65, 0.07), Color("d32f2f"))  # stop
 			_box(r, Vector3(w - 0.5, 0.12, 0.04), Vector3(w / 2, 0.45, d - 0.07), Color("bdbdbd"))  # tampon
+			if pol:
+				for sx in [0.09, w - 0.09]:
+					_box(r, Vector3(0.03, 0.2, d * 0.85), Vector3(sx, 0.65, d / 2), Color("1e4fa8"))
+				_box(r, Vector3(0.3, 0.14, 0.25), Vector3(w / 2 - 0.17, 1.47, cab_z), Color("2e6fd8"))
+				_box(r, Vector3(0.3, 0.14, 0.25), Vector3(w / 2 + 0.17, 1.47, cab_z), Color("d32f2f"))
 			if amb:
 				_box(r, Vector3(0.03, 0.15, d * 0.8), Vector3(0.09, 0.8, d / 2), Color("d32f2f"))
 				_box(r, Vector3(0.03, 0.15, d * 0.8), Vector3(w - 0.09, 0.8, d / 2), Color("d32f2f"))
@@ -523,6 +529,33 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, Vector3(w - 0.1, 0.9, 0.04), Vector3(w / 2, 1.5, 0.03), Color("6d6d6d"))  # alet panosu
 			for k in int(w * 4):
 				_box(r, Vector3(0.06, 0.3, 0.04), Vector3(0.2 + k * 0.25, 1.5, 0.07), [Color("d32f2f"), Color("f2b705"), Color("2e6fd8")][k % 3])
+		"kafes":
+			# Hayvan kafesleri: iki katlı, ızgaralı kapaklar.
+			_box(r, Vector3(w - 0.05, h, d - 0.1), Vector3(w / 2, h / 2, d / 2 - 0.05), Color("dfe3e6"))
+			for k in 2:
+				var y := 0.25 + k * 0.5
+				_box(r, Vector3(w - 0.15, 0.4, 0.02), Vector3(w / 2, y, d - 0.08), Color("4a4f55"))
+				for j in int(w * 6):
+					_box(r, Vector3(0.03, 0.38, 0.03), Vector3(0.1 + j * (w - 0.2) / maxf(1.0, w * 6 - 1), y, d - 0.06), Color("b0b6bb"))
+		"kopek", "kedi":
+			# Köşeli dost: gövde, baş, kulaklar, kuyruk, bacaklar. Önü +Z.
+			var dog := id == "kopek"
+			var c: Color = Color("c8935a") if dog else Color("8a8f94")
+			var s := 1.0 if dog else 0.6
+			_box(r, Vector3(0.35 * s, 0.3 * s, 0.7 * s), Vector3(w / 2, 0.45 * s, d / 2), c)
+			_box(r, Vector3(0.3 * s, 0.3 * s, 0.3 * s), Vector3(w / 2, 0.68 * s, d / 2 + 0.42 * s), c)
+			_box(r, Vector3(0.14 * s, 0.1 * s, 0.12 * s), Vector3(w / 2, 0.62 * s, d / 2 + 0.6 * s), c.lightened(0.2))
+			_box(r, Vector3(0.05 * s, 0.05 * s, 0.02), Vector3(w / 2, 0.65 * s, d / 2 + 0.67 * s), Color("1b1b1b"))
+			for ex in [-0.08, 0.08]:
+				_box(r, Vector3(0.05 * s, 0.05 * s, 0.02), Vector3(w / 2 + ex * s, 0.75 * s, d / 2 + 0.57 * s + 0.01), Color("1b1b1b"))
+				_box(r, Vector3(0.08 * s, (0.15 if dog else 0.12) * s, 0.06 * s), Vector3(w / 2 + ex * 1.4 * s, (0.86 if not dog else 0.8) * s, d / 2 + 0.4 * s), c.darkened(0.25 if dog else 0.0))
+			for p in [Vector2(-0.12, -0.25), Vector2(0.12, -0.25), Vector2(-0.12, 0.25), Vector2(0.12, 0.25)]:
+				_box(r, Vector3(0.08 * s, 0.3 * s, 0.08 * s), Vector3(w / 2 + p.x * s, 0.15 * s, d / 2 + p.y * s), c.darkened(0.1))
+			_box(r, Vector3(0.06 * s, 0.06 * s, 0.3 * s), Vector3(w / 2, 0.6 * s, d / 2 - 0.45 * s), c)
+		"muayene_masasi":
+			_box(r, Vector3(w - 0.1, 0.1, d - 0.2), Vector3(w / 2, 0.85, d / 2), Color("c9d1d6"))
+			_box(r, Vector3(0.1, 0.8, 0.1), Vector3(w / 2, 0.4, d / 2), Color("8a9298"))
+			_box(r, Vector3(0.6, 0.05, 0.6), Vector3(w / 2, 0.03, d / 2), Color("8a9298"))
 		"saksi":
 			_box(r, Vector3(0.45, 0.4, 0.45), Vector3(w / 2, 0.2, d / 2), Color("b5562f"))
 			_box(r, Vector3(0.6, 0.45, 0.6), Vector3(w / 2, 0.65, d / 2), Color("3f8f3a"))
@@ -810,7 +843,7 @@ const DECOR_SIZE := {
 	"poster": Vector3(0.9, 1.2, 0.03), "duvar_saati": Vector3(0.5, 0.5, 0.06),
 	"futbol_topu": Vector3(0.35, 0.35, 0.35), "oda_halisi": Vector3(2.2, 0.02, 1.6),
 	"tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
-	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
+	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "buyuk_saat": Vector3(2.2, 2.2, 0.1), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 	"pano": Vector3(1.8, 1.1, 0.04), "harita": Vector3(1.5, 1.0, 0.03), "sofra": Vector3(1.6, 0.12, 0.7),
 }
 
@@ -878,6 +911,14 @@ static func build_decor(id: String) -> Node3D:
 			_box(root, Vector3(0.05, 0.12, 0.05), Vector3(0, 0.06, -0.14), Color("3a3a3a"))
 			_box(root, Vector3(0.45, 0.02, 0.15), Vector3(0, 0.01, 0.1), Color("2b2b2b"))
 			_box(root, Vector3(0.06, 0.02, 0.09), Vector3(0.3, 0.01, 0.1), Color("2b2b2b"))
+		"buyuk_saat":
+			_box(root, size, Vector3.ZERO, Color("c9a64a"))
+			_box(root, Vector3(size.x - 0.25, size.y - 0.25, 0.02), Vector3(0, 0, 0.05), Color("fbf7ec"))
+			for k in 12:
+				var a := k * TAU / 12
+				_box(root, Vector3(0.1, 0.1, 0.02), Vector3(cos(a) * 0.85, sin(a) * 0.85, 0.07), Color("2b2b2b"))
+			_box(root, Vector3(0.08, 0.7, 0.02), Vector3(0, 0.3, 0.08), Color("2b2b2b"))
+			_box(root, Vector3(0.5, 0.08, 0.02), Vector3(0.22, 0, 0.09), Color("2b2b2b"))
 		"oda_halisi":
 			_box(root, size, Vector3(0, 0.01, 0), Color("6fb3e0"))
 			_box(root, Vector3(1.6, 0.022, 1.0), Vector3(0, 0.012, 0), Color("a9d6f2"))
