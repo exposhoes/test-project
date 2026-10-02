@@ -31,6 +31,7 @@ const SETS := {
 	"kutuphane": Vector3i(56, GROUND + 1, 65),
 	"benzinlik": Vector3i(84, GROUND + 1, 65),
 	"sahil": Vector3i(101, GROUND + 1, 0),
+	"metro": Vector3i(4, GROUND + 1 - 7, -22),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -364,6 +365,13 @@ const POINTS := {
 		"kam_dis": Vector3(9.0, 2.5, -2.0),
 		"kam_market": Vector3(15.0, 2.3, 11.0),
 	},
+	"metro": {
+		"peron": Vector3(12.5, 0, 2.5),
+		"peron_kuzey": Vector3(16.5, 0, 11.5),
+		"tren_kapisi": Vector3(14.5, 0, 3.6),
+		"kam_genel": Vector3(30.0, 3.5, 1.5),
+		"kam_peron": Vector3(2.0, 2.5, 12.0),
+	},
 	"sahil": {
 		"kordon": Vector3(1.5, 0, 18.5),
 		"plaj": Vector3(7.5, 0, 9.5),
@@ -411,6 +419,7 @@ func _init() -> void:
 	_river()
 	_seaside()
 	_tram()
+	_metro()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -2556,3 +2565,64 @@ func _tram_stop(p: Vector3i) -> void:
 	_prop(o, "bilet_makinesi", p + Vector3i(4, 0, 1), Vector2i(1, 1), PI)
 	_fill(o, p + Vector3i(-1, 0, 1), p + Vector3i(-1, 3, 1), Blocks.STONE)
 	_put(o + p + Vector3i(-1, 4, 1), Blocks.TOY_BRICK_RED)
+
+
+## Metro: güney caddesinin (z -16) altında istasyon (x 4..36, z -22..-8, zemin y -8); iki peron, ortada çift
+## hat ve üç vagonlu tren; güney kaldırımında kırmızı "M" işaretli iki merdivenli giriş.
+func _metro() -> void:
+	var o := Vector3i(0, Y0, 0)
+	var a := Vector3i(4, -9, -22)
+	var b := Vector3i(36, -2, -8)
+	_walls(o, a, b, Blocks.TRIM_WHITE)
+	_fill(o, a + Vector3i(1, 1, 1), b - Vector3i(1, 1, 1), Blocks.AIR)
+	_fill(o, Vector3i(5, -8, -21), Vector3i(35, -8, -9), Blocks.STONE_BASE)  # peron zemini
+	_fill(o, Vector3i(5, -8, -17), Vector3i(35, -8, -13), Blocks.AIR)  # hat çukuru
+	_fill(o, Vector3i(5, -9, -17), Vector3i(35, -9, -13), Blocks.GRAVEL)
+	_fill(o, Vector3i(4, -2, -22), Vector3i(36, -2, -8), Blocks.CEILING_TILE)
+	for x in range(7, 36, 5):
+		for z in [-19, -11]:
+			_put(o + Vector3i(x, -2, z), Blocks.CEILING_LIGHT)
+	# Tünel ağızları (iki uçta karanlık).
+	for x in [4, 36]:
+		_fill(o, Vector3i(x, -8, -17), Vector3i(x, -5, -13), Blocks.AIR)
+		var dx := -1 if x == 4 else 1
+		_walls(o, Vector3i(x + dx * 6 if dx < 0 else x + 1, -9, -18), Vector3i(x - 1 if dx < 0 else x + 6, -4, -12), Blocks.COBBLESTONE)
+		_fill(o, Vector3i(x + dx * 5 if dx < 0 else x + 1, -8, -17), Vector3i(x - 1 if dx < 0 else x + 5, -5, -13), Blocks.AIR)
+	_fill(o, Vector3i(-2, -9, -18), Vector3i(-2, -4, -12), Blocks.COBBLESTONE)
+	_fill(o, Vector3i(42, -9, -18), Vector3i(42, -4, -12), Blocks.COBBLESTONE)
+	for tz in [-16.0, -14.0]:
+		for x in range(0, 41, 8):
+			_decor(o, "ray", Vector3(x + 4.0, -8, tz), 0.0)
+	_prop(o, "metro", Vector3i(11, -8, -17), Vector2i(18, 2), PI / 2)
+	# Peron kenarı sarı çizgi, banklar, duvarda M işaretleri.
+	for x in range(5, 36):
+		_put(o + Vector3i(x, -8, -18), Blocks.TOY_BRICK_YELLOW)
+		_put(o + Vector3i(x, -8, -12), Blocks.TOY_BRICK_YELLOW)
+	for x in [22, 30]:
+		_prop(o, "bank", Vector3i(x, -7, -21), Vector2i(2, 1))
+	for x in [10, 30]:
+		_prop(o, "bank", Vector3i(x, -7, -9), Vector2i(2, 1), PI)
+	for x in [10.0, 20.0, 30.0]:
+		_decor(o, "metro_m", Vector3(x, -5, -21.9), 0.0)
+		_decor(o, "metro_m", Vector3(x, -5, -8.1), PI)
+	# Girişler: kaldırımdan perona inen merdiven, cam korkuluk, M direği.
+	_metro_stairs(6, 1, -20)
+	_metro_stairs(26, -1, -12)
+
+
+func _metro_stairs(x0: int, dir: int, z0: int) -> void:
+	var o := Vector3i(0, Y0, 0)
+	for k in 7:
+		var x := x0 + k * dir
+		for z in [z0, z0 + 1]:
+			_fill(o, Vector3i(x, -1 - k, z), Vector3i(x, 2, z), Blocks.AIR)
+			_put(o + Vector3i(x, -2 - k, z), Blocks.STONE_BASE)
+	for k in 7:
+		var x := x0 + k * dir
+		_put(o + Vector3i(x, 0, z0 - 1), Blocks.GLASS)
+		_put(o + Vector3i(x, 0, z0 + 2), Blocks.GLASS)
+	var px := x0 - dir
+	_put(o + Vector3i(px, 0, z0 - 1), Blocks.STONE)
+	_put(o + Vector3i(px, 1, z0 - 1), Blocks.STONE)
+	_put(o + Vector3i(px, 2, z0 - 1), Blocks.STONE)
+	_decor(o, "metro_m", Vector3(px + 0.5, 3.7, z0 - 0.5), PI / 2 if dir > 0 else -PI / 2)

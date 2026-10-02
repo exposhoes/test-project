@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "trafik_isigi": 3.2, "otomat": 1.9, "trambolin": 0.8, "pompa": 1.8, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "tramvay": 3.2, "tramvay_sari": 3.2, "tramvay_mavi": 3.2, "bilet_makinesi": 1.7, "tekne": 1.2, "yelkenli": 5.5, "surat_teknesi": 1.1, "havlu": 0.05, "dondurma_arabasi": 1.6, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "trafik_isigi": 3.2, "otomat": 1.9, "trambolin": 0.8, "pompa": 1.8, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "tramvay": 3.2, "metro": 3.0, "tramvay_sari": 3.2, "tramvay_mavi": 3.2, "bilet_makinesi": 1.7, "tekne": 1.2, "yelkenli": 5.5, "surat_teknesi": 1.1, "havlu": 0.05, "dondurma_arabasi": 1.6, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 	"serum_askisi": 1.9, "ilac_dolabi": 2.0, "paravan": 1.8, "tarti": 1.3, "bekleme_koltugu": 0.9,
 	"su_sebili": 1.4, "stant": 1.3, "sepetlik": 0.8,
@@ -649,6 +649,18 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, Vector3(0.4, 0.3, 0.02), Vector3(w / 2, 1.25, d / 2 + 0.23), Color("1d2b3a"))  # ekran
 			_box(r, Vector3(0.3, 0.06, 0.03), Vector3(w / 2, 0.85, d / 2 + 0.23), Color("333333"))  # bilet ağzı
 			_box(r, Vector3(0.14, 0.14, 0.02), Vector3(w / 2, 1.5, d / 2 + 0.23), Color("2e7d32"))
+		"metro":
+			for car in int(d / 6.0):
+				var cz := 3.0 + car * 6.0
+				_box(r, Vector3(w - 0.2, 2.6, 5.8), Vector3(w / 2, 1.5, cz), Color("d9dde2"))  # gövde
+				_box(r, Vector3(w - 0.18, 0.3, 5.82), Vector3(w / 2, 1.0, cz), Color("d62828"))  # kırmızı şerit
+				_box(r, Vector3(w - 0.16, 0.8, 4.6), Vector3(w / 2, 1.95, cz), Color(0.35, 0.5, 0.62, 1))  # pencere
+				for dz in [-1.6, 1.6]:
+					_box(r, Vector3(w - 0.14, 1.9, 0.9), Vector3(w / 2, 1.15, cz + dz), Color("8f979e"))  # kapı
+			for e in [0.04, d - 0.04]:
+				_box(r, Vector3(w - 0.6, 0.9, 0.05), Vector3(w / 2, 2.0, e), Color(0.35, 0.5, 0.62, 1))
+				_box(r, Vector3(0.25, 0.15, 0.06), Vector3(0.4, 0.8, e), Color("fff4b0"))
+				_box(r, Vector3(0.25, 0.15, 0.06), Vector3(w - 0.4, 0.8, e), Color("fff4b0"))
 		"dus":
 			_box(r, Vector3(w - 0.05, 0.1, d - 0.05), Vector3(w / 2, 0.05, d / 2), Color("f2f2f2"))  # tekne
 			_box(r, Vector3(0.03, 2.0, d - 0.05), Vector3(w - 0.03, 1.1, d / 2), Color(0.75, 0.88, 0.95, 1))  # cam
@@ -946,7 +958,7 @@ static func _box(parent: Node3D, size: Vector3, center: Vector3, color: Color) -
 const DECOR_SIZE := {
 	"poster": Vector3(0.9, 1.2, 0.03), "duvar_saati": Vector3(0.5, 0.5, 0.06),
 	"futbol_topu": Vector3(0.35, 0.35, 0.35), "oda_halisi": Vector3(2.2, 0.02, 1.6),
-	"ray": Vector3(8.0, 0.08, 1.2), "tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
+	"ray": Vector3(8.0, 0.08, 1.2), "metro_m": Vector3(1.2, 1.2, 0.1), "tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
 	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "buyuk_saat": Vector3(2.2, 2.2, 0.1), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 	"pano": Vector3(1.8, 1.1, 0.04), "harita": Vector3(1.5, 1.0, 0.03), "sofra": Vector3(1.6, 0.12, 0.7),
 }
@@ -1001,6 +1013,12 @@ static func build_decor(id: String) -> Node3D:
 				var sx := (k - 0.5) * size.x * 0.75
 				_box(root, Vector3(size.x * 0.3, size.y, size.z), Vector3(sx, 0, 0), Color("c98b6b"))
 			_box(root, Vector3(size.x + 0.3, 0.05, 0.05), Vector3(0, size.y / 2, 0), Color("6b4026"))
+		"metro_m":
+			_box(root, size, Vector3.ZERO, Color("d62828"))
+			for bx in [-0.35, 0.35]:
+				_box(root, Vector3(0.14, 0.8, 0.02), Vector3(bx, 0, 0.06), Color("ffffff"))
+			for bx in [-0.17, 0.17]:
+				_box(root, Vector3(0.12, 0.45, 0.02), Vector3(bx, 0.12, 0.065), Color("ffffff"))
 		"ray":
 			for k in 8:
 				_box(root, Vector3(0.25, 0.04, 1.3), Vector3(-3.5 + k, 0.02, 0), Color("5b4636"))  # travers
