@@ -74,6 +74,8 @@ const POINTS := {
 		"sira_4": Vector3(10.5, 0, 8.6),
 		"bahce": Vector3(7.5, 0, 16.0),
 		"kaydirak": Vector3(14.0, 0, 17.0),
+		"agac_onu": Vector3(10.5, 0, 19.3),          # bahçedeki ağacın önü (saklambaçta ebe sayar)
+		"kam_agac_arka": Vector3(10.5, 2.3, 15.2),
 		"top_alani": Vector3(3.0, 0, 18.0),
 		"kam_sinif": Vector3(7.5, 2.6, 9.5),
 		"kam_tahta": Vector3(7.5, 2.2, 3.5),

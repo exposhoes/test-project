@@ -9,6 +9,7 @@ extends RefCounted
 ##   {"place": "emir", "at": nokta, "look": nokta, "lie": bool}   oyuncuyu sahneye koyar
 ##   {"cam": nokta, "look": nokta, "t": sn}             kamerayı götürür (t=0 kesme)
 ##   {"say": "emir", "text": "..."}                     diyalog kutusu; okunma süresi kadar bekler
+##     "keep_cam": true                                  kamera konuşana dönmez (ör. arkadan çekim)
 ##   {"walk": "emir", "to": nokta, "wait": false}       yürür (wait false: yürürken sonraki adıma geçer)
 ##   {"lie": "emir", "value": false}                    yatar/kalkar
 ##   {"turn": "emir", "to": nokta}                      bir yere döner
@@ -73,9 +74,14 @@ const LIST := [
 			{"say": "emir", "text": "Olur! Ama bu sefer ebe sensin Ali!"},
 			{"walk": "zeynep", "to": Vector3(53.5, 11, 17.0)},
 			{"say": "zeynep", "text": "Ben de varım! Kum havuzunun arkasına saklanacağım."},
-			{"say": "ali", "text": "Tamam, gözlerimi kapatıyorum. Bir... iki... üç..."},
+			{"walk": "ali", "to": "okul.agac_onu"},
+			{"turn": "ali", "to": Vector3(58.5, 11, 20.5)},
+			{"cam": "okul.kam_agac_arka", "look": Vector3(58.5, 12.4, 20.5), "t": 1.0},
+			{"say": "ali", "text": "Tamam, gözlerimi kapatıyorum. Bir... iki... üç...", "keep_cam": true},
+			{"cam": "okul.kam_bahce", "look": "okul.bahce", "t": 0},
 			{"walk": "emir", "to": "okul.sinif_kapi", "wait": false},
 			{"walk": "zeynep", "to": "okul.top_alani"},
+			{"turn": "ali", "to": "okul.bahce"},
 			{"say": "ali", "text": "...on! Önüm arkam sağım solum sobe!"},
 			{"cam": "okul.kam_sinif", "look": "okul.sinif_kapi", "t": 1.5},
 			{"say": "emir", "text": "Hiii... Sınıfa saklandım, burayı asla bulamaz!"},
