@@ -7,6 +7,8 @@
 param(
 	[Parameter(Position = 0)][string]$Bolum = "hepsi",
 	[switch]$Yenile,
+	# Yatay videoyu AVI yerine PNG kare dizisi olarak kaydet (4 GB AVI sınırına takılırsa; çok yavaş: kare başına ~4 sn).
+	[switch]$Png,
 	[string]$Cikti = ""
 )
 $ErrorActionPreference = "Continue"
@@ -40,19 +42,39 @@ foreach ($b in $secilen) {
 	$ayar = if ($dikey) {
 		"[display]`nwindow/size/viewport_width=1080`nwindow/size/viewport_height=1920`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=1.0`nwindow/size/window_width_override=405`nwindow/size/window_height_override=720`nwindow/size/always_on_top=true`n"
 	} else {
-		"[display]`nwindow/size/viewport_width=3840`nwindow/size/viewport_height=2160`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=3.0`nwindow/size/window_width_override=960`nwindow/size/window_height_override=540`nwindow/size/always_on_top=true`n"
+		"[display]`nwindow/size/viewport_width=3840`nwindow/size/viewport_height=2160`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=3.0`nwindow/size/window_width_override=960`nwindow/size/window_height_override=540`nwindow/size/always_on_top=true`n[editor]`nmovie_writer/mjpeg_quality=0.6`n"
 	}
+	# 4K kareler büyük: geçici AVI C: yerine çıktı sürücüsüne yazılır (yer sorunu olmasın).
+	if (-not $dikey) { $avi = Join-Path $Cikti "_gecici_$($b.Id).avi" }
 	Write-Host "Kaydediliyor: $ad"
 	Set-Content $override -Encoding ASCII -Value $ayar
-	try {
-		& $godot --path $root --write-movie $avi --fixed-fps 30 --script res://tools/kayit.gd -- $b.Id 2>&1 |
-			Select-String "SCRIPT ERROR|frames at" | ForEach-Object { Write-Host "  $($_.Line.Trim())" }
-	} finally {
-		Remove-Item $override -Force -ErrorAction SilentlyContinue
+	if ($dikey -or -not $Png) {
+		try {
+			& $godot --path $root --write-movie $avi --fixed-fps 30 --script res://tools/kayit.gd -- $b.Id 2>&1 |
+				Select-String "SCRIPT ERROR|frames at" | ForEach-Object { Write-Host "  $($_.Line.Trim())" }
+		} finally {
+			Remove-Item $override -Force -ErrorAction SilentlyContinue
+		}
+		if (-not (Test-Path $avi)) { Write-Host "  HATA: kayıt üretilemedi."; continue }
+		& $ffmpeg -v error -y -ss $basKes -i $avi -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a aac -b:a 160k -movflags +faststart $mp4
+		Remove-Item $avi -Force -ErrorAction SilentlyContinue
+	} else {
+		# 4K: AVI dosyası 4 GB sınırını aşıp görüntüyü yarıda kesiyor; kareler tek tek PNG olarak yazılır.
+		$kareler = Join-Path $Cikti "_gecici\$($b.Id)"
+		if (Test-Path $kareler) { Remove-Item $kareler -Recurse -Force -Confirm:$false }
+		New-Item -ItemType Directory -Force $kareler | Out-Null
+		try {
+			& $godot --path $root --write-movie (Join-Path $kareler "k.png") --fixed-fps 30 --script res://tools/kayit.gd -- $b.Id 2>&1 |
+				Select-String "SCRIPT ERROR|frames at" | ForEach-Object { Write-Host "  $($_.Line.Trim())" }
+		} finally {
+			Remove-Item $override -Force -ErrorAction SilentlyContinue
+		}
+		$sayi = (Get-ChildItem $kareler -Filter "k*.png").Count
+		if ($sayi -eq 0) { Write-Host "  HATA: kayıt üretilemedi."; continue }
+		Write-Host "  $sayi kare yazıldı"
+		& $ffmpeg -v error -y -framerate 30 -i (Join-Path $kareler "k%08d.png") -i (Join-Path $kareler "k.wav") -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k -shortest -movflags +faststart $mp4
+		if (Test-Path $mp4) { Remove-Item $kareler -Recurse -Force -Confirm:$false }
 	}
-	if (-not (Test-Path $avi)) { Write-Host "  HATA: kayıt üretilemedi."; continue }
-	& $ffmpeg -v error -y -ss $basKes -i $avi -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a aac -b:a 160k -movflags +faststart $mp4
-	Remove-Item $avi -Force -ErrorAction SilentlyContinue
 	if (Test-Path $mp4) { Write-Host ("  Hazır: {0} ({1:N1} MB)" -f $mp4, ((Get-Item $mp4).Length / 1MB)) } else { Write-Host "  HATA: MP4'e çevrilemedi." }
 }
 Write-Host "Bitti. Videolar: $Cikti"
