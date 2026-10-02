@@ -73,18 +73,18 @@ const POINTS := {
 	"zeynep_ev": FAMILY_POINTS,
 	"ogretmen_ev": FAMILY_POINTS,
 	"ev": {
-		"yatak": Vector3(1.5, 0.42, 2.0),          # Emir'in uzandığı yer (yatak üstü)
-		"yatak_yani": Vector3(2.8, 0, 2.0),
+		"yatak": Vector3(1.5, 5.42, 2.0),          # Emir'in uzandığı yer (yatak üstü)
+		"yatak_yani": Vector3(2.8, 5, 2.0),
 		"mutfak": Vector3(6.5, 0, 2.6),
 		"ocak": Vector3(7.5, 0, 1.4),
 		"mutfak_on": Vector3(6.8, 0, 4.0),       # mutfakla oda arası, konuşma yeri
 		"masa": Vector3(5.5, 0, 4.4),
-		"canta": Vector3(2.0, 0, 5.4),          # çalışma masasının önü (masa z=6)
+		"canta": Vector3(2.0, 5, 5.4),          # çalışma masasının önü (masa z=6)
 		"kapi_ici": Vector3(4.5, 0, 5.8),
 		"kapi_disi": Vector3(4.5, 0, 9.0),
 		"bahce": Vector3(8.0, 0, 11.0),
 		"yol": Vector3(4.5, 0, 16.0),
-		"kam_yatak": Vector3(4.2, 2.3, 4.8),
+		"kam_yatak": Vector3(4.2, 7.3, 4.8),
 		"kam_mutfak": Vector3(3.0, 2.2, 5.2),
 		"kam_oda": Vector3(7.8, 2.6, 5.8),
 		"kam_dis": Vector3(10.0, 4.0, 15.0),
@@ -97,7 +97,7 @@ const POINTS := {
 		"garaj": Vector3(-3.5, 0, 3.0),
 		"merdiven": Vector3(9.5, 0, -6.5),
 		"bodrum": Vector3(8.5, -4, -5.5),
-		"yatak_odasi": Vector3(4.0, 5, 4.5),
+		"yatak_odasi": Vector3(15.0, 5, -7.0),
 		"ust_kat": Vector3(4.5, 5, -6.0),
 		"teras": Vector3(14.5, 5, 4.5),
 		"yan_bahce": Vector3(21.0, 0, 6.0),
@@ -577,6 +577,9 @@ var decor: Array = []
 
 
 func _decor(o: Vector3i, id: String, at: Vector3, turn: float) -> void:
+	# Perdeler düz levha gibi duruyordu; Mehmet kaldırılmasını istedi (2026-10-02).
+	if id.begins_with("perde"):
+		return
 	decor.append([id, Vector3(o) + at, turn])
 
 
@@ -726,16 +729,37 @@ func _build_house(o: Vector3i) -> void:
 	_prop(o, "camasir_makinesi", Vector3i(-8, 0, -9), Vector2i(1, 1))
 	_prop(o, "camasir_makinesi", Vector3i(-7, 0, -9), Vector2i(1, 1))
 	_fill(o, Vector3i(-3, 0, -9), Vector3i(-2, 1, -9), Blocks.BOOKSHELF)
-	# Üst kat: anne-babanın yatak odası (ön blok), oyun köşesi (arka kanat).
-	_prop(o, "cift_yatak", Vector3i(3, 5, 1), Vector2i(2, 2))
-	_prop(o, "ayna", Vector3i(8, 5, 4), Vector2i(1, 1), -PI / 2)
+	# Üst kat: Emir'in odası (ön blok, aşağıda), anne-babanın yatak odası (arka kanadın doğusu,
+	# x 13..16, merdivenin yanından kapı), oyun köşesi (arka kanadın batısı).
 	_decor(o, "tablo", Vector3(4.0, 7.2, 0.03), 0.0)
 	_decor(o, "perde", Vector3(1.5, 6.55, 6.96), PI)
 	_decor(o, "perde", Vector3(6.5, 6.55, 6.96), PI)
-	_prop(o, "komodin", Vector3i(2, 5, 0), Vector2i(1, 1))
-	_prop(o, "komodin", Vector3i(5, 5, 0), Vector2i(1, 1))
-	_prop(o, "gardirop", Vector3i(0, 5, 4), Vector2i(1, 2))
 	_fill(o, Vector3i(1, 4, 3), Vector3i(6, 4, 5), Blocks.RUG)
+	_fill(o, Vector3i(13, 5, -9), Vector3i(13, 7, -5), P)
+	_fill(o, Vector3i(13, 5, -6), Vector3i(13, 6, -6), Blocks.AIR)
+	_prop(o, "cift_yatak", Vector3i(14, 5, -9), Vector2i(2, 2))
+	_prop(o, "komodin", Vector3i(16, 5, -9), Vector2i(1, 1))
+	_prop(o, "gardirop", Vector3i(16, 5, -6), Vector2i(1, 2), -PI / 2)
+	_prop(o, "ayna", Vector3i(14, 5, -5), Vector2i(1, 1))
+	_fill(o, Vector3i(14, 4, -7), Vector3i(15, 4, -6), Blocks.RUG)
+	_decor(o, "tablo", Vector3(15.0, 7.0, -8.97), 0.0)
+	_put(o + Vector3i(15, 7, -5), Blocks.LANTERN)
+	# İç kapılar (açılır kapı): koridor, garaj, çamaşır odası, üst kat odaları; arka bahçe ve teras kapısı.
+	for dz in [Vector3(5, 0, -0.5), Vector3(13, 0, -0.5), Vector3(-5, 0, -0.5), Vector3(-5, 0, -3.5), Vector3(5, 5, -0.5)]:
+		doors.append([Vector3(o) + dz, 0.0, true])
+	doors.append([Vector3(o) + Vector3(-5, 0, -9.5), 0.0])
+	doors.append([Vector3(o) + Vector3(9.5, 5, 3), -PI / 2])
+	doors.append([Vector3(o) + Vector3(13.5, 5, -6), -PI / 2, true])
+	# Merdiven korkuluğu ve koridorlarda halı yolluk, tablolar.
+	for k in 5:
+		_put(o + Vector3i(7 + k, k + 1, -7), Blocks.BALCONY_RAIL)
+	_fill(o, Vector3i(0, -1, -3), Vector3i(8, -1, -2), Blocks.RUG)
+	_fill(o, Vector3i(-7, 4, -3), Vector3i(6, 4, -2), Blocks.RUG)
+	for t in [[Vector3(-2.5, 1.9, -2.97), 0.0], [Vector3(6.5, 1.9, -2.97), 0.0], [Vector3(1.5, 1.9, -1.03), PI],
+			[Vector3(11.5, 1.9, -1.03), PI], [Vector3(1.5, 6.6, -1.03), PI], [Vector3(7.0, 6.6, -1.03), PI]]:
+		_decor(o, "tablo", t[0], t[1])
+	_decor(o, "tablo_kucuk", Vector3(8.97, 6.6, 2.0), -PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(0.03, 2.2, 2.0), PI / 2)
 	_prop(o, "koltuk", Vector3i(-6, 5, -9), Vector2i(3, 1))
 	_fill(o, Vector3i(0, 5, -9), Vector3i(3, 6, -9), Blocks.BOOKSHELF)
 	# Teras: masa ve saksı çiçekler.
@@ -777,7 +801,7 @@ func _build_house(o: Vector3i) -> void:
 	_decor(o, "perde", Vector3(6.5, 1.55, 6.96), PI)
 	_decor(o, "tablo_kucuk", Vector3(8.97, 2.4, 3.0), -PI / 2)
 	# Emir'in çalışma masasında bilgisayar; salonda pufler; banyoda ayna.
-	_decor(o, "bilgisayar", Vector3(2.0, 0.8, 6.55), PI)
+	_decor(o, "bilgisayar", Vector3(2.0, 5.8, 6.55), PI)
 	_prop(o, "puf", Vector3i(14, 0, 3), Vector2i(1, 1))
 	_prop(o, "puf", Vector3i(15, 0, 2), Vector2i(1, 1))
 	_decor(o, "ayna_duvar", Vector3(3.5, 1.8, -8.97), 0.0)
@@ -818,20 +842,27 @@ func _build_house(o: Vector3i) -> void:
 	_fill(o, Vector3i(19, 4, 11), Vector3i(22, 4, 11), Blocks.PLANKS)
 	_prop(o, "sehpa", Vector3i(20, 0, 11), Vector2i(2, 1))
 	_prop(o, "yemek_masasi", Vector3i(21, 0, -2), Vector2i(1, 1))
-	# Emir'in odası: yatak, kitaplık, sandık.
-	_put(o + Vector3i(1, 0, 1), Blocks.BED)
-	_put(o + Vector3i(1, 0, 2), Blocks.BED)
-	_fill(o, Vector3i(2, 0, 0), Vector3i(3, 1, 0), Blocks.BOOKSHELF)
-	# Minecraft sandık/çalışma masası yerine gerçek ev eşyaları (bkz. PROPS, film_props.gd).
-	_prop(o, "gardirop", Vector3i(0, 0, 5), Vector2i(1, 2))
-	_prop(o, "calisma_masasi", Vector3i(1, 0, 6), Vector2i(2, 1))
-	_prop(o, "komodin", Vector3i(1, 0, 0), Vector2i(1, 1))
-	_prop(o, "oyuncak_kutusu", Vector3i(0, 0, 3), Vector2i(1, 1))
-	# Duvar ve zemin süsleri (yürümeyi engellemez): poster, saat, top, oda halısı.
-	_decor(o, "poster", Vector3(0.02, 1.5, 3.6), PI / 2)
-	_decor(o, "duvar_saati", Vector3(2.0, 2.5, 0.02), 0.0)
-	_decor(o, "futbol_topu", Vector3(3.3, 0, 3.6), 0.0)
-	_decor(o, "oda_halisi", Vector3(1.2, 0, 3.0), 0.0)
+	# Emir'in odası (üst kat, ön blok): yatak, kitaplık, gardırop, çalışma masası.
+	_put(o + Vector3i(1, 5, 1), Blocks.BED)
+	_put(o + Vector3i(1, 5, 2), Blocks.BED)
+	_fill(o, Vector3i(2, 5, 0), Vector3i(3, 6, 0), Blocks.BOOKSHELF)
+	_prop(o, "gardirop", Vector3i(0, 5, 5), Vector2i(1, 2))
+	_prop(o, "calisma_masasi", Vector3i(1, 5, 6), Vector2i(2, 1))
+	_prop(o, "komodin", Vector3i(1, 5, 0), Vector2i(1, 1))
+	_prop(o, "oyuncak_kutusu", Vector3i(0, 5, 3), Vector2i(1, 1))
+	_decor(o, "poster", Vector3(0.02, 6.5, 3.6), PI / 2)
+	_decor(o, "duvar_saati", Vector3(2.0, 7.5, 0.02), 0.0)
+	_decor(o, "futbol_topu", Vector3(3.3, 5, 3.6), 0.0)
+	# Zemin kattaki eski oda artık mutfağın parçası: ikinci tezgâh, üst dolap, kiler rafı, mutfak masası.
+	_prop(o, "mutfak_tezgahi", Vector3i(0, 0, 0), Vector2i(2, 1))
+	_prop(o, "ocak", Vector3i(2, 0, 0), Vector2i(1, 1))
+	_prop(o, "mutfak_tezgahi", Vector3i(3, 0, 0), Vector2i(2, 1))
+	_prop(o, "ust_dolap", Vector3i(0, 0, 0), Vector2i(3, 1))
+	_prop(o, "kiler_rafi", Vector3i(0, 0, 5), Vector2i(1, 2), PI / 2)
+	_prop(o, "yemek_masasi", Vector3i(2, 0, 3), Vector2i(1, 1))
+	_prop(o, "sandalye", Vector3i(1, 0, 3), Vector2i(1, 1), PI / 2)
+	_prop(o, "sandalye", Vector3i(2, 0, 2), Vector2i(1, 1))
+	_decor(o, "sofra", Vector3(2.5, 0.8, 3.5), 0.0)
 	# Mutfak: tezgah, ocak, buzdolabı.
 	_prop(o, "mutfak_tezgahi", Vector3i(6, 0, 0), Vector2i(2, 1))
 	_prop(o, "ocak", Vector3i(8, 0, 0), Vector2i(1, 1))

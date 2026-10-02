@@ -224,6 +224,10 @@ func _run(s: Dictionary) -> void:
 	elif s.has("walk"):
 		var a := _actor(s["walk"])
 		var speed := 0.0 if fast else 2.2
+		# Başka kattaki hedef (ör. üst kattaki oda ↔ mutfak): yol bulucu tek katta çalışır, sahne kesmesiyle geç.
+		if absf(FilmSets.point(s["to"]).y - a.position.y) > 2.0:
+			a.position = FilmSets.point(s["to"])
+			return
 		var path := (world.generator as FilmSets).route(a.position, FilmSets.point(s["to"]))
 		if path.is_empty():
 			route_failures += 1

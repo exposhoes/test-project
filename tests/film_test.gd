@@ -18,7 +18,7 @@ func _init() -> void:
 	# Karakterlerin durduğu noktalar eşyaların içinde olmasın (yerdeki noktalar; kameralar ve yatak üstü hariç).
 	for set_id in FilmSets.POINTS:
 		for p: String in FilmSets.POINTS[set_id]:
-			if p.begins_with("kam") or FilmSets.POINTS[set_id][p].y > 0.0 and FilmSets.POINTS[set_id][p].y < 1.0:
+			if p.begins_with("kam") or fposmod(FilmSets.POINTS[set_id][p].y, 5.0) > 0.0 and fposmod(FilmSets.POINTS[set_id][p].y, 5.0) < 1.0:
 				continue
 			var pos := FilmSets.point(set_id + "." + p)
 			if not sets.is_free(Vector3i(floori(pos.x), floori(pos.y), floori(pos.z))):
@@ -63,7 +63,7 @@ func _init() -> void:
 		fails += 1
 		print("FAIL eşyalara takılmadan yol bulunamayan yürüyüş: ", studio.route_failures)
 	# Yatak seti gerçekten evde mi?
-	if studio.world.get_block(Vector3i(FilmSets.SETS["ev"]) + Vector3i(1, 0, 1)) != Blocks.BED:
+	if studio.world.get_block(Vector3i(FilmSets.SETS["ev"]) + Vector3i(1, 5, 1)) != Blocks.BED:
 		fails += 1
 		print("FAIL evde yatak yok")
 	print("FILM TEST ", "PASS" if fails == 0 else "FAIL %d" % fails)
