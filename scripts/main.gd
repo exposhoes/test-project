@@ -43,6 +43,10 @@ const BOSS_BAR_RANGE := 32.0
 ## Şehri Gez modu: film setlerinin (mahalle, nehir, sahil, metro, havalimanı) içinde serbest dolaşma.
 ## Ana menü Engine meta "gezi" ile açar; kayıt yok, yaratık yok, açlık yok, hep gündüz.
 var explore := false
+## Şehri Gez sesleri: şehir ortam sesi, adım ve kapı sesleri.
+var _ambience: AudioStreamPlayer
+var _steps: AudioStreamPlayer
+var _step_timer := 0.0
 var _doors: Array[Node3D] = []
 
 
@@ -92,6 +96,7 @@ func _ready() -> void:
 		hud.show_quest(quests)
 	else:
 		hud.set_explore()
+		_setup_explore_audio()
 		hud.toast("Şehri Gez: duraklat menüsünden istediğin yere git")
 
 
@@ -137,6 +142,7 @@ func _process(delta: float) -> void:
 	if explore:
 		_update_sun()
 		_swing_doors(delta)
+		_explore_steps(delta)
 		# Şehrin altına düşerse (chunk geç yüklendiyse) Emir'in evinin önüne geri al.
 		if player.is_spawned() and player.global_position.y < 0.0:
 			player.teleport(FilmSets.point("ev.kapi_disi") + Vector3(0, 0.1, 0))
@@ -448,4 +454,51 @@ func _swing_doors(delta: float) -> void:
 		var center := d.global_position + d.global_transform.basis.x * 0.5
 		var near := player.global_position.distance_to(center) < 2.2
 		var hinge := d.get_child(0) as Node3D
+		if near != d.get_meta("near", false):
+			d.set_meta("near", near)
+			_door_sound(d)
 		hinge.rotation.y = move_toward(hinge.rotation.y, 1.7 if near else 0.0, delta * 3.0)
+
+
+func _setup_explore_audio() -> void:
+	var amb := load("res://assets/audio/sfx/ortam_sehir.mp3") as AudioStreamMP3
+	if amb:
+		amb = amb.duplicate()
+		amb.loop = true
+		_ambience = AudioStreamPlayer.new()
+		_ambience.stream = amb
+		_ambience.volume_db = -12.0
+		add_child(_ambience)
+		_ambience.play()
+	_steps = AudioStreamPlayer.new()
+	_steps.stream = load("res://assets/audio/sfx/ayak.mp3")
+	_steps.volume_db = -8.0
+	add_child(_steps)
+
+
+## Yürürken her adımda ayak sesi (koşunca daha sık).
+func _explore_steps(delta: float) -> void:
+	if _steps == null or not player.is_spawned():
+		return
+	var v := Vector2(player.velocity.x, player.velocity.z).length()
+	if not player.is_on_floor() or v < 0.8:
+		_step_timer = 0.0
+		return
+	_step_timer -= delta
+	if _step_timer <= 0.0:
+		_step_timer = clampf(1.6 / v, 0.25, 0.55)
+		_steps.pitch_scale = randf_range(0.9, 1.1)
+		_steps.play()
+
+
+func _door_sound(d: Node3D) -> void:
+	var st := load("res://assets/audio/sfx/kapi.wav") as AudioStream
+	if st == null:
+		return
+	var p := AudioStreamPlayer3D.new()
+	p.stream = st
+	p.unit_size = 4.0
+	p.pitch_scale = randf_range(0.9, 1.1)
+	d.add_child(p)
+	p.finished.connect(p.queue_free)
+	p.play()
