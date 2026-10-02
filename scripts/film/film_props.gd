@@ -15,6 +15,7 @@ const HEIGHTS := {
 	"serum_askisi": 1.9, "ilac_dolabi": 2.0, "paravan": 1.8, "tarti": 1.3, "bekleme_koltugu": 0.9,
 	"su_sebili": 1.4, "stant": 1.3, "sepetlik": 0.8,
 	"pasta_vitrini": 1.3, "ekmek_rafi": 2.0, "ogrenci_dolabi": 1.9, "cop_kutusu": 0.7,
+	"yangin_hortumu": 1.6, "kask_askisi": 1.9, "misir_makinesi": 1.7,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
 ## daha geniş tabanlarda x/z ölçeklenir.
@@ -723,6 +724,33 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 		"cop_kutusu":
 			_box(r, Vector3(0.4, 0.6, 0.4), Vector3(w / 2, 0.3, d / 2), _tone(id, Color("4f9f5f")))
 			_box(r, Vector3(0.44, 0.06, 0.44), Vector3(w / 2, 0.63, d / 2), Color("37474f"))
+		"yangin_hortumu":
+			# Duvara dayalı kırmızı hortum dolabı: sarılı hortum makarası ve yanında yangın söndürücü.
+			_box(r, Vector3(0.8, 0.9, 0.2), Vector3(w / 2, 1.1, 0.12), Color("c62828"))
+			_box(r, Vector3(0.6, 0.6, 0.06), Vector3(w / 2, 1.1, 0.25), Color("f5f5f5"))
+			_box(r, Vector3(0.42, 0.42, 0.06), Vector3(w / 2, 1.1, 0.29), Color("b0b0b0"))
+			_box(r, Vector3(0.22, 0.22, 0.07), Vector3(w / 2, 1.1, 0.3), Color("c62828"))
+			_box(r, Vector3(0.18, 0.5, 0.18), Vector3(w / 2 + 0.3, 0.25, 0.2), Color("d32f2f"))
+			_box(r, Vector3(0.08, 0.1, 0.08), Vector3(w / 2 + 0.3, 0.55, 0.2), Color("263238"))
+		"kask_askisi":
+			# İtfaiyeci askılığı: üst rafta sarı kasklar, altında asılı ceketler, yerde çizmeler.
+			_box(r, Vector3(w - 0.05, 0.05, 0.4), Vector3(w / 2, 1.6, 0.22), Color("8a8a8a"))
+			_box(r, Vector3(w - 0.05, h, 0.04), Vector3(w / 2, h / 2, 0.03), Color("9e9e9e"))
+			for k in int(maxf(1.0, w * 2)):
+				var cx := 0.28 + k * 0.5
+				_box(r, Vector3(0.3, 0.18, 0.32), Vector3(cx, 1.72, 0.22), Color("fbc02d"))
+				_box(r, Vector3(0.36, 0.04, 0.38), Vector3(cx, 1.64, 0.22), Color("f9a825"))
+				_box(r, Vector3(0.34, 0.75, 0.16), Vector3(cx, 1.12, 0.14), Color("3e2f23"))
+				_box(r, Vector3(0.34, 0.06, 0.17), Vector3(cx, 0.95, 0.14), Color("fdd835"))
+				_box(r, Vector3(0.24, 0.3, 0.26), Vector3(cx, 0.15, 0.2), Color("212121"))
+		"misir_makinesi":
+			# Patlamış mısır arabası: kırmızı gövde, camlı hazne, içinde sarı mısır, üstte kırmızı çatı.
+			_box(r, Vector3(0.7, 0.8, 0.6), Vector3(w / 2, 0.4, d / 2), Color("c62828"))
+			_box(r, Vector3(0.72, 0.06, 0.62), Vector3(w / 2, 0.78, d / 2), Color("fdd835"))
+			_box(r, Vector3(0.62, 0.6, 0.52), Vector3(w / 2, 1.15, d / 2), Color("d6ecf3"))
+			_box(r, Vector3(0.56, 0.3, 0.46), Vector3(w / 2, 1.0, d / 2), Color("ffe082"))
+			_box(r, Vector3(0.76, 0.12, 0.66), Vector3(w / 2, 1.52, d / 2), Color("c62828"))
+			_box(r, Vector3(0.5, 0.1, 0.4), Vector3(w / 2, 1.64, d / 2), Color("fdd835"))
 		_:
 			_box(r, f, f / 2, WOOD)
 
