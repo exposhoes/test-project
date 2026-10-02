@@ -33,6 +33,12 @@ const SETS := {
 	"sahil": Vector3i(101, GROUND + 1, 0),
 	"metro": Vector3i(4, GROUND + 1 - 7, -22),
 	"havalimani": Vector3i(-20, GROUND + 1, -80),
+	"avm": Vector3i(-60, GROUND + 1, 104),
+	"amfi": Vector3i(-14, GROUND + 1, 96),
+	"kultur": Vector3i(-14, GROUND + 1, 124),
+	"spor": Vector3i(-60, GROUND + 1, 132),
+	"skate": Vector3i(-14, GROUND + 1, 146),
+	"kampus": Vector3i(34, GROUND + 1, 98),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -366,6 +372,54 @@ const POINTS := {
 		"kam_dis": Vector3(9.0, 2.5, -2.0),
 		"kam_market": Vector3(15.0, 2.3, 11.0),
 	},
+	"avm": {
+		"giris": Vector3(31.5, 0, -2.5),
+		"otopark": Vector3(4.5, 0, -4.5),
+		"teknoloji": Vector3(6.5, 0, 6.5),
+		"giyim": Vector3(17.5, 0, 6.5),
+		"yemek_kati": Vector3(19.5, 5, 9.5),
+		"arcade": Vector3(9.5, 10, 9.5),
+		"sinema": Vector3(29.5, 10, 4.5),
+		"kam_genel": Vector3(19.0, 9.0, -20.0),
+		"kam_ic": Vector3(33.0, 3.5, 17.0),
+		"kam_yemek": Vector3(33.0, 8.5, 17.0),
+	},
+	"amfi": {
+		"sahne": Vector3(14.5, 1, 2.5),
+		"seyirci": Vector3(14.5, 3, 14.5),
+		"kam_genel": Vector3(14.0, 10.0, 22.0),
+	},
+	"kultur": {
+		"giris": Vector3(14.5, 0, -1.5),
+		"resim": Vector3(6.5, 0, 6.5),
+		"muzik": Vector3(22.5, 0, 6.5),
+		"robotik": Vector3(6.5, 5, 6.5),
+		"sergi": Vector3(22.5, 5, 6.5),
+		"kam_genel": Vector3(14.0, 6.0, -12.0),
+		"kam_ic": Vector3(14.5, 2.5, 13.0),
+	},
+	"spor": {
+		"giris": Vector3(19.5, 0, -1.5),
+		"basket": Vector3(9.5, 0, 9.5),
+		"havuz_kenari": Vector3(23.5, 0, 3.5),
+		"kam_genel": Vector3(19.0, 8.0, -10.0),
+		"kam_ic": Vector3(37.0, 5.5, 22.0),
+	},
+	"skate": {
+		"pist": Vector3(14.5, 0, 6.5),
+		"kam_genel": Vector3(14.0, 6.0, -4.0),
+	},
+	"kampus": {
+		"cimen": Vector3(16.5, 0, 4.5),
+		"rektorluk_on": Vector3(16.5, 0, 9.5),
+		"amfi": Vector3(8.5, 0, 17.5),
+		"konferans": Vector3(24.5, 0, 22.5),
+		"kutuphane": Vector3(50.5, 0, 17.5),
+		"kafeterya": Vector3(50.5, 0, 46.5),
+		"yurt_on": Vector3(14.5, 0, 36.5),
+		"kam_genel": Vector3(16.0, 10.0, -6.0),
+		"kam_cimen": Vector3(30.0, 3.0, 2.0),
+	},
 	"havalimani": {
 		"giris": Vector3(20.5, 0, 12.5),
 		"kontuar_on": Vector3(6.5, 0, 7.5),
@@ -433,6 +487,7 @@ func _init() -> void:
 	_tram()
 	_metro()
 	_airport(SETS["havalimani"])
+	_north_district()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -492,7 +547,7 @@ func _tree_spot(g: Vector2i) -> bool:
 	if lx < 3 or lx > 12 or lz < 3 or lz > 12:
 		return false
 	# Setlerin ve önlerindeki yolun çevresi boş kalsın.
-	if g.x > CITY_MIN.x - 8 and g.x < SEA_X1 + 8 and g.y > -112 and g.y < CITY_MAX.y + 8:
+	if g.x > CITY_MIN.x - 8 and g.x < SEA_X1 + 8 and g.y > -112 and g.y < 170:
 		return false
 	return (hash(g) % 23) == 0
 
@@ -2762,3 +2817,286 @@ func _airport(o: Vector3i) -> void:
 	_fill(o, Vector3i(43, 18, -1), Vector3i(49, 18, 5), Blocks.TRIM_WHITE)
 	_fill(o, Vector3i(46, 19, 2), Vector3i(46, 21, 2), Blocks.STONE)
 	_put(o + Vector3i(46, 22, 2), Blocks.TOY_BRICK_RED)
+
+
+## Kuzey mahallesi (z 90..160): yeni cadde; AVM ve otoparkı, amfitiyatro, kültür merkezi, kapalı spor salonu
+## ve olimpik havuz, skatepark, üniversite kampüsü (sütunlu rektörlük, kütüphane, yurtlar, kafeterya, çimen).
+func _north_district() -> void:
+	var o := Vector3i(0, Y0, 0)
+	# Kuzey caddesi (z 90..93) ve kaldırımlar; x 28 sokağının uzantısı.
+	_fill(o, Vector3i(CITY_MIN.x, -1, 88), Vector3i(CITY_MAX.x, -1, 95), Blocks.SIDEWALK)
+	_fill(o, Vector3i(CITY_MIN.x, -1, 90), Vector3i(CITY_MAX.x, -1, 93), Blocks.ASPHALT)
+	_fill(o, Vector3i(26, -1, 84), Vector3i(33, -1, 89), Blocks.SIDEWALK)
+	_fill(o, Vector3i(28, -1, 84), Vector3i(31, -1, 89), Blocks.ASPHALT)
+	for x in range(CITY_MIN.x + 2, CITY_MAX.x, 12):
+		if x < 26 or x > 33:
+			_lamp(o + Vector3i(x, 0, 94))
+	_build_mall(SETS["avm"])
+	_build_amphitheatre(SETS["amfi"])
+	_build_culture_center(SETS["kultur"])
+	_build_sports_hall(SETS["spor"])
+	_build_skatepark(SETS["skate"])
+	_build_campus(SETS["kampus"])
+
+
+## Basit merdiven: x0..x0+1 genişliğinde, z0'dan dz yönünde, y0'dan y0+4'e çıkar; üst döşemede delik açar.
+func _steps(o: Vector3i, x0: int, z0: int, y0: int, dz: int) -> void:
+	for k in 5:
+		for x in [x0, x0 + 1]:
+			_put(o + Vector3i(x, y0 + k, z0 + k * dz), Blocks.STONE_BASE)
+			if k < 4:
+				_fill(o, Vector3i(x, y0 + 4, z0 + k * dz), Vector3i(x, y0 + 4, z0 + k * dz), Blocks.AIR)
+
+
+## AVM: 3 katlı cam cepheli bina (x 0..38, z 0..20), önünde otopark. Zemin: teknoloji/oyun ve giyim
+## mağazaları; 1. kat yemek katı; 2. kat oyun salonu (arcade) ve sinema. Cephede yazısız logo.
+func _build_mall(o: Vector3i) -> void:
+	_fill(o, Vector3i(0, -1, -8), Vector3i(38, -1, -1), Blocks.CONCRETE)
+	for x in range(1, 38, 4):
+		_fill(o, Vector3i(x, -1, -8), Vector3i(x, -1, -5), Blocks.SNOW)
+	var cols := ["araba", "araba_mavi", "araba_sari"]
+	for i in 5:
+		_car(o + Vector3i(2 + i * 8, 0, -8), cols[i % 3], false)
+	_walls(o, Vector3i(0, 0, 0), Vector3i(38, 14, 20), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(1, -1, 1), Vector3i(37, -1, 19), Blocks.STONE_BASE)
+	for f in 3:
+		var y := f * STOREY
+		for x in range(1, 38):
+			if x % 6 != 0:
+				_fill(o, Vector3i(x, y, 0), Vector3i(x, y + 3, 0), Blocks.GLASS)
+		if f > 0:
+			_fill(o, Vector3i(1, y - 1, 1), Vector3i(37, y - 1, 19), Blocks.STONE_BASE)
+		for x in range(4, 37, 8):
+			for z in [5, 15]:
+				_put(o + Vector3i(x, y + 4 if f < 2 else 15, z), Blocks.CEILING_LIGHT)
+	_fill(o, Vector3i(0, 15, 0), Vector3i(38, 15, 20), Blocks.TRIM_WHITE)
+	for x in [30, 31, 32]:
+		_door(o, Vector3i(x, 0, 0), true, false)
+	_decor(o, "avm_logo", Vector3(19.5, 12.5, -0.06), PI)
+	_steps(o, 34, 6, 0, 1)
+	_steps(o, 34, 14, 5, -1)
+	# Zemin: teknoloji ve oyun mağazası (x 1..12) ve giyim mağazası (x 14..25); arkada cam vitrin.
+	_fill(o, Vector3i(13, 0, 1), Vector3i(13, 3, 12), Blocks.PLASTER)
+	_fill(o, Vector3i(26, 0, 1), Vector3i(26, 3, 12), Blocks.PLASTER)
+	_fill(o, Vector3i(1, 0, 13), Vector3i(26, 3, 13), Blocks.GLASS)
+	_door(o, Vector3i(6, 0, 13), true, false)
+	_door(o, Vector3i(19, 0, 13), true, false)
+	_prop(o, "oyun_konsolu", Vector3i(2, 0, 2), Vector2i(3, 1))
+	_prop(o, "oyun_konsolu", Vector3i(7, 0, 2), Vector2i(3, 1))
+	_prop(o, "kamera_tripod", Vector3i(10, 0, 8), Vector2i(1, 1))
+	_prop(o, "kamera_tripod", Vector3i(11, 0, 10), Vector2i(1, 1))
+	_prop(o, "kasa", Vector3i(2, 0, 9), Vector2i(2, 1))
+	var tee := ["e84a8a", "3fa9f5", "ffd23f", "3f9f4f"]
+	for i in 4:
+		_prop(o, "manken@" + tee[i], Vector3i(15 + i * 2, 0, 2), Vector2i(1, 1))
+	_prop(o, "elbise_askisi", Vector3i(15, 0, 9), Vector2i(3, 1))
+	_prop(o, "elbise_askisi", Vector3i(20, 0, 9), Vector2i(3, 1))
+	_prop(o, "kasa", Vector3i(23, 0, 5), Vector2i(2, 1))
+	# 1. kat: yemek katı.
+	var ff := ["d62828", "ffd23f", "3f9f4f", "ff7a1a"]
+	for i in 4:
+		_prop(o, "fastfood_tezgahi@" + ff[i], Vector3i(2 + i * 5, 5, 18), Vector2i(4, 2), PI)
+	for x in [4, 10, 16, 22]:
+		for z in [8, 12]:
+			_table4(o, Vector3i(x, 5, z))
+	# 2. kat: oyun salonu ve sinema.
+	var ac := ["6a3fd1", "d62828", "2e6fd8", "3f9f4f", "ff7a1a", "e84a8a", "ffd23f", "1a1a1a"]
+	for i in 8:
+		_prop(o, "arcade@" + ac[i], Vector3i(2 + i * 2, 10, 18), Vector2i(1, 1), PI)
+	for i in 4:
+		_prop(o, "arcade@" + ac[7 - i], Vector3i(4 + i * 3, 10, 3), Vector2i(1, 1))
+	_fill(o, Vector3i(21, 10, 1), Vector3i(21, 14, 19), Blocks.DARK_PLANKS)
+	_door(o, Vector3i(21, 10, 6), false, true)
+	_fill(o, Vector3i(23, 11, 19), Vector3i(36, 13, 19), Blocks.SNOW)
+	for z in [8, 10, 12, 14]:
+		_prop(o, "koltuk@c62828", Vector3i(24, 10, z), Vector2i(4, 1), 0.0)
+		_prop(o, "koltuk@c62828", Vector3i(29, 10, z), Vector2i(4, 1), 0.0)
+
+
+## Amfitiyatro: yarım daire basamaklı taş oturma yerleri (merkez x 14, z 2), önde ahşap sahne ve fon duvarı.
+func _build_amphitheatre(o: Vector3i) -> void:
+	for x in range(0, 29):
+		for z in range(2, 21):
+			var d := Vector2(x - 14, z - 2).length()
+			if d >= 7.0 and d <= 15.0:
+				var h := int((d - 7.0) / 2.0) + 1
+				_fill(o, Vector3i(x, 0, z), Vector3i(x, h - 1, z), Blocks.COBBLESTONE)
+			elif d < 6.0:
+				_put(o + Vector3i(x, 0, z), Blocks.PLANKS)
+	for x in range(8, 21):
+		_put(o + Vector3i(x, 0, 1), Blocks.PLANKS)
+		_fill(o, Vector3i(x, 0, 0), Vector3i(x, 4, 0), Blocks.STONE_BASE)
+	_lamp(o + Vector3i(7, 0, 1))
+	_lamp(o + Vector3i(21, 0, 1))
+
+
+## Kültür merkezi / gençlik kulübü: 2 katlı (x 0..28, z 0..16). Zemin: resim ve müzik atölyesi;
+## üst kat: robotik atölyesi ve sergi salonu.
+func _build_culture_center(o: Vector3i) -> void:
+	_walls(o, Vector3i(0, 0, 0), Vector3i(28, 9, 16), Blocks.PLASTER)
+	_fill(o, Vector3i(1, -1, 1), Vector3i(27, -1, 15), Blocks.STONE_BASE)
+	_fill(o, Vector3i(1, 4, 1), Vector3i(27, 4, 15), Blocks.PLANKS)
+	_fill(o, Vector3i(0, 10, 0), Vector3i(28, 10, 16), Blocks.ROOF_TERRACOTTA)
+	for f in 2:
+		var y := f * STOREY
+		for x in range(2, 28, 2):
+			_fill(o, Vector3i(x, y + 1, 0), Vector3i(x, y + 2, 0), Blocks.GLASS)
+			_fill(o, Vector3i(x, y + 1, 16), Vector3i(x, y + 2, 16), Blocks.GLASS)
+		_fill(o, Vector3i(15, y, 1), Vector3i(15, y + 3, 15), Blocks.PLASTER)
+		_door(o, Vector3i(15, y, 3), false, true)
+		_put(o + Vector3i(7, y + 4 if f == 0 else 10, 8), Blocks.CEILING_LIGHT)
+		_put(o + Vector3i(22, y + 4 if f == 0 else 10, 8), Blocks.CEILING_LIGHT)
+	_door(o, Vector3i(14, 0, 0), true, true, true)
+	_steps(o, 25, 8, 0, 1)
+	# Resim atölyesi.
+	for at in [Vector3i(3, 0, 3), Vector3i(5, 0, 3), Vector3i(9, 0, 3), Vector3i(3, 0, 11), Vector3i(9, 0, 11)]:
+		_prop(o, "sovale", at, Vector2i(1, 1))
+	# Müzik atölyesi.
+	_prop(o, "piyano", Vector3i(17, 0, 14), Vector2i(2, 1), PI)
+	_prop(o, "ogrenci_gitar", Vector3i(20, 0, 3), Vector2i(1, 1))
+	_prop(o, "ogrenci_gitar@e84a8a", Vector3i(22, 0, 11), Vector2i(1, 1), PI)
+	# Robotik atölyesi (üst kat).
+	for at in [Vector3i(3, 5, 3), Vector3i(8, 5, 3), Vector3i(3, 5, 11), Vector3i(9, 5, 11)]:
+		_prop(o, "robot", at, Vector2i(2, 1))
+	# Sergi salonu: duvarlarda tablolar.
+	for z in [4.0, 8.0, 12.0]:
+		_decor(o, "tablo", Vector3(27.97, 6.8, z), -PI / 2)
+	for x in [18.0, 21.0]:
+		_decor(o, "tablo", Vector3(x, 6.8, 15.97), PI)
+		_decor(o, "tablo_kucuk", Vector3(x, 6.8, 1.03), 0.0)
+
+
+## Kapalı spor salonu (x 0..38, z 0..24): batıda basketbol sahası ve tribün, doğuda olimpik yüzme havuzu.
+func _build_sports_hall(o: Vector3i) -> void:
+	_walls(o, Vector3i(0, 0, 0), Vector3i(38, 8, 24), Blocks.CONCRETE)
+	_fill(o, Vector3i(1, -1, 1), Vector3i(37, -1, 23), Blocks.STONE_BASE)
+	_fill(o, Vector3i(0, 9, 0), Vector3i(38, 9, 24), Blocks.CONCRETE)
+	for x in range(2, 38, 4):
+		_fill(o, Vector3i(x, 9, 2), Vector3i(x + 1, 9, 22), Blocks.GLASS)
+	for x in range(1, 38, 2):
+		_fill(o, Vector3i(x, 5, 0), Vector3i(x, 7, 0), Blocks.GLASS)
+	for x in [18, 19, 20]:
+		_door(o, Vector3i(x, 0, 0), true, false)
+	# Basketbol sahası (x 3..16) ve iki basamaklı tribün (x 1..2).
+	_fill(o, Vector3i(3, -1, 1), Vector3i(16, -1, 23), Blocks.PLANKS)
+	for z in range(1, 24):
+		_put(o + Vector3i(9, -1, z), Blocks.SNOW) if z % 2 == 0 else null
+	_fill(o, Vector3i(1, 0, 4), Vector3i(2, 0, 20), Blocks.COBBLESTONE)
+	_fill(o, Vector3i(1, 1, 4), Vector3i(1, 1, 20), Blocks.COBBLESTONE)
+	_prop(o, "basket_potasi", Vector3i(9, 0, 1), Vector2i(1, 1))
+	_prop(o, "basket_potasi", Vector3i(9, 0, 23), Vector2i(1, 1), PI)
+	# Olimpik havuz (x 21..37, z 5..22): 3 blok derin, şeritli dip.
+	_fill(o, Vector3i(21, -4, 5), Vector3i(37, -4, 22), Blocks.SNOW)
+	for x in range(23, 37, 3):
+		_fill(o, Vector3i(x, -4, 6), Vector3i(x, -4, 21), Blocks.TOY_BRICK_BLUE)
+	_fill(o, Vector3i(21, -3, 5), Vector3i(37, -1, 22), Blocks.WATER)
+	_fill(o, Vector3i(21, 0, 5), Vector3i(37, 2, 22), Blocks.AIR)
+	for x in range(22, 37, 3):
+		_put(o + Vector3i(x, 0, 4), Blocks.TRIM_WHITE)  # atlama taşları
+	for k in 5:
+		_put(o + Vector3i(36 - k, k, 23), Blocks.COBBLESTONE)
+
+
+## Skatepark: beton zemin, iki uçta basamaklı rampa, ortada zıplama kutusu ve kayma rayları.
+func _build_skatepark(o: Vector3i) -> void:
+	_fill(o, Vector3i(0, -1, 0), Vector3i(28, -1, 14), Blocks.CONCRETE)
+	for x in range(2, 27):
+		for k in 3:
+			_fill(o, Vector3i(x, 0, k), Vector3i(x, 2 - k, k), Blocks.CONCRETE)
+			_fill(o, Vector3i(x, 0, 14 - k), Vector3i(x, 2 - k, 14 - k), Blocks.CONCRETE)
+	_fill(o, Vector3i(4, 0, 6), Vector3i(7, 0, 8), Blocks.CONCRETE)
+	_fill(o, Vector3i(5, 1, 6), Vector3i(6, 1, 8), Blocks.CONCRETE)
+	for x in range(20, 26):
+		_put(o + Vector3i(x, 0, 7), Blocks.BALCONY_RAIL)
+	for x in [9, 11]:
+		_put(o + Vector3i(x, 0, 10), Blocks.STONE_BASE)
+	_prop(o, "bank", Vector3i(0, 0, 6), Vector2i(1, 2), PI / 2)
+
+
+## Üniversite kampüsü: girişte logolu kapı, çimende öğrenciler, sütunlu rektörlük (amfi ve konferans
+## salonu), 3 katlı kütüphane, iki yurt bloğu ve açık hava masalı kafeterya.
+func _build_campus(o: Vector3i) -> void:
+	_fill(o, Vector3i(16, -1, 0), Vector3i(17, -1, 13), Blocks.GRAVEL)
+	_fill(o, Vector3i(18, -1, 32), Vector3i(50, -1, 33), Blocks.GRAVEL)
+	_fill(o, Vector3i(14, 0, 0), Vector3i(14, 3, 0), Blocks.STONE_BASE)
+	_fill(o, Vector3i(19, 0, 0), Vector3i(19, 3, 0), Blocks.STONE_BASE)
+	_fill(o, Vector3i(14, 4, 0), Vector3i(19, 6, 0), Blocks.STONE_BASE)
+	_decor(o, "kampus_logo", Vector3(16.5, 5.0, -0.06), PI)
+	# Çimende öğrenciler.
+	_prop(o, "ogrenci_gitar", Vector3i(6, 0, 3), Vector2i(1, 1))
+	_prop(o, "ogrenci@e84a8a", Vector3i(7, 0, 5), Vector2i(1, 1), PI)
+	_prop(o, "ogrenci@3f9f4f", Vector3i(5, 0, 5), Vector2i(1, 1), PI)
+	_prop(o, "ogrenci_gitar@ffd23f", Vector3i(26, 0, 5), Vector2i(1, 1))
+	_prop(o, "ogrenci@ff7a1a", Vector3i(27, 0, 7), Vector2i(1, 1), PI)
+	_prop(o, "ogrenci@6a3fd1", Vector3i(36, 0, 4), Vector2i(1, 1), PI / 2)
+	for p in [Vector3i(2, 0, 9), Vector3i(30, 0, 9), Vector3i(10, 0, 1)]:
+		_tree(o + p)
+	# Rektörlük ve derslik binası (x 0..32, z 14..30), önünde sütunlu revak (z 10..13) ve alınlık.
+	_walls(o, Vector3i(0, 0, 14), Vector3i(32, 9, 30), Blocks.FACADE_CREAM)
+	_fill(o, Vector3i(1, -1, 15), Vector3i(31, -1, 29), Blocks.STONE_BASE)
+	_fill(o, Vector3i(0, 10, 14), Vector3i(32, 10, 30), Blocks.STONE_BASE)
+	_fill(o, Vector3i(0, -1, 10), Vector3i(32, -1, 13), Blocks.STONE_BASE)
+	for x in range(1, 32, 3):
+		_fill(o, Vector3i(x, 0, 11), Vector3i(x, 7, 11), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(0, 8, 10), Vector3i(32, 8, 13), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(3, 9, 10), Vector3i(29, 9, 13), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(8, 10, 10), Vector3i(24, 10, 13), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(13, 11, 10), Vector3i(19, 11, 13), Blocks.TRIM_WHITE)
+	for x in range(2, 31, 3):
+		_fill(o, Vector3i(x, 2, 14), Vector3i(x, 6, 14), Blocks.GLASS)
+		_fill(o, Vector3i(x, 2, 30), Vector3i(x, 6, 30), Blocks.GLASS)
+	_fill(o, Vector3i(16, 0, 15), Vector3i(16, 9, 29), Blocks.FACADE_CREAM)
+	_door(o, Vector3i(8, 0, 14), true, true, true)
+	_door(o, Vector3i(24, 0, 14), true, true, true)
+	for x in [8, 24]:
+		for z in [18, 26]:
+			_put(o + Vector3i(x, 9, z), Blocks.CEILING_LIGHT)
+	# Amfi (batı): arkaya doğru yükselen sıralar, önde kürsü ve tahta.
+	for r in 5:
+		_fill(o, Vector3i(1, 0, 20 + r * 2), Vector3i(15, r - 1, 21 + r * 2), Blocks.COBBLESTONE) if r > 0 else null
+		for x in [2, 6, 10]:
+			_prop(o, "sira", Vector3i(x, r, 20 + r * 2), Vector2i(3, 1), PI)
+	_fill(o, Vector3i(4, 1, 15), Vector3i(12, 3, 15), Blocks.SNOW)
+	_prop(o, "muayene_masasi", Vector3i(11, 0, 17), Vector2i(2, 1))
+	# Konferans salonu (doğu): kürsü ve sandalye sıraları.
+	_fill(o, Vector3i(19, 0, 15), Vector3i(29, 0, 16), Blocks.PLANKS)
+	for x in range(19, 30, 2):
+		for z in range(20, 29, 2):
+			_prop(o, "sandalye", Vector3i(x, 0, z), Vector2i(1, 1), PI)
+	# Kütüphane (x 40..60, z 14..32), 3 kat.
+	_walls(o, Vector3i(40, 0, 14), Vector3i(60, 14, 32), Blocks.BRICKS)
+	_fill(o, Vector3i(41, -1, 15), Vector3i(59, -1, 31), Blocks.PLANKS)
+	_fill(o, Vector3i(40, 15, 14), Vector3i(60, 15, 32), Blocks.CONCRETE)
+	for f in 3:
+		var y := f * STOREY
+		if f > 0:
+			_fill(o, Vector3i(41, y - 1, 15), Vector3i(59, y - 1, 31), Blocks.PLANKS)
+		for x in range(41, 60):
+			if x % 4 != 0:
+				_fill(o, Vector3i(x, y + 1, 14), Vector3i(x, y + 2, 14), Blocks.GLASS)
+		for x in range(42, 58, 3):
+			if x >= 48 and x <= 52:
+				continue
+			for z in [22, 26, 30]:
+				_prop(o, "kitaplik", Vector3i(x, y, z), Vector2i(2, 1), PI)
+		_put(o + Vector3i(50, y + 4 if f < 2 else 15, 22), Blocks.CEILING_LIGHT)
+		_table4(o, Vector3i(43, y, 17))
+	_door(o, Vector3i(50, 0, 14), true, true, true)
+	_steps(o, 57, 16, 0, 1)
+	_steps(o, 57, 24, 5, -1)
+	# Yurtlar.
+	_building(o + Vector3i(2, 0, 38), Vector2i(12, 10), 4, 1, false, -1)
+	_building(o + Vector3i(18, 0, 38), Vector2i(12, 10), 4, 2, false, -1)
+	# Kafeterya: küçük büfe ve açık hava masaları.
+	_walls(o, Vector3i(52, 0, 46), Vector3i(60, 3, 52), Blocks.PLANKS)
+	_fill(o, Vector3i(53, 1, 46), Vector3i(59, 2, 46), Blocks.GLASS)
+	_door(o, Vector3i(56, 0, 46), true, true, true)
+	_fill(o, Vector3i(52, 4, 46), Vector3i(60, 4, 52), Blocks.DARK_PLANKS)
+	_awning(o, 52, 60, 3, 45, Blocks.TOY_BRICK_BLUE)
+	_prop(o, "kasa", Vector3i(53, 0, 50), Vector2i(2, 1), PI)
+	_prop(o, "pasta_vitrini", Vector3i(56, 0, 50), Vector2i(2, 1), PI)
+	for x in [42, 46]:
+		for z in [40, 44]:
+			_table4(o, Vector3i(x, 0, z))
+	_prop(o, "semsiye", Vector3i(45, 0, 42), Vector2i(1, 1))
+	_prop(o, "semsiye", Vector3i(41, 0, 42), Vector2i(1, 1))

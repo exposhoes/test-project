@@ -34,6 +34,8 @@ const GEZI_YERLERI := [
 	["Emir'in Evi", "ev.kapi_disi"], ["Okul", "okul.sinif_kapi"], ["Hastane", "hastane.dis"],
 	["Pazar", "pazar.giris"], ["Park", "park.bank_yani"], ["Sahil", "sahil.kordon"],
 	["Metro", "metro.peron"], ["Havalimanı", "havalimani.giris"],
+	["AVM", "avm.giris"], ["Üniversite", "kampus.cimen"], ["Amfitiyatro", "amfi.seyirci"],
+	["Kültür Merkezi", "kultur.giris"], ["Spor Salonu", "spor.giris"], ["Skatepark", "skate.pist"],
 ]
 
 
@@ -240,14 +242,18 @@ func set_explore() -> void:
 	_show_pause_buttons()
 
 
-func _show_places() -> void:
+func _show_places(page := 0) -> void:
 	_pause_menu.title = "Nereye gidelim?"
 	var buttons := []
-	for pl: Array in GEZI_YERLERI:
+	const PER_PAGE := 6
+	var pages := ceili(GEZI_YERLERI.size() / float(PER_PAGE))
+	for pl: Array in GEZI_YERLERI.slice(page * PER_PAGE, (page + 1) * PER_PAGE):
 		var target: String = pl[1]
 		buttons.append({"label": pl[0], "action": func() -> void:
 			close_pause()
 			player.teleport(FilmSets.point(target) + Vector3(0, 0.1, 0))})
+	if pages > 1:
+		buttons.append({"label": "Diğer Yerler (%d/%d)" % [page + 1, pages], "action": func() -> void: _show_places((page + 1) % pages)})
 	buttons.append({"label": "Geri", "action": _show_pause_buttons})
 	_pause_menu.set_buttons(buttons)
 

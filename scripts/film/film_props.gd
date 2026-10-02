@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "trafik_isigi": 3.2, "otomat": 1.9, "trambolin": 0.8, "pompa": 1.8, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "tramvay": 3.2, "metro": 3.0, "balikci": 1.8, "ucak": 4.2, "jet": 2.6, "helikopter": 3.0, "bagaj_bandi": 0.8, "tramvay_sari": 3.2, "tramvay_mavi": 3.2, "bilet_makinesi": 1.7, "tekne": 1.2, "yelkenli": 5.5, "surat_teknesi": 1.1, "havlu": 0.05, "dondurma_arabasi": 1.6, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "trafik_isigi": 3.2, "otomat": 1.9, "trambolin": 0.8, "pompa": 1.8, "kafes": 1.0, "kopek": 0.7, "kedi": 0.45, "muayene_masasi": 0.9, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "tramvay": 3.2, "metro": 3.0, "oyun_konsolu": 1.0, "kamera_tripod": 1.6, "manken": 1.9, "elbise_askisi": 1.6, "fastfood_tezgahi": 2.4, "arcade": 1.9, "sovale": 1.7, "piyano": 1.3, "robot": 1.4, "ogrenci_gitar": 1.1, "ogrenci": 1.1, "rampa": 1.0, "balikci": 1.8, "ucak": 4.2, "jet": 2.6, "helikopter": 3.0, "bagaj_bandi": 0.8, "tramvay_sari": 3.2, "tramvay_mavi": 3.2, "bilet_makinesi": 1.7, "tekne": 1.2, "yelkenli": 5.5, "surat_teknesi": 1.1, "havlu": 0.05, "dondurma_arabasi": 1.6, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 	"serum_askisi": 1.9, "ilac_dolabi": 2.0, "paravan": 1.8, "tarti": 1.3, "bekleme_koltugu": 0.9,
 	"su_sebili": 1.4, "stant": 1.3, "sepetlik": 0.8,
@@ -700,6 +700,81 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, Vector3(0.04, 0.04, 2.4), Vector3(w / 2 + 0.2, 1.4, d / 2 + 1.2), Color("5b3a22"))  # olta
 			_box(r, Vector3(0.01, 1.3, 0.01), Vector3(w / 2 + 0.2, 0.75, d / 2 + 2.4), Color("eeeeee"))  # misina
 			_box(r, Vector3(0.25, 0.25, 0.25), Vector3(w / 2 - 0.4, 0.12, d / 2), Color("1e5bb8"))  # kova
+		"oyun_konsolu":
+			_box(r, Vector3(w - 0.1, 0.9, d - 0.1), Vector3(w / 2, 0.45, d / 2), Color("2b2b33"))  # sergi masası
+			for k in 3:
+				var cx := 0.3 + k * (w - 0.6) / 2.0
+				_box(r, Vector3(0.35, 0.08, 0.25), Vector3(cx, 0.94, d / 2 - 0.1), [Color("f2f2f2"), Color("1a1a1a"), Color("d62828")][k])  # konsol
+				_box(r, Vector3(0.2, 0.06, 0.12), Vector3(cx, 0.93, d / 2 + 0.2), Color("2e6fd8"))  # kol
+			_box(r, Vector3(w - 0.2, 0.6, 0.06), Vector3(w / 2, 1.3, 0.1), Color("111111"))  # ekran
+			_box(r, Vector3(w - 0.3, 0.5, 0.02), Vector3(w / 2, 1.3, 0.14), Color("3fa9f5"))
+		"kamera_tripod":
+			for a in 3:
+				var an := a * TAU / 3
+				_box(r, Vector3(0.04, 1.2, 0.04), Vector3(w / 2 + cos(an) * 0.2, 0.6, d / 2 + sin(an) * 0.2), Color("333333"))
+			_box(r, Vector3(0.35, 0.25, 0.22), Vector3(w / 2, 1.35, d / 2), Color("1a1a1a"))  # kamera
+			_box(r, Vector3(0.12, 0.12, 0.12), Vector3(w / 2, 1.35, d / 2 + 0.16), Color("4a4a55"))  # lens
+			_box(r, Vector3(0.5, 0.5, 0.03), Vector3(w / 2 + 0.45, 1.5, d / 2), Color("fff6c8"))  # ışık paneli
+		"manken":
+			var mc := _tone(id, Color("e84a8a"))
+			_box(r, Vector3(0.6, 0.08, 0.6), Vector3(w / 2, 0.04, d / 2), Color("cccccc"))
+			_box(r, Vector3(0.06, 0.5, 0.06), Vector3(w / 2, 0.3, d / 2), Color("cccccc"))
+			_box(r, Vector3(0.45, 0.4, 0.25), Vector3(w / 2, 0.75, d / 2), Color("3b4f7a"))  # pantolon
+			_box(r, Vector3(0.5, 0.55, 0.28), Vector3(w / 2, 1.22, d / 2), mc)  # tişört
+			_box(r, Vector3(0.3, 0.3, 0.3), Vector3(w / 2, 1.7, d / 2), Color("e8e2d6"))  # baş
+		"elbise_askisi":
+			_box(r, Vector3(0.05, 1.5, 0.05), Vector3(0.1, 0.75, d / 2), STEEL)
+			_box(r, Vector3(0.05, 1.5, 0.05), Vector3(w - 0.1, 0.75, d / 2), STEEL)
+			_box(r, Vector3(w - 0.1, 0.05, 0.05), Vector3(w / 2, 1.5, d / 2), STEEL)
+			var cols := [Color("d62828"), Color("ffd23f"), Color("2e6fd8"), Color("3f9f4f"), Color("e84a8a"), Color("ff7a1a")]
+			for k in int(w * 4):
+				_box(r, Vector3(0.12, 0.8, 0.45), Vector3(0.25 + k * 0.24, 1.05, d / 2), cols[k % cols.size()])
+		"fastfood_tezgahi":
+			var fc := _tone(id, Color("d62828"))
+			_box(r, Vector3(w - 0.1, 1.0, 0.6), Vector3(w / 2, 0.5, d - 0.3), Color("f2f2f2"))  # tezgâh
+			_box(r, Vector3(w - 0.1, 0.12, 0.62), Vector3(w / 2, 1.05, d - 0.3), fc)
+			_box(r, Vector3(w - 0.1, 0.5, 0.1), Vector3(w / 2, 2.15, 0.05), fc)  # üst pano (yazısız)
+			for k in 3:
+				_box(r, Vector3(0.5, 0.35, 0.02), Vector3(0.6 + k * (w - 1.2) / 2.0, 2.15, 0.11), [Color("ffd23f"), Color("8a5a35"), Color("f2f2f2")][k])  # menü resimleri
+			_box(r, Vector3(0.4, 0.4, 0.4), Vector3(0.4, 1.3, d - 0.3), Color("9aa3ab"))  # içecek makinesi
+		"arcade":
+			var ac := _tone(id, Color("6a3fd1"))
+			_box(r, Vector3(w - 0.1, 1.8, d - 0.2), Vector3(w / 2, 0.9, d / 2), ac)
+			_box(r, Vector3(w - 0.3, 0.5, 0.04), Vector3(w / 2, 1.35, 0.08), Color("111111"))  # ekran
+			_box(r, Vector3(w - 0.4, 0.4, 0.02), Vector3(w / 2, 1.35, 0.06), Color("3fe0a0"))
+			_box(r, Vector3(w - 0.2, 0.08, 0.35), Vector3(w / 2, 0.95, 0.1), Color("222222"))  # kontrol paneli
+			_box(r, Vector3(0.08, 0.08, 0.08), Vector3(w / 2 - 0.15, 1.02, 0.05), Color("d62828"))
+			_box(r, Vector3(0.08, 0.08, 0.08), Vector3(w / 2 + 0.1, 1.02, 0.05), Color("ffd23f"))
+			_box(r, Vector3(w - 0.1, 0.12, d - 0.2), Vector3(w / 2, 1.82, d / 2), Color("ffd23f"))
+		"sovale":
+			_box(r, Vector3(0.05, 1.6, 0.05), Vector3(w / 2 - 0.3, 0.8, d / 2), Color("8a5a35"))
+			_box(r, Vector3(0.05, 1.6, 0.05), Vector3(w / 2 + 0.3, 0.8, d / 2), Color("8a5a35"))
+			_box(r, Vector3(0.05, 1.5, 0.05), Vector3(w / 2, 0.75, d / 2 + 0.35), Color("8a5a35"))
+			_box(r, Vector3(0.75, 0.6, 0.03), Vector3(w / 2, 1.25, d / 2 - 0.03), Color("fafafa"))  # tuval
+			_box(r, Vector3(0.3, 0.2, 0.01), Vector3(w / 2 - 0.1, 1.3, d / 2 - 0.05), Color("3fa9f5"))
+			_box(r, Vector3(0.2, 0.15, 0.01), Vector3(w / 2 + 0.15, 1.15, d / 2 - 0.05), Color("ffd23f"))
+		"piyano":
+			_box(r, Vector3(w - 0.1, 1.2, 0.6), Vector3(w / 2, 0.6, 0.3), Color("1a1a1a"))
+			_box(r, Vector3(w - 0.2, 0.06, 0.3), Vector3(w / 2, 0.75, 0.75), Color("f5f5f5"))  # tuşlar
+			for k in int(w * 6):
+				_box(r, Vector3(0.05, 0.03, 0.15), Vector3(0.2 + k * 0.17, 0.79, 0.68), Color("111111"))
+		"robot":
+			_box(r, Vector3(w - 0.1, 0.8, d - 0.1), Vector3(w / 2, 0.4, d / 2), Color("8a5a35"))  # masa
+			_box(r, Vector3(0.35, 0.3, 0.25), Vector3(w / 2, 0.95, d / 2), Color("9aa3ab"))  # gövde
+			_box(r, Vector3(0.25, 0.2, 0.2), Vector3(w / 2, 1.2, d / 2), Color("c0c7cf"))  # baş
+			_box(r, Vector3(0.05, 0.05, 0.02), Vector3(w / 2 - 0.06, 1.22, d / 2 + 0.1), Color("3fe0a0"))
+			_box(r, Vector3(0.05, 0.05, 0.02), Vector3(w / 2 + 0.06, 1.22, d / 2 + 0.1), Color("3fe0a0"))
+			for sx in [-0.25, 0.25]:
+				_box(r, Vector3(0.08, 0.08, 0.08), Vector3(w / 2 + sx, 0.84, d / 2 + 0.12), Color("222222"))  # tekerlek
+		"ogrenci_gitar", "ogrenci":
+			var shirt := _tone(id, Color("2e6fd8"))
+			_box(r, Vector3(0.45, 0.25, 0.7), Vector3(w / 2, 0.12, d / 2 + 0.1), Color("3b4f7a"))  # oturan bacaklar
+			_box(r, Vector3(0.5, 0.6, 0.3), Vector3(w / 2, 0.55, d / 2 - 0.15), shirt)
+			_box(r, Vector3(0.36, 0.36, 0.36), Vector3(w / 2, 1.05, d / 2 - 0.15), Color("d9a57a"))
+			_box(r, Vector3(0.38, 0.12, 0.38), Vector3(w / 2, 1.24, d / 2 - 0.15), Color("3a2a1a"))  # saç
+			if id == "ogrenci_gitar":
+				_box(r, Vector3(0.45, 0.35, 0.12), Vector3(w / 2 + 0.1, 0.45, d / 2 + 0.12), Color("b5652f"))  # gitar gövdesi
+				_box(r, Vector3(0.6, 0.06, 0.06), Vector3(w / 2 + 0.55, 0.6, d / 2 + 0.12), Color("5b3a22"))  # sap
 		"dus":
 			_box(r, Vector3(w - 0.05, 0.1, d - 0.05), Vector3(w / 2, 0.05, d / 2), Color("f2f2f2"))  # tekne
 			_box(r, Vector3(0.03, 2.0, d - 0.05), Vector3(w - 0.03, 1.1, d / 2), Color(0.75, 0.88, 0.95, 1))  # cam
@@ -997,7 +1072,7 @@ static func _box(parent: Node3D, size: Vector3, center: Vector3, color: Color) -
 const DECOR_SIZE := {
 	"poster": Vector3(0.9, 1.2, 0.03), "duvar_saati": Vector3(0.5, 0.5, 0.06),
 	"futbol_topu": Vector3(0.35, 0.35, 0.35), "oda_halisi": Vector3(2.2, 0.02, 1.6),
-	"ray": Vector3(8.0, 0.08, 1.2), "metro_m": Vector3(1.2, 1.2, 0.1), "balik_sari": Vector3(0.6, 0.35, 0.08), "balik_turuncu": Vector3(0.6, 0.35, 0.08), "balik_mavi": Vector3(0.6, 0.35, 0.08), "havalimani_logo": Vector3(4.0, 1.6, 0.1), "tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
+	"ray": Vector3(8.0, 0.08, 1.2), "metro_m": Vector3(1.2, 1.2, 0.1), "avm_logo": Vector3(5.0, 2.0, 0.1), "kampus_logo": Vector3(3.0, 3.0, 0.1), "balik_sari": Vector3(0.6, 0.35, 0.08), "balik_turuncu": Vector3(0.6, 0.35, 0.08), "balik_mavi": Vector3(0.6, 0.35, 0.08), "havalimani_logo": Vector3(4.0, 1.6, 0.1), "tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
 	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "buyuk_saat": Vector3(2.2, 2.2, 0.1), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 	"pano": Vector3(1.8, 1.1, 0.04), "harita": Vector3(1.5, 1.0, 0.03), "sofra": Vector3(1.6, 0.12, 0.7),
 	"ucus_tabelasi": Vector3(2.6, 1.5, 0.08),
@@ -1071,6 +1146,19 @@ static func build_decor(id: String) -> Node3D:
 			_box(root, Vector3(0.45, 0.3, 0.1), Vector3(0, 0, 0), fc)  # gövde
 			_box(root, Vector3(0.15, 0.3, 0.06), Vector3(-0.28, 0, 0), fc.darkened(0.25))  # kuyruk
 			_box(root, Vector3(0.06, 0.06, 0.12), Vector3(0.14, 0.05, 0), Color("111111"))  # göz
+		"avm_logo":
+			_box(root, size, Vector3.ZERO, Color("1e3d6b"))
+			_box(root, Vector3(1.2, 1.1, 0.02), Vector3(-1.2, -0.1, 0.06), Color("ffd23f"))  # alışveriş çantası
+			_box(root, Vector3(0.7, 0.12, 0.02), Vector3(-1.2, 0.55, 0.065), Color("ffd23f"))
+			_box(root, Vector3(0.6, 0.6, 0.02), Vector3(0.6, 0.2, 0.06), Color("e84a8a"))  # renkli kareler
+			_box(root, Vector3(0.6, 0.6, 0.02), Vector3(1.4, 0.2, 0.06), Color("3fe0a0"))
+			_box(root, Vector3(0.6, 0.6, 0.02), Vector3(1.0, -0.5, 0.06), Color("3fa9f5"))
+		"kampus_logo":
+			_box(root, size, Vector3.ZERO, Color("6b1e2b"))
+			_box(root, Vector3(2.0, 0.3, 0.02), Vector3(0, 0.6, 0.06), Color("ffd23f"))  # kep
+			_box(root, Vector3(1.0, 0.4, 0.02), Vector3(0, 0.3, 0.06), Color("ffd23f"))
+			_box(root, Vector3(1.6, 1.0, 0.02), Vector3(0, -0.6, 0.06), Color("f2f2f2"))  # açık kitap
+			_box(root, Vector3(0.05, 1.0, 0.025), Vector3(0, -0.6, 0.07), Color("6b1e2b"))
 		"ray":
 			for k in 8:
 				_box(root, Vector3(0.25, 0.04, 1.3), Vector3(-3.5 + k, 0.02, 0), Color("5b4636"))  # travers
