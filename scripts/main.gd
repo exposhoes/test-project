@@ -40,8 +40,18 @@ var _loot_rng := RandomNumberGenerator.new()
 const BOSS_BAR_RANGE := 32.0
 
 
+## Şehri Gez modu: film setlerinin (mahalle, nehir, sahil, metro, havalimanı) içinde serbest dolaşma.
+## Ana menü Engine meta "gezi" ile açar; kayıt yok, yaratık yok, açlık yok, hep gündüz.
+var explore := false
+var _doors: Array[Node3D] = []
+
+
 func _ready() -> void:
 	_setup_input()
+	if Engine.has_meta("gezi"):
+		explore = true
+		Engine.remove_meta("gezi")
+		save_path = ""
 	var save := SaveGame.read(save_path) if save_path != "" else {}
 	if not save.is_empty():
 		SaveGame.apply_world(save, self)
@@ -54,11 +64,18 @@ func _ready() -> void:
 
 	world.name = "World"
 	add_child(world)
+	if explore:
+		world.generator = FilmSets.new()
+		_build_film_props(world.generator as FilmSets)
+		time_of_day = 0.4
 
 	player.name = "Player"
 	player.world = world
 	player.hud = hud
 	add_child(player)
+	if explore:
+		player.saved_position = FilmSets.point("ev.kapi_disi") + Vector3(0, 0.1, 0)
+		player.survival.set_process(false)
 	player.tamed_mob.connect(_on_tamed)
 	player.used_portal.connect(travel)
 
@@ -70,7 +87,10 @@ func _ready() -> void:
 		hud.toast("Kaldığın yerden devam")
 	quests.completed.connect(_on_quest_completed)
 	player.inventory.changed.connect(func() -> void: quests.check_inventory(player.inventory))
-	hud.show_quest(quests)
+	if not explore:
+		hud.show_quest(quests)
+	else:
+		hud.toast("Şehri Gez: mahalle, nehir, sahil, metro, havalimanı")
 
 
 func _on_quest_completed(text: String) -> void:
@@ -112,6 +132,10 @@ func is_night() -> bool:
 
 
 func _process(delta: float) -> void:
+	if explore:
+		_update_sun()
+		_swing_doors(delta)
+		return
 	time_of_day = fposmod(time_of_day + delta / DAY_LENGTH, 1.0)
 	_update_sun()
 	_autosave_timer += delta
@@ -379,3 +403,44 @@ func _setup_input() -> void:
 func _ensure_action(action: String) -> void:
 	if not InputMap.has_action(action):
 		InputMap.add_action(action)
+
+
+## Gezi modu: setlerin gerçek eşyaları, kapıları ve süsleri sahneye eklenir (film_studio ile aynı).
+func _build_film_props(sets: FilmSets) -> void:
+	for pr: Array in sets.props:
+		var n := FilmProps.build(pr[0], pr[2], pr[3] if pr.size() > 3 else null)
+		n.position = Vector3(pr[1])
+		add_child(n)
+		# Eşyaya çarpılsın: tabanı kadar kutu çarpıştırıcı (çok alçak olanlar hariç).
+		var h := FilmProps.height(pr[0])
+		if h >= 0.3:
+			var size: Vector2i = pr[2]
+			var body := StaticBody3D.new()
+			var shape := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			box.size = Vector3(size.x - 0.1, minf(h, 3.0), size.y - 0.1)
+			shape.shape = box
+			shape.position = Vector3(size.x / 2.0, minf(h, 3.0) / 2.0, size.y / 2.0)
+			body.add_child(shape)
+			body.position = Vector3(pr[1])
+			add_child(body)
+	for dr: Array in sets.doors:
+		var n := FilmProps.build_door(dr.size() > 2 and dr[2])
+		n.position = dr[0]
+		n.rotation.y = dr[1]
+		add_child(n)
+		_doors.append(n)
+	for d: Array in sets.decor:
+		var n := FilmProps.build_decor(d[0])
+		n.position = d[1]
+		n.rotation.y = d[2]
+		add_child(n)
+
+
+## Oyuncu yaklaşınca kapılar açılır.
+func _swing_doors(delta: float) -> void:
+	for d in _doors:
+		var center := d.global_position + d.global_transform.basis.x * 0.5
+		var near := player.global_position.distance_to(center) < 2.2
+		var hinge := d.get_child(0) as Node3D
+		hinge.rotation.y = move_toward(hinge.rotation.y, 1.7 if near else 0.0, delta * 3.0)
