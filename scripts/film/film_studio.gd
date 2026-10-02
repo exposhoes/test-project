@@ -307,6 +307,11 @@ func _say(id: String, text: String) -> void:
 	_box.visible = true
 	a.talking = true
 	_line += 1
+	# İkili diyalog: konuşan ile bir önceki konuşan birbirine döner (Mehmet, 2026-10-02).
+	if _speaker and is_instance_valid(_speaker) and _speaker != a and _speaker.visible and a.visible \
+			and _speaker.position.distance_to(a.position) < 6.0 and not _speaker._moving and not a._moving:
+		a.face_towards(_speaker.position)
+		_speaker.face_towards(a.position)
 	_speaker = a
 	_frame_speaker(a)
 	_auto_zoom(text)
