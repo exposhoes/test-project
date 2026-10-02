@@ -1212,6 +1212,7 @@ func _build_school(o: Vector3i) -> void:
 		_prop(o, "sandalye", Vector3i(x, 0, -4), Vector2i(1, 1), PI)
 	_fill(o, Vector3i(24, 0, -8), Vector3i(24, 1, -6), Blocks.BOOKSHELF)
 	_prop(o, "bitki", Vector3i(24, 0, -2), Vector2i(1, 1))
+	_decor(o, "tablo", Vector3(21.5, 2.4, -8.97), 0.0)
 	# Müdür odası.
 	_prop(o, "ogretmen_masasi", Vector3i(10, 0, -7), Vector2i(2, 1))
 	_prop(o, "koltuk", Vector3i(12, 0, -8), Vector2i(2, 1))
@@ -1230,11 +1231,16 @@ func _build_school(o: Vector3i) -> void:
 	for at in [Vector3i(3, 5, 4), Vector3i(9, 5, 4), Vector3i(3, 5, 7), Vector3i(9, 5, 7)]:
 		_prop(o, "sira", at, Vector2i(3, 1))
 	_decor(o, "duvar_saati", Vector3(7.5, 8.3, 0.02), 0.0)
+	_decor(o, "poster", Vector3(0.03, 6.6, 7.5), PI / 2)
+	_prop(o, "bitki", Vector3i(0, 5, 10), Vector2i(1, 1))
 	# Resim odası.
 	_prop(o, "yemek_masasi", Vector3i(2, 5, -7), Vector2i(3, 2))
 	_prop(o, "yemek_masasi", Vector3i(9, 5, -7), Vector2i(3, 2))
 	_fill(o, Vector3i(1, 6, -9), Vector3i(13, 7, -9), Blocks.PLAYROOM_WALL)
 	_prop(o, "oyuncak_kutusu", Vector3i(14, 5, -3), Vector2i(1, 1))
+	# Resim odasının duvarlarında çocukların resimleri (yazısız).
+	for x in [2.0, 5.0, 9.0, 12.0]:
+		_decor(o, "tablo_kucuk", Vector3(x, 6.8, -8.97), 0.0)
 	# Kütüphane.
 	_fill(o, Vector3i(24, 5, -8), Vector3i(24, 6, 10), Blocks.BOOKSHELF)
 	_fill(o, Vector3i(22, 5, -7), Vector3i(22, 6, -3), Blocks.BOOKSHELF)
@@ -1300,6 +1306,9 @@ func _build_market(o: Vector3i) -> void:
 	_fill(o, Vector3i(0, -1, 14), Vector3i(12, -1, 17), Blocks.SIDEWALK)
 	_prop(o, "saksi", Vector3i(0, 0, 14), Vector2i(1, 1))
 	_prop(o, "saksi", Vector3i(12, 0, 14), Vector2i(1, 1))
+	_decor(o, "duvar_saati", Vector3(6.0, 2.6, 1.97), PI)
+	_prop(o, "koli", Vector3i(1, 0, 12), Vector2i(1, 1))
+	_prop(o, "koli", Vector3i(11, 0, 12), Vector2i(1, 1))
 
 
 ## Lokanta (dış x 0..14, z 0..12; kapı güneyde, caddeye): yemek salonu (masalar ve sandalyeler),
@@ -1326,6 +1335,10 @@ func _build_restaurant(o: Vector3i) -> void:
 	_prop(o, "bitki", Vector3i(1, 0, 1), Vector2i(1, 1))
 	_decor(o, "poster", Vector3(0.02, 1.6, 5.0), PI / 2)
 	_decor(o, "duvar_saati", Vector3(7.0, 2.6, 7.98), PI)
+	_decor(o, "tablo", Vector3(13.97, 2.3, 3.0), -PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(13.97, 2.3, 6.0), -PI / 2)
+	_prop(o, "bitki", Vector3i(13, 0, 1), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(1, 0, 7), Vector2i(1, 1))
 
 
 ## Pastane (dış x 0..7, z 0..9; kapı güneyde): pasta vitrini, kasa, fırın, ekmek rafları, iki masa.
@@ -1345,6 +1358,9 @@ func _build_bakery(o: Vector3i) -> void:
 	_prop(o, "sandalye", Vector3i(1, 0, 3), Vector2i(1, 1), PI)
 	_prop(o, "yemek_masasi", Vector3i(5, 0, 2), Vector2i(1, 1))
 	_prop(o, "sandalye", Vector3i(6, 0, 2), Vector2i(1, 1), -PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(0.03, 2.3, 3.0), PI / 2)
+	_decor(o, "duvar_saati", Vector3(6.97, 2.6, 4.0), -PI / 2)
+	_prop(o, "bitki", Vector3i(6, 0, 4), Vector2i(1, 1))
 
 
 ## Hastane (dış x -1..13, z -7..9): girişte danışma ve bekleme, iki yataklı koğuş, arkada muayene
