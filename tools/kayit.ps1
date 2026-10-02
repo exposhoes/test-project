@@ -9,6 +9,8 @@ param(
 	[switch]$Yenile,
 	# Yatay videoyu AVI yerine PNG kare dizisi olarak kaydet (4 GB AVI sınırına takılırsa; çok yavaş: kare başına ~4 sn).
 	[switch]$Png,
+	# Yatay videoyu 4K yerine 1080p kaydet (hızlı deneme kaydı).
+	[switch]$Hd,
 	[string]$Cikti = ""
 )
 $ErrorActionPreference = "Continue"
@@ -40,12 +42,13 @@ foreach ($b in $secilen) {
 	$avi = Join-Path $env:TEMP "emircraft_$($b.Id).avi"
 	# Pencere ekrana sığacak kadar küçük açılır; görüntü tam çözünürlükte işlenir.
 	$ayar = if ($dikey) {
-		"[display]`nwindow/size/viewport_width=1080`nwindow/size/viewport_height=1920`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=1.0`nwindow/size/window_width_override=405`nwindow/size/window_height_override=720`nwindow/size/always_on_top=true`n"
+		"[display]`nwindow/size/viewport_width=1080`nwindow/size/viewport_height=1920`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=1.0`nwindow/size/window_width_override=405`nwindow/size/window_height_override=720`nwindow/size/initial_position_type=0`nwindow/size/initial_position=Vector2i(-2600, 60)`n"
 	} else {
-		"[display]`nwindow/size/viewport_width=3840`nwindow/size/viewport_height=2160`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=3.0`nwindow/size/window_width_override=960`nwindow/size/window_height_override=540`nwindow/size/always_on_top=true`n[editor]`nmovie_writer/mjpeg_quality=0.6`n"
+		"[display]`nwindow/size/viewport_width=3840`nwindow/size/viewport_height=2160`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=3.0`nwindow/size/window_width_override=960`nwindow/size/window_height_override=540`nwindow/size/initial_position_type=0`nwindow/size/initial_position=Vector2i(-2600, 60)`n[editor]`nmovie_writer/mjpeg_quality=0.6`n"
 	}
 	# 4K kareler büyük: geçici AVI C: yerine çıktı sürücüsüne yazılır (yer sorunu olmasın).
 	if (-not $dikey) { $avi = Join-Path $Cikti "_gecici_$($b.Id).avi" }
+	if ($Hd -and -not $dikey) { $ayar = $ayar.Replace("viewport_width=3840", "viewport_width=1920").Replace("viewport_height=2160", "viewport_height=1080").Replace("stretch/scale=3.0", "stretch/scale=1.5") }
 	Write-Host "Kaydediliyor: $ad"
 	Set-Content $override -Encoding ASCII -Value $ayar
 	if ($dikey -or -not $Png) {
