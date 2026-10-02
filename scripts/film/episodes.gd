@@ -38,6 +38,9 @@ const LIST := [
 			{"sfx": "vuup"},
 			{"place": "emir", "at": "ev.mutfak_on", "look": "ev.ocak"},
 			{"turn": "anne", "to": "ev.mutfak_on"},
+			# Anne "Hoş geldiniz çocuklar!" diyor: Ali ile Zeynep de mutfakta, Emir'in yanında.
+			{"place": "ali", "at": "ev.masa", "look": "ev.ocak"},
+			{"place": "zeynep", "at": Vector3(7.8, 11, 4.4), "look": "ev.ocak"},
 			{"cam": "ev.kam_mutfak", "look": "ev.mutfak", "t": 0},
 			{"say": "emir", "text": "Bu benim annem. Dünyanın en güzel kurabiyelerini o yapar!"},
 			{"say": "anne", "text": "Hoş geldiniz çocuklar! Emir, kahvaltını bitirmeden çıkmak yok!"},
@@ -86,7 +89,7 @@ const LIST := [
 			{"hide": "ali"},
 			{"place": "doktor", "at": "hastane.kapi_onu", "look": "hastane.dis"},
 			{"place": "emir", "at": "hastane.dis", "look": "hastane.kapi_onu"},
-			{"cam": "hastane.kam_dis", "look": "hastane.kapi_onu", "t": 0},
+			{"cam": Vector3(-29.5, 13.0, 12.5), "look": Vector3(-33.5, 11.0, 12.5), "t": 0},  # yandan, yakın ve sabit
 			{"say": "emir", "text": "Dizimizi kanatınca Doktor Amca bizi hemen iyileştirir.", "keep_cam": true},
 			{"say": "doktor", "text": "Dikkatli oynayın çocuklar. Ama korkmayın, ben buradayım!", "keep_cam": true},
 			# 7. Şehir turu: hızlı geçişler (Emir sesi üstte).
