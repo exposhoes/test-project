@@ -2208,7 +2208,7 @@ func _street_furniture_2() -> void:
 		_put(o + c + Vector3i(-1, 0, 2), Blocks.SNOW)
 		_put(o + c + Vector3i(1, 0, 2), Blocks.SNOW)
 	# Gazete büfeleri.
-	for p in [Vector3i(8, 0, 30), Vector3i(-28, 0, -20)]:
+	for p in [Vector3i(40, 0, 29), Vector3i(-28, 0, -20)]:
 		_walls(o, p, p + Vector3i(2, 2, 1), Blocks.TOY_BRICK_BLUE)
 		_fill(o, p + Vector3i(0, 1, 0), p + Vector3i(2, 1, 0), Blocks.GLASS)
 		_fill(o, p + Vector3i(-1, 3, -1), p + Vector3i(3, 3, 2), Blocks.TOY_BRICK_YELLOW)
