@@ -597,6 +597,10 @@ func set_time(t: float) -> void:
 	_sun.light_color = Color.WHITE.lerp(Color("ffc58a"), warm)
 	_sky.sky_top_color = Color("3f8fdc").lerp(Color("6a86c8"), warm)
 	_sky.sky_horizon_color = Color("a8d4f5").lerp(Color("ffcf9e"), warm)
+	# Gökyüzünün alt yarısı koyu kahverengiydi; dünyanın kenarında ufukta basamaklı koyu bant
+	# görünüyordu (Mehmet, 2026-10-02). Alt yarı ufuk rengiyle aynı yapılır.
+	_sky.ground_horizon_color = _sky.sky_horizon_color
+	_sky.ground_bottom_color = _sky.sky_horizon_color
 
 
 func _setup_environment() -> void:

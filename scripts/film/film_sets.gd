@@ -154,6 +154,8 @@ const POINTS := {
 	"hastane": {
 		"giris": Vector3(6.5, 0, 9.0),
 		"dis": Vector3(6.5, 0, 14.0),
+		# Kapının iki blok önü: eşikte durunca cam ve kapı kanadı kadrajı bölüyordu.
+		"kapi_onu": Vector3(6.5, 0, 11.0),
 		"danisma": Vector3(6.5, 0, 6.5),
 		"danisma_arka": Vector3(6.5, 0, 4.6),
 		"yatak_1": Vector3(1.5, 0.42, 2.0),
