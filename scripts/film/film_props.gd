@@ -12,6 +12,9 @@ const HEIGHTS := {
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
 	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
+	"serum_askisi": 1.9, "ilac_dolabi": 2.0, "paravan": 1.8, "tarti": 1.3, "bekleme_koltugu": 0.9,
+	"su_sebili": 1.4, "stant": 1.3, "sepetlik": 0.8,
+	"pasta_vitrini": 1.3, "ekmek_rafi": 2.0, "ogrenci_dolabi": 1.9, "cop_kutusu": 0.7,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
 ## daha geniş tabanlarda x/z ölçeklenir.
@@ -576,6 +579,107 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				_box(r, Vector3(w - 0.05, 0.04, d - 0.1), Vector3(w / 2, sy, d / 2), Color("a0a0a0"))
 				for k in int(w / 0.25):
 					_box(r, Vector3(0.14, 0.22, 0.14), Vector3(0.18 + k * 0.25, sy + 0.13, d / 2), jc[(i + k) % jc.size()])
+		"serum_askisi":
+			# Tekerlekli ayak, direk, üstte askı ve serum torbası.
+			_box(r, Vector3(0.5, 0.05, 0.08), Vector3(w / 2, 0.05, d / 2), STEEL)
+			_box(r, Vector3(0.08, 0.05, 0.5), Vector3(w / 2, 0.05, d / 2), STEEL)
+			_box(r, Vector3(0.04, 1.8, 0.04), Vector3(w / 2, 0.95, d / 2), STEEL)
+			_box(r, Vector3(0.4, 0.03, 0.03), Vector3(w / 2, 1.85, d / 2), STEEL)
+			_box(r, Vector3(0.16, 0.28, 0.06), Vector3(w / 2 + 0.15, 1.65, d / 2), Color("d8f0f7"))
+			_box(r, Vector3(0.02, 0.5, 0.02), Vector3(w / 2 + 0.15, 1.25, d / 2), Color("cfd8dc"))
+		"ilac_dolabi":
+			# Beyaz dolap, camlı üst bölmede ilaç kutuları, kapakta kırmızı artı.
+			_box(r, Vector3(w - 0.06, h, 0.45), Vector3(w / 2, h / 2, 0.24), Color("f4f6f7"))
+			_box(r, Vector3(w - 0.16, 0.95, 0.02), Vector3(w / 2, 1.45, 0.475), Color("cfe3ea"))
+			var ic := [Color("e53935"), Color("1e88e5"), Color("43a047"), Color("fdd835"), Color("fb8c00")]
+			for k in 3:
+				_box(r, Vector3(w - 0.18, 0.02, 0.03), Vector3(w / 2, 1.05 + k * 0.3, 0.49), Color("b0bec5"))
+				for j in int((w - 0.2) / 0.18):
+					_box(r, Vector3(0.12, 0.18, 0.03), Vector3(0.2 + j * 0.18, 1.16 + k * 0.3, 0.49), ic[(j + k * 2) % ic.size()])
+			_box(r, Vector3(0.28, 0.08, 0.02), Vector3(w / 2, 0.55, 0.475), Color("e53935"))
+			_box(r, Vector3(0.08, 0.28, 0.02), Vector3(w / 2, 0.55, 0.475), Color("e53935"))
+		"paravan":
+			# Üç kanatlı hasta paravanı: çelik çerçeve, açık mavi kumaş.
+			for k in 3:
+				var px := w / 6 + k * w / 3
+				_box(r, Vector3(w / 3 - 0.04, 1.5, 0.03), Vector3(px, 0.95, d / 2 + (0.08 if k == 1 else -0.08)), Color("bfe3f2"))
+				_box(r, Vector3(0.03, 1.75, 0.03), Vector3(px - w / 6 + 0.02, 0.875, d / 2), STEEL)
+			_box(r, Vector3(0.03, 1.75, 0.03), Vector3(w - 0.02, 0.875, d / 2), STEEL)
+		"tarti":
+			# Boy ölçerli hasta tartısı.
+			_box(r, Vector3(0.5, 0.08, 0.6), Vector3(w / 2, 0.04, d / 2 + 0.05), Color("eceff1"))
+			_box(r, Vector3(0.4, 0.02, 0.45), Vector3(w / 2, 0.09, d / 2 + 0.08), Color("37474f"))
+			_box(r, Vector3(0.06, 1.2, 0.06), Vector3(w / 2, 0.65, d / 2 - 0.22), STEEL)
+			_box(r, Vector3(0.3, 0.2, 0.08), Vector3(w / 2, 1.2, d / 2 - 0.2), Color("eceff1"))
+			_box(r, Vector3(0.2, 0.1, 0.02), Vector3(w / 2, 1.2, d / 2 - 0.15), Color("263238"))
+		"bekleme_koltugu":
+			# Bekleme salonu oturağı: çelik ayaklar üstünde yan yana mavi koltuklar (önü +Z).
+			var n := int(maxf(1.0, w))
+			_box(r, Vector3(w - 0.1, 0.06, 0.08), Vector3(w / 2, 0.3, d / 2), STEEL)
+			for sx in [0.2, w - 0.2]:
+				_box(r, Vector3(0.06, 0.3, 0.5), Vector3(sx, 0.15, d / 2), STEEL)
+			for k in n:
+				var cx := (k + 0.5) * w / n
+				_box(r, Vector3(w / n - 0.12, 0.08, 0.5), Vector3(cx, 0.42, d / 2 + 0.05), Color("2f6fb5"))
+				_box(r, Vector3(w / n - 0.12, 0.45, 0.08), Vector3(cx, 0.68, d / 2 - 0.22), Color("2f6fb5"))
+		"su_sebili":
+			_box(r, Vector3(0.4, 0.95, 0.4), Vector3(w / 2, 0.475, d / 2), Color("f4f6f7"))
+			_box(r, Vector3(0.3, 0.4, 0.3), Vector3(w / 2, 1.17, d / 2), Color("6ec1ea"))
+			_box(r, Vector3(0.06, 0.06, 0.06), Vector3(w / 2 - 0.08, 0.7, d / 2 + 0.22), Color("1e88e5"))
+			_box(r, Vector3(0.06, 0.06, 0.06), Vector3(w / 2 + 0.08, 0.7, d / 2 + 0.22), Color("e53935"))
+		"stant":
+			# Dükkân ortası çift taraflı alçak raf: üç kat, iki yüzünde renkli ürün kutuları.
+			_box(r, Vector3(w - 0.1, 0.1, d - 0.2), Vector3(w / 2, 0.05, d / 2), Color("b0b0b0"))
+			_box(r, Vector3(w - 0.1, h - 0.1, 0.05), Vector3(w / 2, h / 2, d / 2), Color("d7d7d7"))
+			var sc := [Color("e53935"), Color("fdd835"), Color("43a047"), Color("1e88e5"), Color("fb8c00"), Color("ec407a")]
+			for k in 3:
+				var sy := 0.12 + k * 0.38
+				_box(r, Vector3(w - 0.1, 0.03, d - 0.25), Vector3(w / 2, sy, d / 2), Color("c8c8c8"))
+				for j in int((w - 0.2) / 0.22):
+					for side in [-1.0, 1.0]:
+						_box(r, Vector3(0.17, 0.24, 0.17), Vector3(0.2 + j * 0.22, sy + 0.135, d / 2 + side * 0.22), sc[(j + k + (1 if side > 0 else 3)) % sc.size()])
+		"sepetlik":
+			# Üst üste alışveriş sepetleri.
+			for k in 4:
+				_box(r, Vector3(0.55 - k * 0.02, 0.16, 0.4 - k * 0.02), Vector3(w / 2, 0.1 + k * 0.17, d / 2), Color("d32f2f") if k % 2 == 0 else Color("b71c1c"))
+			_box(r, Vector3(0.5, 0.03, 0.03), Vector3(w / 2, 0.78, d / 2), Color("263238"))
+		"pasta_vitrini":
+			# Camlı pasta dolabı: beyaz gövde, iki cam raf, üstünde dilim pastalar ve kurabiyeler.
+			_box(r, Vector3(w - 0.05, 0.6, d - 0.15), Vector3(w / 2, 0.3, d / 2), Color("f4f1ea"))
+			_box(r, Vector3(w - 0.05, 0.04, d - 0.15), Vector3(w / 2, 1.28, d / 2), Color("f4f1ea"))
+			for sx in [0.04, w - 0.04]:
+				_box(r, Vector3(0.04, 0.66, d - 0.15), Vector3(sx, 0.94, d / 2), Color("cfd4d8"))
+			_box(r, Vector3(w - 0.1, 0.03, d - 0.25), Vector3(w / 2, 0.95, d / 2), Color("d6e8ee"))
+			var kc := [Color("f48fb1"), Color("6d4c41"), Color("fff59d"), Color("ef5350"), Color("a5d6a7")]
+			for j in int((w - 0.2) / 0.3):
+				_box(r, Vector3(0.2, 0.14, 0.2), Vector3(0.2 + j * 0.3, 0.68, d / 2), kc[j % kc.size()])
+				_box(r, Vector3(0.2, 0.03, 0.2), Vector3(0.2 + j * 0.3, 0.765, d / 2), Color("fafafa"))
+				_box(r, Vector3(0.16, 0.1, 0.16), Vector3(0.2 + j * 0.3, 1.02, d / 2), kc[(j + 2) % kc.size()])
+		"ekmek_rafi":
+			# Ahşap fırın rafı: dört kat, somun ekmekler ve simitler.
+			var c := _tone(id, Color("9a6a3f"))
+			_box(r, Vector3(w - 0.05, h, 0.06), Vector3(w / 2, h / 2, 0.05), c.darkened(0.2))
+			for sx in [0.04, w - 0.04]:
+				_box(r, Vector3(0.06, h, 0.45), Vector3(sx, h / 2, 0.25), c.darkened(0.2))
+			for k in 4:
+				var sy := 0.2 + k * 0.45
+				_box(r, Vector3(w - 0.1, 0.04, 0.45), Vector3(w / 2, sy, 0.25), c)
+				for j in int((w - 0.2) / 0.34):
+					_box(r, Vector3(0.26, 0.13, 0.16), Vector3(0.22 + j * 0.34, sy + 0.085, 0.27), Color("d9a35a") if (j + k) % 3 != 0 else Color("b97a3a"))
+		"ogrenci_dolabi":
+			# Koridor dolapları: yan yana renkli metal kapaklar, havalandırma çizgileri, küçük kulp.
+			var lc := [Color("3f7fbf"), Color("e0a030"), Color("4f9f5f"), Color("c8504a")]
+			var n := int(maxf(1.0, w * 2))
+			_box(r, Vector3(w - 0.02, h, 0.42), Vector3(w / 2, h / 2, 0.22), Color("78838c"))
+			for k in n:
+				var cx := (k + 0.5) * w / n
+				_box(r, Vector3(w / n - 0.04, h - 0.1, 0.02), Vector3(cx, h / 2, 0.44), lc[k % lc.size()])
+				for v in 3:
+					_box(r, Vector3(w / n - 0.2, 0.02, 0.01), Vector3(cx, h - 0.25 - v * 0.07, 0.455), Color("2b2b2b"))
+				_box(r, Vector3(0.04, 0.1, 0.03), Vector3(cx + w / n * 0.3, h / 2, 0.46), STEEL)
+		"cop_kutusu":
+			_box(r, Vector3(0.4, 0.6, 0.4), Vector3(w / 2, 0.3, d / 2), _tone(id, Color("4f9f5f")))
+			_box(r, Vector3(0.44, 0.06, 0.44), Vector3(w / 2, 0.63, d / 2), Color("37474f"))
 		_:
 			_box(r, f, f / 2, WOOD)
 
@@ -707,6 +811,7 @@ const DECOR_SIZE := {
 	"futbol_topu": Vector3(0.35, 0.35, 0.35), "oda_halisi": Vector3(2.2, 0.02, 1.6),
 	"tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
 	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
+	"pano": Vector3(1.8, 1.1, 0.04), "harita": Vector3(1.5, 1.0, 0.03), "sofra": Vector3(1.6, 0.12, 0.7),
 }
 
 
@@ -776,6 +881,29 @@ static func build_decor(id: String) -> Node3D:
 		"oda_halisi":
 			_box(root, size, Vector3(0, 0.01, 0), Color("6fb3e0"))
 			_box(root, Vector3(1.6, 0.022, 1.0), Vector3(0, 0.012, 0), Color("a9d6f2"))
+		"pano":
+			# Mantar pano: ahşap çerçeve, üstünde renkli kâğıtlar (yazısız).
+			_box(root, size, Vector3.ZERO, Color("8a5a3b"))
+			_box(root, Vector3(size.x - 0.12, size.y - 0.12, 0.01), Vector3(0, 0, 0.022), Color("c9a26b"))
+			var pc := [Color("f5f5f5"), Color("ffd23f"), Color("7fd4ff"), Color("ff8fc8"), Color("9fe870"), Color("ffb347")]
+			for k in 8:
+				var px := -size.x / 2 + 0.25 + (k % 4) * (size.x - 0.5) / 3.0
+				var py := 0.22 if k < 4 else -0.22
+				_box(root, Vector3(0.28, 0.34, 0.01), Vector3(px, py, 0.03), pc[(k * 5 + 1) % pc.size()])
+		"harita":
+			# Yazısız dünya haritası: mavi deniz, yeşil kara parçaları.
+			_box(root, size, Vector3.ZERO, Color("f2efe6"))
+			_box(root, Vector3(size.x - 0.08, size.y - 0.08, 0.01), Vector3(0, 0, 0.018), Color("5aa9e6"))
+			for b in [[-0.45, 0.15, 0.3, 0.35], [-0.38, -0.2, 0.16, 0.3], [0.05, 0.1, 0.25, 0.5], [0.4, 0.15, 0.45, 0.3], [0.5, -0.25, 0.2, 0.15]]:
+				_box(root, Vector3(b[2], b[3], 0.01), Vector3(b[0], b[1], 0.026), Color("6dbb5a"))
+		"sofra":
+			# Masa üstü: iki tabak, iki bardak, ortada sürahi ve peçetelik.
+			for sx in [-0.45, 0.45]:
+				_box(root, Vector3(0.3, 0.02, 0.3), Vector3(sx, 0.01, 0.05), Color("fafafa"))
+				_box(root, Vector3(0.18, 0.015, 0.18), Vector3(sx, 0.025, 0.05), Color("e8a33d"))
+				_box(root, Vector3(0.08, 0.11, 0.08), Vector3(sx + 0.22, 0.055, -0.15), Color("bfe3f2"))
+			_box(root, Vector3(0.12, 0.2, 0.12), Vector3(0, 0.1, -0.05), Color("7fc4e8"))
+			_box(root, Vector3(0.1, 0.08, 0.06), Vector3(0, 0.04, 0.2), Color("d94b4b"))
 		_:
 			_box(root, size, Vector3(0, size.y / 2, 0), WOOD)
 	return root
