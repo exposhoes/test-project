@@ -27,6 +27,8 @@ const SETS := {
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
+## Ev başına koltuk rengi (FilmProps "ad@renk" boyaması).
+const FAMILY_SOFA := {"ali_ev": "2f5d8a", "zeynep_ev": "c76b8f", "ogretmen_ev": "5f8a4f"}
 const FAMILY_POINTS := {
 	"kapi_disi": Vector3(4.5, 0, -2.0),
 	"kapi_ici": Vector3(4.5, 0, 1.6),
@@ -300,7 +302,7 @@ func _init() -> void:
 	_build_bakery(SETS["pastane"])
 	_build_parking(SETS["otopark"])
 	for h: String in FAMILY_HOUSES:
-		_build_family_house(SETS[h], FAMILY_HOUSES[h])
+		_build_family_house(SETS[h], FAMILY_HOUSES[h], FAMILY_SOFA[h])
 	_family_extras()
 	_build_fire_station(SETS["itfaiye"])
 	_connect_sets()
@@ -591,6 +593,21 @@ func _build_house(o: Vector3i) -> void:
 	_decor(o, "perde", Vector3(1.5, 1.55, 6.96), PI)
 	_decor(o, "perde", Vector3(6.5, 1.55, 6.96), PI)
 	_decor(o, "tablo_kucuk", Vector3(8.97, 2.4, 3.0), -PI / 2)
+	# Emir'in çalışma masasında bilgisayar; salonda pufler; banyoda ayna.
+	_decor(o, "bilgisayar", Vector3(2.0, 0.8, 6.55), PI)
+	_prop(o, "puf", Vector3i(14, 0, 3), Vector2i(1, 1))
+	_prop(o, "puf", Vector3i(15, 0, 2), Vector2i(1, 1))
+	_decor(o, "ayna_duvar", Vector3(3.5, 1.8, -8.97), 0.0)
+	# Garaj: alet tezgâhı ve panosu, bisiklet, raf.
+	_prop(o, "alet_tezgahi", Vector3i(-3, 0, 0), Vector2i(2, 1))
+	_prop(o, "bisiklet", Vector3i(-8, 0, 2), Vector2i(1, 2))
+	_prop(o, "kiler_rafi", Vector3i(-8, 0, 5), Vector2i(1, 2), PI / 2)
+	# Teras: teleskop ve şezlong.
+	_prop(o, "teleskop", Vector3i(15, 5, 1), Vector2i(1, 1), PI)
+	_prop(o, "sezlong", Vector3i(11, 5, 4), Vector2i(1, 2), PI)
+	# Bodrum: dağınık koliler, eski bisiklet.
+	for k in [Vector3i(12, -4, -5), Vector3i(13, -4, -5), Vector3i(10, -4, -3), Vector3i(6, -4, -5)]:
+		_prop(o, "koli", k, Vector2i(1, 1))
 	_prop(o, "ust_dolap", Vector3i(6, 0, 0), Vector2i(3, 1))
 	_prop(o, "sandalye", Vector3i(4, 0, 3), Vector2i(1, 1), PI / 2)
 	_prop(o, "sandalye", Vector3i(6, 0, 3), Vector2i(1, 1), -PI / 2)
@@ -682,6 +699,13 @@ func _build_shop(o: Vector3i) -> void:
 	_put(o + Vector3i(5, -1, 8), Blocks.RUG)
 	for x in [2, 3, 7, 8]:
 		_put(o + Vector3i(x, 0, 11), Blocks.FLOWERS)
+	# İçecek dolabı, kasa, meyve reyonu, koliler, duvarda saat.
+	_prop(o, "icecek_dolabi", Vector3i(10, 0, 1), Vector2i(1, 2))
+	_prop(o, "kasa", Vector3i(7, 0, 2), Vector2i(1, 1), PI)
+	_prop(o, "meyve_reyonu", Vector3i(7, 0, 7), Vector2i(2, 1), 0.0)
+	_prop(o, "koli", Vector3i(9, 0, 1), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(1, 0, 8), Vector2i(1, 1))
+	_decor(o, "duvar_saati", Vector3(5.0, 2.6, 0.03), 0.0)
 
 
 ## Futbol sahası: beyaz çizgiler, iki kale, kenarda seyirci bankı.
@@ -1345,6 +1369,15 @@ func _build_hospital(o: Vector3i) -> void:
 	for z in [5, 7]:
 		_prop(o, "sandalye", Vector3i(0, 0, z), Vector2i(1, 1), PI / 2)
 	_prop(o, "bitki", Vector3i(12, 0, 8), Vector2i(1, 1))
+	# Koğuşta komodinler, bekleme salonunda televizyon, saksılar, tablo ve saat.
+	_prop(o, "komodin", Vector3i(2, 0, 1), Vector2i(1, 1))
+	_prop(o, "komodin", Vector3i(10, 0, 1), Vector2i(1, 1))
+	_prop(o, "sandalye", Vector3i(0, 0, 6), Vector2i(1, 1), PI / 2)
+	_prop(o, "sandalye", Vector3i(0, 0, 8), Vector2i(1, 1), PI / 2)
+	_prop(o, "bitki", Vector3i(0, 0, 4), Vector2i(1, 1))
+	_prop(o, "tv", Vector3i(3, 0, 8), Vector2i(2, 1), -PI / 2)
+	_decor(o, "tablo", Vector3(6.5, 2.4, -0.03 + 0.06), 0.0)
+	_decor(o, "duvar_saati", Vector3(12.97, 2.6, 6.0), -PI / 2)
 	# Muayene odası.
 	_prop(o, "ogretmen_masasi", Vector3i(1, 0, -5), Vector2i(2, 1))
 	_put(o + Vector3i(5, 0, -6), Blocks.BED)
@@ -1454,7 +1487,7 @@ func _build_park(o: Vector3i) -> void:
 ## Karakter evi (Ali, Zeynep, öğretmen): iki katlı müstakil ev, önü caddeye (düşük z). Dış x 0..14 z 0..10.
 ## Zemin: salon x1..7, mutfak/yemek x9..13 (arka köşede merdiven). Üst kat: çocuk odası x1..6,
 ## anne-baba odası x8..13. Kiremit çatı, önde çitli bahçe, çakıl yol, çiçekler, ağaç.
-func _build_family_house(o: Vector3i, wall: int) -> void:
+func _build_family_house(o: Vector3i, wall: int, sofa: String) -> void:
 	_shell(o, Vector2i(0, 0), Vector2i(14, 10), 2, wall, Blocks.PLANKS)
 	# Giriş kapısı, söveler.
 	_door(o, Vector3i(4, 0, 0), true, true, true)
@@ -1464,16 +1497,15 @@ func _build_family_house(o: Vector3i, wall: int) -> void:
 	_iwall(o, Vector3i(8, 0, 1), Vector3i(8, 0, 9))
 	_door(o, Vector3i(8, 0, 4), false)
 	# Salon: L koltuk takımı, berjer, sehpa, halı, TV ünitesi, vitrin, abajur, tablolar, perdeler.
-	_prop(o, "koltuk", Vector3i(1, 0, 1), Vector2i(3, 1))
-	_prop(o, "koltuk", Vector3i(1, 0, 3), Vector2i(1, 3), PI / 2)
-	_prop(o, "berjer", Vector3i(6, 0, 4), Vector2i(1, 1), -PI / 2)
+	_prop(o, "koltuk" + "@" + sofa, Vector3i(1, 0, 1), Vector2i(3, 1))
+	_prop(o, "koltuk" + "@" + sofa, Vector3i(1, 0, 3), Vector2i(1, 3), PI / 2)
+	_prop(o, "berjer" + "@" + sofa, Vector3i(6, 0, 4), Vector2i(1, 1), -PI / 2)
 	_prop(o, "sehpa", Vector3i(3, 0, 4), Vector2i(2, 1))
 	_prop(o, "abajur", Vector3i(6, 0, 1), Vector2i(1, 1))
 	_prop(o, "tv", Vector3i(2, 0, 8), Vector2i(3, 1), PI)
 	_prop(o, "vitrin", Vector3i(6, 0, 8), Vector2i(2, 1))
 	_prop(o, "bitki", Vector3i(7, 0, 1), Vector2i(1, 1))
 	_prop(o, "bitki", Vector3i(1, 0, 8), Vector2i(1, 1))
-	_decor(o, "salon_halisi", Vector3(4.0, 0, 4.5), 0.0)
 	_decor(o, "tablo_kucuk", Vector3(1.03, 2.4, 3.0), PI / 2)
 	_decor(o, "tablo_kucuk", Vector3(3.0, 2.4, 9.97), PI)
 	_decor(o, "perde", Vector3(1.5, 1.55, 1.04), 0.0)
@@ -1585,15 +1617,18 @@ func _build_fire_station(o: Vector3i) -> void:
 ## resim köşesi, öğretmende kitaplıklar.
 func _family_extras() -> void:
 	var a: Vector3i = SETS["ali_ev"]
+	_decor(a, "salon_halisi", Vector3(4.0, 0, 4.5), 0.0)
 	_decor(a, "futbol_topu", Vector3(4.5, 5, 2.5), 0.0)
 	_decor(a, "poster", Vector3(6.97, 6.8, 2.5), -PI / 2)
 	var z: Vector3i = SETS["zeynep_ev"]
+	_decor(z, "oda_halisi", Vector3(4.0, 0, 4.5), PI / 2)
 	_prop(z, "oyuncak_kutusu", Vector3i(6, 5, 1), Vector2i(1, 1))
 	_decor(z, "tablo_kucuk", Vector3(6.97, 6.8, 2.5), -PI / 2)
 	_decor(z, "oda_halisi", Vector3(4.0, 5, 3.8), 0.0)
 	_decor(z, "tablo_kucuk", Vector3(2.0, 7.0, 9.97), PI)
 	_prop(z, "bitki", Vector3i(13, 5, 7), Vector2i(1, 1))
 	var t: Vector3i = SETS["ogretmen_ev"]
+	_fill(t, Vector3i(2, -1, 3), Vector3i(5, -1, 6), Blocks.RUG)
 	_prop(t, "kitaplik", Vector3i(8, 5, 8), Vector2i(1, 2), PI / 2)
 	_prop(t, "kitaplik", Vector3i(7, 0, 6), Vector2i(1, 2), -PI / 2)
 	_decor(t, "tablo", Vector3(1.03, 7.2, 4.5), PI / 2)

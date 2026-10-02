@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "teleskop": 1.6, "sezlong": 0.6, "bisiklet": 1.0, "puf": 0.45, "alet_tezgahi": 0.9, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
@@ -22,6 +22,7 @@ const STEEL := Color("9ea7ad")
 
 
 static func height(id: String) -> float:
+	id = id.get_slice("@", 0)
 	if id.begins_with("araba_"):
 		return HEIGHTS["araba"]
 	return HEIGHTS.get(id, 1.0)
@@ -46,7 +47,12 @@ const FACING := {
 
 ## Eşyayı kurar; köşesi (0,0,0), tabanı size.x × size.y blok. Eşyalar parça parça köşeli
 ## bloklardan kurulur (bacak, tabla, kapak, kulp); ana rengi Mehmet'in PNG'sinin ön görünüşünden alınır.
+## id "koltuk@3a6ea5" gibi verilirse eşya o renge boyanır (evler birbirinden farklı görünsün).
 static func build(id: String, size: Vector2i, turn_override = null) -> Node3D:
+	var tint = null
+	if "@" in id:
+		tint = Color(id.get_slice("@", 1))
+		id = id.get_slice("@", 0)
 	var root := Node3D.new()
 	root.name = "Esya_" + id
 	var turn: float = FACING.get(id, 0.0) if turn_override == null else float(turn_override)
@@ -66,6 +72,8 @@ static func build(id: String, size: Vector2i, turn_override = null) -> Node3D:
 	pivot.rotation.y = turn
 	pivot.position = Vector3(size.x / 2.0, 0, size.y / 2.0)
 	root.add_child(pivot)
+	if tint != null:
+		_paint(model, tint)
 	if id == "calisma_masasi":
 		# Emir'in okul eşyaları masanın üstünde: çanta, kalemlik, defter.
 		var top := height(id)
@@ -471,6 +479,47 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			var c := _tone(id, Color("d9b383"))
 			_box(r, Vector3(w - 0.05, h, d - 0.2), Vector3(w / 2, h / 2, d / 2 - 0.1), c)
 			_box(r, Vector3(w - 0.15, 0.02, 0.02), Vector3(w / 2, h * 0.5, d - 0.19), c.darkened(0.3))
+		"teleskop":
+			for a in [0.0, TAU / 3, 2 * TAU / 3]:
+				_box(r, Vector3(0.05, 1.0, 0.05), Vector3(w / 2 + cos(a) * 0.2, 0.5, d / 2 + sin(a) * 0.2), Color("3a3a3a"))
+			var tube := Node3D.new()
+			tube.position = Vector3(w / 2, 1.15, d / 2)
+			tube.rotation = Vector3(-0.6, 0, 0)
+			r.add_child(tube)
+			_box(tube, Vector3(0.2, 0.2, 1.0), Vector3(0, 0, 0.1), Color("f5f5f5"))
+			_box(tube, Vector3(0.24, 0.24, 0.12), Vector3(0, 0, 0.6), Color("2e6fd8"))
+			_box(tube, Vector3(0.08, 0.08, 0.15), Vector3(0, 0.05, -0.45), Color("222222"))
+		"sezlong":
+			_box(r, Vector3(w - 0.3, 0.08, d - 0.2), Vector3(w / 2, 0.3, d / 2 + 0.1), Color("f5f5f5"))
+			for k in 4:
+				_box(r, Vector3(w - 0.32, 0.09, (d - 0.2) / 8), Vector3(w / 2, 0.31, 0.2 + k * (d - 0.2) / 4), Color("2e86c1"))
+			var back := Node3D.new()
+			back.position = Vector3(w / 2, 0.35, 0.2)
+			back.rotation = Vector3(0.9, 0, 0)
+			r.add_child(back)
+			_box(back, Vector3(w - 0.3, 0.08, 0.7), Vector3(0, 0, -0.35), Color("2e86c1"))
+			for p in [Vector2(0.2, 0.2), Vector2(w - 0.2, 0.2), Vector2(0.2, d - 0.1), Vector2(w - 0.2, d - 0.1)]:
+				_box(r, Vector3(0.05, 0.3, 0.05), Vector3(p.x, 0.15, p.y), Color("cfd4d8"))
+		"bisiklet":
+			# Önü +Z: iki teker, kadro, sele, gidon.
+			for z in [0.25, d - 0.25]:
+				_box(r, Vector3(0.05, 0.6, 0.6), Vector3(w / 2, 0.3, z), Color("222222"))
+				_box(r, Vector3(0.06, 0.4, 0.4), Vector3(w / 2, 0.3, z), Color("bdbdbd"))
+			_box(r, Vector3(0.05, 0.05, d - 0.5), Vector3(w / 2, 0.6, d / 2), Color("d32f2f"))
+			_box(r, Vector3(0.05, 0.4, 0.05), Vector3(w / 2, 0.45, d / 2 - 0.15), Color("d32f2f"))
+			_box(r, Vector3(0.12, 0.05, 0.25), Vector3(w / 2, 0.75, d / 2 - 0.15), Color("222222"))
+			_box(r, Vector3(0.45, 0.04, 0.04), Vector3(w / 2, 0.85, d - 0.3), Color("222222"))
+			_box(r, Vector3(0.04, 0.3, 0.04), Vector3(w / 2, 0.7, d - 0.3), Color("d32f2f"))
+		"puf":
+			_box(r, Vector3(0.6, 0.42, 0.6), Vector3(w / 2, 0.21, d / 2), _tone(id, Color("e8a33d")))
+		"alet_tezgahi":
+			var c := _tone(id, Color("8a5a3b"))
+			_box(r, Vector3(w - 0.05, 0.08, d - 0.1), Vector3(w / 2, 0.86, d / 2), c)
+			for p in [Vector2(0.1, 0.1), Vector2(w - 0.1, 0.1), Vector2(0.1, d - 0.15), Vector2(w - 0.1, d - 0.15)]:
+				_box(r, Vector3(0.08, 0.82, 0.08), Vector3(p.x, 0.41, p.y), c.darkened(0.3))
+			_box(r, Vector3(w - 0.1, 0.9, 0.04), Vector3(w / 2, 1.5, 0.03), Color("6d6d6d"))  # alet panosu
+			for k in int(w * 4):
+				_box(r, Vector3(0.06, 0.3, 0.04), Vector3(0.2 + k * 0.25, 1.5, 0.07), [Color("d32f2f"), Color("f2b705"), Color("2e6fd8")][k % 3])
 		"saksi":
 			_box(r, Vector3(0.45, 0.4, 0.45), Vector3(w / 2, 0.2, d / 2), Color("b5562f"))
 			_box(r, Vector3(0.6, 0.45, 0.6), Vector3(w / 2, 0.65, d / 2), Color("3f8f3a"))
@@ -657,7 +706,7 @@ const DECOR_SIZE := {
 	"poster": Vector3(0.9, 1.2, 0.03), "duvar_saati": Vector3(0.5, 0.5, 0.06),
 	"futbol_topu": Vector3(0.35, 0.35, 0.35), "oda_halisi": Vector3(2.2, 0.02, 1.6),
 	"tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
-	"salon_halisi": Vector3(3.0, 0.02, 2.2), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
+	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 }
 
 
@@ -717,6 +766,13 @@ static func build_decor(id: String) -> Node3D:
 		"ayna_duvar":
 			_box(root, size, Vector3.ZERO, Color("c9a64a"))
 			_box(root, Vector3(size.x - 0.08, size.y - 0.08, 0.01), Vector3(0, 0, 0.02), Color("d6e8ee"))
+		"bilgisayar":
+			# Masa üstü: monitör (+Z'ye bakar), ayak, klavye, fare.
+			_box(root, Vector3(0.6, 0.38, 0.04), Vector3(0, 0.3, -0.12), Color("1b1b1b"))
+			_box(root, Vector3(0.54, 0.32, 0.01), Vector3(0, 0.3, -0.095), Color("3d7fd6"))
+			_box(root, Vector3(0.05, 0.12, 0.05), Vector3(0, 0.06, -0.14), Color("3a3a3a"))
+			_box(root, Vector3(0.45, 0.02, 0.15), Vector3(0, 0.01, 0.1), Color("2b2b2b"))
+			_box(root, Vector3(0.06, 0.02, 0.09), Vector3(0.3, 0.01, 0.1), Color("2b2b2b"))
 		"oda_halisi":
 			_box(root, size, Vector3(0, 0.01, 0), Color("6fb3e0"))
 			_box(root, Vector3(1.6, 0.022, 1.0), Vector3(0, 0.012, 0), Color("a9d6f2"))
@@ -951,3 +1007,18 @@ static func build_door(interior := false) -> Node3D:
 	mi.position = Vector3(0.48, 1.46, 0)
 	hinge.add_child(mi)
 	return root
+
+
+## Eşyanın ana renkli parçalarını boyar: açık ve doygun yüzeyler renge çekilir, siyah/metal parçalar kalır.
+static func _paint(node: Node, tint: Color) -> void:
+	for mi in node.find_children("*", "MeshInstance3D", true, false):
+		var m: Material = (mi as MeshInstance3D).mesh.surface_get_material(0) if (mi as MeshInstance3D).mesh else null
+		if m is StandardMaterial3D:
+			var c: Color = (m as StandardMaterial3D).albedo_color
+			if c.v < 0.25 or (c.s < 0.12 and c.v < 0.7):
+				continue
+			var n := (m as StandardMaterial3D).duplicate() as StandardMaterial3D
+			n.albedo_color = Color(tint.r * (0.6 + 0.4 * c.v), tint.g * (0.6 + 0.4 * c.v), tint.b * (0.6 + 0.4 * c.v))
+			if n.albedo_texture:
+				n.albedo_color = n.albedo_color.lightened(0.25)
+			(mi as MeshInstance3D).material_override = n
