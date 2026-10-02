@@ -9,8 +9,9 @@ param(
 	[switch]$Yenile,
 	# Yatay videoyu AVI yerine PNG kare dizisi olarak kaydet (4 GB AVI sınırına takılırsa; çok yavaş: kare başına ~4 sn).
 	[switch]$Png,
-	# Yatay videoyu 4K yerine 1080p kaydet (hızlı deneme kaydı).
+	# Yatay video varsayılan olarak 1080p kaydedilir (Mehmet: "ilk baştaki kayda dön"); -Dort ile 4K.
 	[switch]$Hd,
+	[switch]$Dort,
 	[string]$Cikti = ""
 )
 $ErrorActionPreference = "Continue"
@@ -48,7 +49,7 @@ foreach ($b in $secilen) {
 	}
 	# 4K kareler büyük: geçici AVI C: yerine çıktı sürücüsüne yazılır (yer sorunu olmasın).
 	if (-not $dikey) { $avi = Join-Path $Cikti "_gecici_$($b.Id).avi" }
-	if ($Hd -and -not $dikey) { $ayar = $ayar.Replace("viewport_width=3840", "viewport_width=1920").Replace("viewport_height=2160", "viewport_height=1080").Replace("stretch/scale=3.0", "stretch/scale=1.5") }
+	if (-not $Dort -and -not $dikey) { $ayar = $ayar.Replace("viewport_width=3840", "viewport_width=1920").Replace("viewport_height=2160", "viewport_height=1080").Replace("stretch/scale=3.0", "stretch/scale=1.5") }
 	Write-Host "Kaydediliyor: $ad"
 	Set-Content $override -Encoding ASCII -Value $ayar
 	if ($dikey -or -not $Png) {

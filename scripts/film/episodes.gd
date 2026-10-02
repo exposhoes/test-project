@@ -44,7 +44,7 @@ const LIST := [
 			{"cam": "ev.kam_mutfak", "look": "ev.mutfak", "t": 0},
 			{"say": "emir", "text": "Bu benim annem. Dünyanın en güzel kurabiyelerini o yapar!"},
 			{"say": "anne", "text": "Hoş geldiniz çocuklar! Emir, kahvaltını bitirmeden çıkmak yok!"},
-			{"say": "emir", "text": "Hahaha! Tamam anne!"},
+			{"say": "emir", "text": "Hahaha! Tamam anne!", "keep_cam": true},  # anne çekiminde kal; aynı geniş açıya dönüp tekrar gibi görünmesin
 			# 3. Evin önü: arkadaşlar.
 			{"sfx": "vuup"},
 			{"hide": "anne"},
@@ -61,14 +61,15 @@ const LIST := [
 			{"say": "zeynep", "text": "Merhaba! Birlikte çok eğleneceğiz!"},
 			# 4. Okul.
 			{"sfx": "vuup"},
-			{"place": "emir", "at": "okul.bahce", "look": "okul.okul_kapi"},
-			{"place": "ali", "at": "okul.agac_onu", "look": "okul.okul_kapi"},
-			{"place": "zeynep", "at": "okul.top_alani", "look": "okul.okul_kapi"},
-			{"place": "ogretmen", "at": "okul.okul_kapi", "look": "okul.bahce"},
-			{"cam": "okul.kam_bahce", "look": "okul.bahce", "t": 0},
-			{"say": "emir", "text": "Burası okulumuz. Bu da Kemal Öğretmen. Dersleri hiç sıkıcı değil!", "cuts": [[0.3, "okul.kam_ogretmen", "okul.okul_kapi"]]},
+			# Mehmet: "Bu da Kemal Öğretmen" derken öğretmen görünmeli. Öğretmen okul kapısının önünde,
+			# üç çocuk karşısında; baştan sona tek, yakın ve sabit kadraj (ağaç ve lamba kadraja girmez).
+			{"place": "ogretmen", "at": Vector3(65.0, 11, 13.2), "look": Vector3(65.0, 11, 16.0)},
+			{"place": "emir", "at": Vector3(64.8, 11, 15.8), "look": Vector3(65.0, 11, 13.2)},
+			{"place": "zeynep", "at": Vector3(66.2, 11, 15.0), "look": Vector3(65.0, 11, 13.2)},
+			{"place": "ali", "at": Vector3(67.4, 11, 15.7), "look": Vector3(65.0, 11, 13.2)},
+			{"cam": Vector3(61.6, 12.9, 17.6), "look": Vector3(65.6, 11.0, 14.3), "t": 0},
+			{"say": "emir", "text": "Burası okulumuz. Bu da Kemal Öğretmen. Dersleri hiç sıkıcı değil!", "keep_cam": true},
 			{"sfx": "okul_zili"},
-			{"cam": "okul.kam_ogretmen", "look": "okul.okul_kapi", "t": 0},
 			{"gesture": "ogretmen", "kind": "selam"},
 			{"say": "ogretmen", "text": "Günaydın çocuklar! Zil çaldı, derse geç kalmak yok!", "keep_cam": true},
 			# 5. Bakkal.
