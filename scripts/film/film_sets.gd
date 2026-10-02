@@ -2225,6 +2225,22 @@ func _furnish_new_buildings() -> void:
 	_prop(o, "puf@4fa3d9", Vector3i(-7, 5, -6), Vector2i(1, 1))
 	_decor(o, "oda_halisi", Vector3(-4.5, 5, -6.0), 0.0)
 	_decor(o, "tablo", Vector3(-4.5, 7.2, -8.97), 0.0)
+	# Sahil (dünya koordinatı): kafede saksı, tablo, saat; dış masalarda sofra ve ikinci şemsiye;
+	# akvaryumda bilet kasası, ikinci bank, saksılar, çöp kutusu.
+	o = Vector3i(0, Y0, 0)
+	_prop(o, "saksi", Vector3i(109, 0, -17), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(105, 0, -17), Vector2i(1, 1))
+	_decor(o, "tablo", Vector3(105.03, 2.3, -18.0), PI / 2)
+	_decor(o, "duvar_saati", Vector3(108.0, 2.7, -18.97), 0.0)
+	_decor(o, "sofra", Vector3(106.0, 0.8, -11.5), 0.0)
+	_decor(o, "sofra", Vector3(110.0, 0.8, -11.5), 0.0)
+	_prop(o, "semsiye", Vector3i(107, 0, -10), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(104, 0, -14), Vector2i(1, 1))
+	_prop(o, "kasa", Vector3i(105, 0, 68), Vector2i(1, 1), PI / 2)
+	_prop(o, "bank", Vector3i(106, 0, 67), Vector2i(2, 1))
+	_prop(o, "bitki", Vector3i(105, 0, 65), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(105, 0, 75), Vector2i(1, 1))
+	_prop(o, "cop_kutusu", Vector3i(108, 0, 65), Vector2i(1, 1))
 
 
 ## Mehmet'in mevcut setlere eklemeleri (setin kendi inşa fonksiyonuna dokunmadan, üstüne):
