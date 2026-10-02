@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "vitrin": 2.0, "cift_yatak": 0.9, "abajur": 1.5, "ayna": 1.8, "kitaplik": 2.0, "tv_unitesi": 0.6, "ayakkabilik": 1.0, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
@@ -40,6 +40,7 @@ const FACING := {
 	"gardirop": PI / 2, "oyuncak_kutusu": PI / 2, "market_rafi": PI / 2,
 	"calisma_masasi": PI, "buzdolabi": -PI / 2, "tv": PI,
 	"icecek_dolabi": -PI / 2, "meyve_reyonu": PI / 2,
+	"vitrin": PI, "kitaplik": PI, "cift_yatak": 0.0,
 }
 
 
@@ -425,6 +426,51 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 		"itfaiye_diregi":
 			_box(r, Vector3(0.12, f.y, 0.12), Vector3(w / 2, f.y / 2, d / 2), Color("d9dde0"))
 			_box(r, Vector3(0.9, 0.06, 0.9), Vector3(w / 2, 0.03, d / 2), Color("8a8f94"))  # yumuşak minder
+		"vitrin":
+			# Camlı vitrin: koyu ahşap gövde, cam kapaklar, içinde tabak ve fincanlar.
+			var c := _tone(id, Color("6b4026"))
+			_box(r, Vector3(w - 0.05, h, 0.45), Vector3(w / 2, h / 2, 0.25), c)
+			_box(r, Vector3(w - 0.2, h * 0.55, 0.03), Vector3(w / 2, h * 0.66, 0.49), Color(0.78, 0.9, 0.95, 1))
+			_box(r, Vector3(w - 0.2, h * 0.3, 0.03), Vector3(w / 2, h * 0.18, 0.49), c.darkened(0.15))
+			for k in 3:
+				_box(r, Vector3(w - 0.25, 0.03, 0.38), Vector3(w / 2, h * 0.42 + k * h * 0.17, 0.25), c.lightened(0.2))
+				for j in int(maxf(2.0, w * 3)):
+					_box(r, Vector3(0.14, 0.12, 0.14), Vector3(0.25 + j * (w - 0.5) / maxf(1.0, w * 3 - 1), h * 0.42 + k * h * 0.17 + 0.08, 0.3), [Color("f5f5f5"), Color("4a7fc1"), Color("e0b84a")][(j + k) % 3])
+			_box(r, Vector3(0.03, h * 0.55, 0.04), Vector3(w / 2, h * 0.66, 0.5), c.darkened(0.2))
+		"cift_yatak":
+			# Önü (ayak ucu) +Z, başlık arkada. Çift kişilik: iki yastık.
+			var c := _tone(id, Color("8a5a3b"))
+			_box(r, Vector3(w - 0.05, 0.35, d - 0.05), Vector3(w / 2, 0.22, d / 2), c)
+			_box(r, Vector3(w - 0.1, 0.9, 0.12), Vector3(w / 2, 0.45, 0.06), c.darkened(0.2))  # başlık
+			_box(r, Vector3(w - 0.15, 0.2, d - 0.25), Vector3(w / 2, 0.48, d / 2 + 0.05), Color("f4f1ea"))  # yatak
+			_box(r, Vector3(w - 0.1, 0.06, d * 0.6), Vector3(w / 2, 0.6, d * 0.65), Color("5b8fd6"))  # yorgan
+			for px in [w * 0.27, w * 0.73]:
+				_box(r, Vector3(w * 0.36, 0.14, 0.35), Vector3(px, 0.65, 0.35), Color("ffffff"))
+		"abajur":
+			_box(r, Vector3(0.3, 0.05, 0.3), Vector3(w / 2, 0.025, d / 2), Color("3a3a3a"))
+			_box(r, Vector3(0.05, 1.1, 0.05), Vector3(w / 2, 0.6, d / 2), Color("3a3a3a"))
+			_box(r, Vector3(0.45, 0.35, 0.45), Vector3(w / 2, 1.3, d / 2), Color("f3e1b5"))
+		"ayna":
+			_box(r, Vector3(w * 0.6, h, 0.08), Vector3(w / 2, h / 2, 0.08), Color("8a5a3b"))
+			_box(r, Vector3(w * 0.5, h - 0.2, 0.02), Vector3(w / 2, h / 2, 0.13), Color("cfe3ea"))
+		"kitaplik":
+			var c := _tone(id, Color("8a5a3b"))
+			_box(r, Vector3(w - 0.05, h, 0.4), Vector3(w / 2, h / 2, 0.2), c)
+			var cols := [Color("c0392b"), Color("2e86c1"), Color("27ae60"), Color("f1c40f"), Color("8e44ad"), Color("e67e22")]
+			for k in 4:
+				_box(r, Vector3(w - 0.15, 0.03, 0.36), Vector3(w / 2, 0.1 + k * h / 4, 0.22), c.lightened(0.15))
+				var n := int(w * 7)
+				for j in n:
+					_box(r, Vector3(0.1, 0.3 + (j % 3) * 0.04, 0.3), Vector3(0.12 + j * (w - 0.24) / maxf(1.0, n - 1), 0.28 + k * h / 4, 0.24), cols[(j + k * 2) % cols.size()])
+		"tv_unitesi":
+			var c := _tone(id, Color("efe8dc"))
+			_box(r, Vector3(w - 0.05, h, d - 0.1), Vector3(w / 2, h / 2, d / 2), c)
+			for k in 3:
+				_box(r, Vector3(w / 3 - 0.08, h - 0.15, 0.02), Vector3(w / 6 + k * w / 3, h / 2, d - 0.04), c.darkened(0.1))
+		"ayakkabilik":
+			var c := _tone(id, Color("d9b383"))
+			_box(r, Vector3(w - 0.05, h, d - 0.2), Vector3(w / 2, h / 2, d / 2 - 0.1), c)
+			_box(r, Vector3(w - 0.15, 0.02, 0.02), Vector3(w / 2, h * 0.5, d - 0.19), c.darkened(0.3))
 		"saksi":
 			_box(r, Vector3(0.45, 0.4, 0.45), Vector3(w / 2, 0.2, d / 2), Color("b5562f"))
 			_box(r, Vector3(0.6, 0.45, 0.6), Vector3(w / 2, 0.65, d / 2), Color("3f8f3a"))
@@ -610,6 +656,8 @@ static func _box(parent: Node3D, size: Vector3, center: Vector3, color: Color) -
 const DECOR_SIZE := {
 	"poster": Vector3(0.9, 1.2, 0.03), "duvar_saati": Vector3(0.5, 0.5, 0.06),
 	"futbol_topu": Vector3(0.35, 0.35, 0.35), "oda_halisi": Vector3(2.2, 0.02, 1.6),
+	"tablo": Vector3(1.0, 0.75, 0.04), "tablo_kucuk": Vector3(0.55, 0.7, 0.04), "perde": Vector3(1.0, 2.1, 0.06),
+	"salon_halisi": Vector3(3.0, 0.02, 2.2), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 }
 
 
@@ -649,6 +697,26 @@ static func build_decor(id: String) -> Node3D:
 			root.add_child(mi)
 			for p in [Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1), Vector3(0, 0, -1), Vector3(0.6, 0.6, 0.5)]:
 				_box(root, Vector3.ONE * size.x * 0.28, Vector3(0, size.y / 2, 0) + p.normalized() * size.x * 0.4, Color("222222"))
+		"tablo", "tablo_kucuk":
+			# Yazısız manzara tablosu: çerçeve, gök, tepe, güneş.
+			_box(root, size, Vector3.ZERO, Color("8a5a3b"))
+			var iw := size.x - 0.12
+			var ih := size.y - 0.12
+			_box(root, Vector3(iw, ih * 0.55, 0.01), Vector3(0, ih * 0.22, 0.025), Color("8ec9ef"))
+			_box(root, Vector3(iw, ih * 0.45, 0.01), Vector3(0, -ih * 0.27, 0.025), Color("5fae4a"))
+			_box(root, Vector3(iw * 0.2, iw * 0.2, 0.012), Vector3(iw * 0.25, ih * 0.28, 0.027), Color("ffd23f"))
+		"perde":
+			for k in 2:
+				var sx := (k - 0.5) * size.x * 0.75
+				_box(root, Vector3(size.x * 0.3, size.y, size.z), Vector3(sx, 0, 0), Color("c98b6b"))
+			_box(root, Vector3(size.x + 0.3, 0.05, 0.05), Vector3(0, size.y / 2, 0), Color("6b4026"))
+		"salon_halisi":
+			_box(root, size, Vector3(0, 0.01, 0), Color("9c3b3b"))
+			_box(root, Vector3(size.x - 0.4, 0.022, size.z - 0.4), Vector3(0, 0.012, 0), Color("d8b46a"))
+			_box(root, Vector3(size.x - 0.8, 0.024, size.z - 0.8), Vector3(0, 0.013, 0), Color("9c3b3b"))
+		"ayna_duvar":
+			_box(root, size, Vector3.ZERO, Color("c9a64a"))
+			_box(root, Vector3(size.x - 0.08, size.y - 0.08, 0.01), Vector3(0, 0, 0.02), Color("d6e8ee"))
 		"oda_halisi":
 			_box(root, size, Vector3(0, 0.01, 0), Color("6fb3e0"))
 			_box(root, Vector3(1.6, 0.022, 1.0), Vector3(0, 0.012, 0), Color("a9d6f2"))

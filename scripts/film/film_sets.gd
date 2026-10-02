@@ -39,7 +39,8 @@ const FAMILY_POINTS := {
 	"kam_dis": Vector3(9.0, 3.0, -9.0),
 	"kam_salon": Vector3(7.2, 2.3, 2.0),
 	"kam_mutfak": Vector3(9.6, 2.3, 7.0),
-	"kam_oda": Vector3(5.8, 7.3, 8.5),
+	"banyo": Vector3(5.5, 5, 7.8),
+	"kam_oda": Vector3(6.3, 7.3, 1.6),
 	"kam_ebeveyn": Vector3(12.5, 7.3, 7.0),
 }
 ## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
@@ -299,6 +300,7 @@ func _init() -> void:
 	_build_parking(SETS["otopark"])
 	for h: String in FAMILY_HOUSES:
 		_build_family_house(SETS[h], FAMILY_HOUSES[h])
+	_family_extras()
 	_build_fire_station(SETS["itfaiye"])
 	_connect_sets()
 	for pos: Vector3i in _blocks:
@@ -1448,35 +1450,67 @@ func _build_family_house(o: Vector3i, wall: int) -> void:
 	# Zemin kat: salon | mutfak duvarı ve kapısı.
 	_iwall(o, Vector3i(8, 0, 1), Vector3i(8, 0, 9))
 	_door(o, Vector3i(8, 0, 4), false)
+	# Salon: L koltuk takımı, berjer, sehpa, halı, TV ünitesi, vitrin, abajur, tablolar, perdeler.
 	_prop(o, "koltuk", Vector3i(1, 0, 1), Vector2i(3, 1))
-	_prop(o, "sehpa", Vector3i(1, 0, 3), Vector2i(3, 1))
-	_prop(o, "tv", Vector3i(1, 0, 7), Vector2i(3, 1), PI)
+	_prop(o, "koltuk", Vector3i(1, 0, 3), Vector2i(1, 3), PI / 2)
+	_prop(o, "berjer", Vector3i(6, 0, 4), Vector2i(1, 1), -PI / 2)
+	_prop(o, "sehpa", Vector3i(3, 0, 4), Vector2i(2, 1))
+	_prop(o, "abajur", Vector3i(6, 0, 1), Vector2i(1, 1))
+	_prop(o, "tv", Vector3i(2, 0, 8), Vector2i(3, 1), PI)
+	_prop(o, "vitrin", Vector3i(6, 0, 8), Vector2i(2, 1))
 	_prop(o, "bitki", Vector3i(7, 0, 1), Vector2i(1, 1))
-	_fill(o, Vector3i(1, -1, 4), Vector3i(4, -1, 6), Blocks.RUG)
+	_prop(o, "bitki", Vector3i(1, 0, 8), Vector2i(1, 1))
+	_decor(o, "salon_halisi", Vector3(4.0, 0, 4.5), 0.0)
+	_decor(o, "tablo_kucuk", Vector3(1.03, 2.4, 3.0), PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(3.0, 2.4, 9.97), PI)
+	_decor(o, "perde", Vector3(1.5, 1.55, 1.04), 0.0)
+	_decor(o, "perde", Vector3(5.5, 1.55, 1.04), 0.0)
+	_decor(o, "duvar_saati", Vector3(7.97, 2.7, 2.5), -PI / 2)
+	# Mutfak: tezgâh ve üst dolaplar, ocak, buzdolabı, kiler rafı, dört kişilik masa.
 	_prop(o, "mutfak_tezgahi", Vector3i(9, 0, 1), Vector2i(2, 1))
+	_prop(o, "ust_dolap", Vector3i(9, 0, 1), Vector2i(2, 1))
 	_prop(o, "ocak", Vector3i(11, 0, 1), Vector2i(1, 1))
 	_prop(o, "buzdolabi", Vector3i(12, 0, 1), Vector2i(1, 1))
+	_prop(o, "kiler_rafi", Vector3i(13, 0, 5), Vector2i(1, 2), -PI / 2)
 	_table4(o, Vector3i(10, 0, 4))
+	_decor(o, "duvar_saati", Vector3(8.97 + 0.06, 2.7, 6.0), PI / 2)
+	_decor(o, "tablo_kucuk", Vector3(13.97, 2.3, 3.0), -PI / 2)
 	# Merdiven: mutfağın arkasında x 9..13 boyunca yukarı.
 	for k in 5:
 		_fill(o, Vector3i(9 + k, 0, 8), Vector3i(9 + k, k, 9), Blocks.PLANKS)
 	_fill(o, Vector3i(9, 4, 8), Vector3i(12, 4, 9), Blocks.AIR)
-	# Üst kat: çocuk odası | anne-baba odası.
+	# Üst kat: çocuk odası (köşesinde banyo) | anne-baba odası.
 	_iwall(o, Vector3i(7, 5, 1), Vector3i(7, 5, 9))
-	_door(o, Vector3i(7, 5, 6), false)
+	_door(o, Vector3i(7, 5, 4), false)
 	_put(o + Vector3i(1, 5, 1), Blocks.BED)
 	_put(o + Vector3i(1, 5, 2), Blocks.BED)
 	_prop(o, "komodin", Vector3i(2, 5, 1), Vector2i(1, 1))
-	_prop(o, "gardirop", Vector3i(1, 5, 6), Vector2i(1, 2))
-	_prop(o, "calisma_masasi", Vector3i(3, 5, 9), Vector2i(2, 1))
+	_prop(o, "gardirop", Vector3i(1, 5, 4), Vector2i(1, 2))
+	_prop(o, "calisma_masasi", Vector3i(1, 5, 9), Vector2i(2, 1))
+	_prop(o, "sandalye", Vector3i(1, 5, 8), Vector2i(1, 1), PI)
 	_prop(o, "oyuncak_kutusu", Vector3i(5, 5, 1), Vector2i(1, 1))
-	_fill(o, Vector3i(2, 4, 3), Vector3i(5, 4, 6), Blocks.RUG)
-	for x in [10, 11]:
-		_put(o + Vector3i(x, 5, 1), Blocks.BED)
-		_put(o + Vector3i(x, 5, 2), Blocks.BED)
+	_fill(o, Vector3i(2, 4, 3), Vector3i(5, 4, 5), Blocks.RUG)
+	_decor(o, "tablo_kucuk", Vector3(1.03, 7.0, 1.6), PI / 2)
+	_decor(o, "perde", Vector3(1.5, 6.55, 1.04), 0.0)
+	# Banyo (x 4..6, z 7..9): klozet, lavabo ve ayna, duş, havluluk.
+	_iwall(o, Vector3i(3, 5, 7), Vector3i(3, 5, 9))
+	_iwall(o, Vector3i(3, 5, 6), Vector3i(6, 5, 6))
+	_door(o, Vector3i(5, 5, 6), true)
+	_fill(o, Vector3i(4, 4, 7), Vector3i(6, 4, 9), Blocks.TILE_BATH)
+	_prop(o, "lavabo", Vector3i(4, 5, 9), Vector2i(1, 1), PI)
+	_decor(o, "ayna_duvar", Vector3(4.5, 6.8, 9.97), PI)
+	_prop(o, "klozet", Vector3i(6, 5, 9), Vector2i(1, 1), PI)
+	_prop(o, "dus", Vector3i(6, 5, 7), Vector2i(1, 1), -PI / 2)
+	_prop(o, "havluluk", Vector3i(4, 5, 7), Vector2i(1, 1), PI / 2)
+	# Anne-baba odası: çift kişilik yatak, iki komodin ve abajur, gardırop, boy aynası, tablo.
+	_prop(o, "cift_yatak", Vector3i(10, 5, 1), Vector2i(2, 2))
 	_prop(o, "komodin", Vector3i(9, 5, 1), Vector2i(1, 1))
 	_prop(o, "komodin", Vector3i(12, 5, 1), Vector2i(1, 1))
 	_prop(o, "gardirop", Vector3i(13, 5, 4), Vector2i(1, 2))
+	_prop(o, "ayna", Vector3i(8, 5, 6), Vector2i(1, 1), PI / 2)
+	_decor(o, "tablo", Vector3(8.03, 7.3, 2.5), PI / 2)
+	_decor(o, "oda_halisi", Vector3(10.8, 5, 4.6), 0.0)
+	_decor(o, "perde", Vector3(8.5 + 0.5, 6.55, 1.04), 0.0)
 	# Kiremit çatı: sırt x boyunca, alınlıklar yanlarda.
 	for st in 6:
 		_fill(o, Vector3i(-1, 10 + st, -1 + st), Vector3i(15, 10 + st, 11 - st), Blocks.ROOF_TERRACOTTA)
@@ -1530,3 +1564,18 @@ func _build_fire_station(o: Vector3i) -> void:
 	_fill(o, Vector3i(0, -1, 17), Vector3i(9, -1, 20), Blocks.CONCRETE)
 	_put(o + Vector3i(0, 0, 19), Blocks.TOY_BRICK_RED)
 	_put(o + Vector3i(9, 2, 17), Blocks.LANTERN)
+
+
+## Karakter evlerini birbirinden ayıran eşyalar: Ali'de top ve spor posteri, Zeynep'te oyuncaklar ve
+## resim köşesi, öğretmende kitaplıklar.
+func _family_extras() -> void:
+	var a: Vector3i = SETS["ali_ev"]
+	_decor(a, "futbol_topu", Vector3(4.5, 5, 2.5), 0.0)
+	_decor(a, "poster", Vector3(6.97, 6.8, 2.5), -PI / 2)
+	var z: Vector3i = SETS["zeynep_ev"]
+	_prop(z, "oyuncak_kutusu", Vector3i(6, 5, 1), Vector2i(1, 1))
+	_decor(z, "tablo_kucuk", Vector3(6.97, 6.8, 2.5), -PI / 2)
+	_decor(z, "oda_halisi", Vector3(4.0, 5, 3.8), 0.0)
+	var t: Vector3i = SETS["ogretmen_ev"]
+	_prop(t, "kitaplik", Vector3i(8, 5, 8), Vector2i(1, 2), PI / 2)
+	_prop(t, "kitaplik", Vector3i(6, 0, 1), Vector2i(1, 1))
