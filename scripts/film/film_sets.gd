@@ -145,7 +145,7 @@ const POINTS := {
 		"yatak_2_yani": Vector3(10.2, 0, 2.0),
 		"bekleme": Vector3(2.0, 0, 6.5),
 		"kam_ic": Vector3(6.5, 2.6, 8.0),
-		"kam_yatak": Vector3(4.6, 2.5, 6.4),
+		"kam_yatak": Vector3(4.2, 2.5, 3.6),
 		"kam_dis": Vector3(12.0, 4.5, 18.0),
 		"muayene": Vector3(3.0, 0, -3.0),
 		"muayene_doktor": Vector3(1.5, 0, -6.0),
@@ -695,7 +695,7 @@ func _build_shop(o: Vector3i) -> void:
 	for z in range(10, 14):
 		_put(o + Vector3i(5, -1, z), Blocks.GRAVEL)
 	# Arka duvarda renkli ürün rafları, kapıda paspas, önde saksı çiçekleri.
-	_fill(o, Vector3i(1, 0, 0), Vector3i(9, 1, 0), Blocks.BOOKSHELF)
+	_prop(o, "market_rafi", Vector3i(1, 0, 0), Vector2i(9, 1), 0.0)
 	_put(o + Vector3i(5, -1, 8), Blocks.RUG)
 	for x in [2, 3, 7, 8]:
 		_put(o + Vector3i(x, 0, 11), Blocks.FLOWERS)
@@ -1384,7 +1384,11 @@ func _build_hospital(o: Vector3i) -> void:
 	_put(o + Vector3i(5, 0, -5), Blocks.BED)
 	_prop(o, "lavabo", Vector3i(0, 0, -2), Vector2i(1, 1), PI / 2)
 	# Eczane: ilaç rafları, tezgâh.
-	_fill(o, Vector3i(7, 0, -6), Vector3i(12, 1, -6), Blocks.BOOKSHELF)
+	_prop(o, "market_rafi", Vector3i(7, 0, -6), Vector2i(6, 1), 0.0)
+	_prop(o, "komodin", Vector3i(3, 0, -6), Vector2i(1, 1))
+	_prop(o, "bitki", Vector3i(0, 0, -6), Vector2i(1, 1))
+	_decor(o, "tablo_kucuk", Vector3(3.0, 2.3, -6.97), 0.0)
+	_prop(o, "bitki", Vector3i(12, 0, 4), Vector2i(1, 1))
 	_prop(o, "mutfak_tezgahi", Vector3i(7, 0, -4), Vector2i(4, 1))
 	_prop(o, "kasa", Vector3i(11, 0, -4), Vector2i(1, 1))
 	# Bahçe yolu, çiçekler, ambulans.
