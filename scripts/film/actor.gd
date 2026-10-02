@@ -128,6 +128,28 @@ const ACTORS := {
 			[Vector3(0.56, 0.1, 0.56), Vector3(0, 2.08, 0.02), Color("9a9a9a")],
 		],
 		"face": [0.48, Vector3(0, 1.8, -0.26)], "hair": Color("9a9a9a"), "eyes": Color("2a2a2a")},
+	# Yan karakterler (2026-10-02): Mehmet'in önden/yandan/arkadan köşeli resimleri kaplanır
+	# (tools/art/build_actor.py -> <kod>_skin.png/json); "parts" yalnızca kaplama yoksa kullanılır.
+	"itfaiyeci": {"name": "İtfaiyeci", "color": Color("ff6b3d"), "sharp": true, "mouth_y": 0.2,
+		"parts": [
+			[Vector3(0.46, 0.7, 0.23), Vector3(0, 0.35, 0), Color("22305a")],
+			[Vector3(0.46, 0.75, 0.23), Vector3(0, 1.08, 0), Color("22305a")],
+			[Vector3(0.46, 0.55, 0.46), Vector3(0, 1.73, 0), SKIN],
+		],
+		"face": [0.44, Vector3(0, 1.7, -0.235)], "hair": Color("f2e000"), "eyes": Color("5a2a10")},
+	"polis": {"name": "Polis", "color": Color("6fa8ff"), "sharp": true, "mouth_y": 0.21,
+		"parts": [
+			[Vector3(0.46, 0.7, 0.23), Vector3(0, 0.35, 0), Color("22305a")],
+			[Vector3(0.46, 0.75, 0.23), Vector3(0, 1.08, 0), Color("7aaee0")],
+			[Vector3(0.46, 0.55, 0.46), Vector3(0, 1.73, 0), SKIN],
+		],
+		"face": [0.44, Vector3(0, 1.7, -0.235)], "hair": Color("22305a"), "eyes": Color("6a4a10")},
+	"findik": {"name": "Fındık", "color": Color("d08a3a"), "sharp": true, "mouth_y": 0.3,
+		"parts": [
+			[Vector3(0.32, 0.29, 0.53), Vector3(0, 0.37, 0), Color("c97a35")],
+			[Vector3(0.4, 0.33, 0.3), Vector3(0, 0.58, -0.24), Color("c97a35")],
+		],
+		"face": [0.3, Vector3(0, 0.58, -0.4)], "hair": Color("7a4a20"), "eyes": Color("2a1a10")},
 }
 
 ## Yürürken engel kontrolü: hücre boşsa true döner (film stüdyosu bağlar; yoksa düz yürür).
@@ -434,15 +456,15 @@ func _build_skin() -> bool:
 			var pivot := Node3D.new()
 			pivot.position = Vector3(p["pos"][0], p["pos"][1] + size.y / 2.0, p["pos"][2])
 			_body.add_child(pivot)
-			mi.mesh = _skin_box(size, p["uv"], mat, 0.2 if not info.get("sharp", false) else 0.04)
+			mi.mesh = _skin_box(size, p["uv"], mat, 0.2 if not info.get("sharp", data.get("sharp", false)) else 0.04)
 			mi.position = Vector3(0, -size.y / 2.0, 0)
 			pivot.add_child(mi)
 			(_arms if p["name"] == "arm" else _legs).append(pivot)
 			continue
 		# Kafa belirgin yuvarlak, gövde/kol/bacak hafif yuvarlak köşeli (Roblox plastik oyuncak görünümü).
-		var sharp: bool = info.get("sharp", false)
+		var sharp: bool = info.get("sharp", data.get("sharp", false))
 		var uv: Dictionary = p["uv"]
-		if p["name"] == "head" and uv.has("back"):
+		if p["name"] == "head" and uv.has("back") and not data.get("sharp", false):
 			# Yan yüzlerdeki profil çizimi 3/4 açıdan ikinci bir yüz gibi görünüyordu (çift kafa);
 			# yanlara arka (saç) dokusu konur.
 			uv = uv.duplicate()

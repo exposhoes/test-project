@@ -120,7 +120,7 @@ const LIST := [
 			{"gesture": "ali", "kind": "selam"},
 			{"gesture": "zeynep", "kind": "selam"},
 			{"sfx": "parilti"},
-			{"title": "Emir'in Dünyası", "t": 3.5},
+			{"title": "Emir'in Dünyası", "t": 3.5, "icons": true},
 		],
 	},
 	{

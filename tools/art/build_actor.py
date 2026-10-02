@@ -59,8 +59,47 @@ def fill_black(img, dark=28):
     return Image.alpha_composite(Image.alpha_composite(base, fill), img).convert("RGB")
 
 
+def alpha_fill(img):
+    """Şeffaf arka planlı sayfa: şeffaf pikselleri komşu renkle doldurur (siyah eldiven/bot korunur)."""
+    img = img.convert("RGBA")
+    fill = None
+    for radius in (3, 8, 20, 50):
+        blurred = img.filter(ImageFilter.GaussianBlur(radius))
+        fill = blurred if fill is None else Image.alpha_composite(blurred, fill)
+    base = Image.new("RGBA", img.size, (120, 90, 70, 255))
+    return Image.alpha_composite(Image.alpha_composite(base, fill), img).convert("RGB")
+
+
+def fill_holes(img):
+    """Kafa yüzünde kenara bağlı olmayan şeffaf delikleri (göz parıltısı) beyazla doldurur."""
+    img = img.copy()
+    w, h = img.size
+    px = img.load()
+    seen = bytearray(w * h)
+    stack = [(x, y) for x in range(w) for y in (0, h - 1)] + [(x, y) for y in range(h) for x in (0, w - 1)]
+    while stack:
+        x, y = stack.pop()
+        if x < 0 or y < 0 or x >= w or y >= h or seen[y * w + x] or px[x, y][3] >= 128:
+            continue
+        seen[y * w + x] = 1
+        stack += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    for y in range(h):
+        for x in range(w):
+            if px[x, y][3] < 128 and not seen[y * w + x]:
+                px[x, y] = (255, 255, 255, 255)
+    return img
+
+
+ONLY = sys.argv[1:]  # ör. python3 tools/art/build_actor.py polis findik
+
+
 def build(code, sheet, parts, height=1.8):
-    im = Image.open(os.path.join(SRC, sheet)).convert("RGB")
+    if ONLY and code not in ONLY:
+        return
+    src = Image.open(os.path.join(SRC, sheet))
+    # Yan karakter sayfaları (2026-10-02) şeffaf arka planlı: alfa kanalı doğrudan kullanılır.
+    transparent = src.mode == "RGBA" and src.getchannel("A").getextrema()[0] == 0
+    im = src.convert("RGBA") if transparent else src.convert("RGB")
     faces_order = ["front", "back", "left", "right", "top", "bottom"]
     cells = []
     meta = []
@@ -76,11 +115,17 @@ def build(code, sheet, parts, height=1.8):
             else:
                 box, mirror = spec, False
             x0, y0, x1, y1 = box
-            if p["name"] == "head" and f not in ("top", "bottom"):
+            if transparent:
+                crop = im.crop(box)
+                if p["name"] == "head" and f not in ("top", "bottom"):
+                    crop = fill_holes(crop)
+                if not (p["name"] == "head" and f not in ("top", "bottom")):
+                    crop = alpha_fill(crop).convert("RGBA")
+            elif p["name"] == "head" and f not in ("top", "bottom"):
                 # Kafa: siyah arka plan şeffaf, kafa saçın gerçek biçiminde görünür.
                 crop = cutout_bg(im.crop(box))
             else:
-                if x1 - x0 > 60 and y1 - y0 > 60:  # yuvarlak kenardaki parlak şeridi at
+                if x1 - x0 > 60 and y1 - y0 > 60 and not INSET == 0:  # yuvarlak kenardaki parlak şeridi at
                     k = INSET if INSET else max(10, min(x1 - x0, y1 - y0) // 9)
                     box = (x0 + k, y0 + k, x1 - k, y1 - k)
                 crop = fill_black(im.crop(box)).convert("RGBA")
@@ -298,3 +343,59 @@ INSET = 9  # yalnızca siyah dış çizgiyi at
 build("emir", "emir2.png", down((290, 399, 577, 686), (254, 688, 611, 1103), (688, 1103), (78, 240), (625, 787),
       (257, 433, 608, 1103), {"head": (1076, 399, 1364, 686), "arm": (1143, 700, 1291, 1100), "leg": (1145, 1106, 1291, 1512)},
       1536, 1515, nose_right=True))
+
+
+# Yan karakterler (2026-10-02): Minecraft gibi köşeli, şeffaf arka planlı 2048x2048 sayfa
+# (önden | yandan, burun sağda | arkadan); kollar aşağıda, ayak ucu y=1760.
+S = 2.0 / 1412.0
+INSET = None
+build("itfaiyeci", "itfaiyeci.png", down((227, 348, 550, 737), (225, 737, 552, 1270), (737, 1270), (64, 225), (552, 714),
+      (225, 388, 552, 1270), {"head": (860, 348, 1185, 737), "arm": (942, 737, 1105, 1270), "leg": (942, 1270, 1105, 1760)},
+      1269, 1760, nose_right=True))
+build("polis", "polis.png", down((226, 348, 552, 737), (225, 737, 552, 1270), (737, 1270), (64, 225), (552, 714),
+      (225, 388, 552, 1270), {"head": (860, 369, 1186, 737), "arm": (942, 737, 1105, 1270), "leg": (942, 1270, 1105, 1760)},
+      1270, 1760, nose_right=True))
+
+
+def findik():
+    """Fındık (köpek): önden | yandan (burun solda) | arkadan sayfa; dört bacak, kuyruk, burun kutusu."""
+    global S, FOOT
+    S, FOOT = 0.75 / 757.0, 1412
+    mid_z = 1112  # yandan görünümde gövdenin ortası
+
+    def z(x0, x1):
+        return round(((x0 + x1) / 2 - mid_z) * S, 3)
+
+    def size(w, h, d):
+        return [round(w * S, 3), round(h * S, 3), round(d * S, 3)]
+
+    side_head = (716, 635, 1023, 982)
+    parts = [
+        {"name": "head", "size": size(408, 335, 307), "pos": [0, cy(655, 990), z(716, 1023)],
+         "faces": {"front": (123, 655, 531, 990), "back": (1557, 655, 1944, 990), "left": side_head,
+                   "right": (side_head, True), "top": (1650, 700, 1850, 760), "bottom": (240, 940, 300, 975)}},
+        {"name": "snout", "size": size(182, 145, 101), "pos": [0, cy(800, 945), z(615, 716)],
+         "faces": {"front": (236, 800, 418, 945), "back": (236, 800, 418, 945), "left": (615, 800, 716, 945),
+                   "right": ((615, 800, 716, 945), True), "top": (650, 805, 700, 830), "bottom": (650, 915, 700, 940)}},
+        {"name": "body", "size": size(327, 288, 536), "pos": [0, cy(900, 1188), z(844, 1380)],
+         "faces": {"front": (164, 900, 491, 1188), "back": (1597, 900, 1914, 1188), "left": (844, 900, 1380, 1188),
+                   "right": ((844, 900, 1380, 1188), True), "top": (1050, 1000, 1250, 1060),
+                   "bottom": (1000, 1150, 1150, 1180)}},
+        {"name": "tail", "size": size(68, 203, 121), "pos": [0, cy(697, 900), z(1332, 1453)],
+         "faces": {"front": (1716, 776, 1784, 980), "back": (1716, 776, 1784, 980), "left": (1332, 697, 1453, 900),
+                   "right": ((1332, 697, 1453, 900), True), "top": (1345, 705, 1440, 740),
+                   "bottom": (1345, 860, 1440, 895)}},
+    ]
+    # Sıra: ön sol, ön sağ, arka sağ, arka sol (Actor çapraz bacakları birlikte sallar).
+    legs = [((184, 306), (894, 1023), 327 - 245), ((358, 470), (894, 1023), 327 - 414),
+            ((1791, 1893), (1228, 1351), -(1842 - 1750.5)), ((1618, 1740), (1228, 1351), -(1679 - 1750.5))]
+    for (fx0, fx1), (sx0, sx1), dx in legs:
+        front = (fx0, 1188, fx1, 1412)
+        side = (sx0, 1188, sx1, 1412)
+        parts.append({"name": "leg", "size": size(fx1 - fx0, 224, sx1 - sx0), "pos": [round(dx * S, 3), cy(1188, 1412), z(sx0, sx1)],
+                      "faces": {"front": front, "back": front, "left": side, "right": (side, True),
+                                "top": (fx0 + 20, 1195, fx1 - 20, 1230), "bottom": (fx0 + 20, 1380, fx1 - 20, 1405)}})
+    return parts
+
+
+build("findik", "findik.png", findik())
