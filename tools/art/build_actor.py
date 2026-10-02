@@ -347,7 +347,7 @@ build("emir", "emir2.png", down((290, 399, 577, 686), (254, 688, 611, 1103), (68
 
 # Yan karakterler (2026-10-02): Minecraft gibi köşeli, şeffaf arka planlı 2048x2048 sayfa
 # (önden | yandan, burun sağda | arkadan); kollar aşağıda, ayak ucu y=1760.
-S = 2.0 / 1412.0
+S = 1.85 / 1412.0  # yetişkin boyu (2.0 çocukların yanında çok iri duruyordu)
 INSET = None
 build("itfaiyeci", "itfaiyeci.png", down((227, 348, 550, 737), (225, 737, 552, 1270), (737, 1270), (64, 225), (552, 714),
       (225, 388, 552, 1270), {"head": (860, 348, 1185, 737), "arm": (942, 737, 1105, 1270), "leg": (942, 1270, 1105, 1760)},

@@ -134,6 +134,7 @@ const POINTS := {
 		"tuvalet": Vector3(2.5, 0, -5.5),
 		"arka_koridor": Vector3(7.5, 0, -2.5),
 		"okul_kapi": Vector3(17.0, 0, 13.5),
+		"kam_ogretmen": Vector3(13.5, 2.4, 18.5),  # öğretmeni okul kapısında yakın gösterir
 		"bayrak": Vector3(11.0, 0, 16.5),
 		"basket": Vector3(-7.5, 0, 1.5),
 		"sinif_b": Vector3(7.5, 5, 8.5),
