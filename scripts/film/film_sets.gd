@@ -410,6 +410,7 @@ func _init() -> void:
 	_street_furniture_2()
 	_river()
 	_seaside()
+	_tram()
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -960,6 +961,8 @@ func _build_city() -> void:
 	# Park etmiş arabalar.
 	var i := 0
 	for az: int in AVENUES_Z:
+		if az == TRAM_Z:
+			continue  # tramvay caddesinde park yok
 		for x in range(CITY_MIN.x + 7, CITY_MAX.x - 4, 17):
 			if not _near_street(x) and not _near_street(x + 3):
 				_car(o + Vector3i(x, 0, az + (0 if i % 2 == 0 else 2)), CAR_COLORS[i % CAR_COLORS.size()], true)
@@ -2526,3 +2529,30 @@ func _palm(p: Vector3i) -> void:
 	for d in [Vector3i(1, 0, 0), Vector3i(-1, 0, 0), Vector3i(0, 0, 1), Vector3i(0, 0, -1)]:
 		_put(p + Vector3i(0, 6, 0) + d, Blocks.LEAVES)
 		_put(p + Vector3i(0, 5, 0) + d * 2, Blocks.LEAVES)
+
+
+## Tramvay: kuzey caddesinde (z 25..28) çift hat; kırmızı, sarı ve mavi tramvaylar; okul, hastane ve pazar
+## önünde bilet makineli duraklar (kuzey kaldırımında, z 29..30).
+const TRAM_Z := 25
+
+
+func _tram() -> void:
+	var o := Vector3i(0, Y0, 0)
+	for track_z in [TRAM_Z + 1.0, TRAM_Z + 3.0]:
+		for x in range(CITY_MIN.x, CITY_MAX.x - 6, 8):
+			_decor(o, "ray", Vector3(x + 4.0, 0, track_z), 0.0)
+	_prop(o, "tramvay", Vector3i(6, 0, TRAM_Z), Vector2i(8, 2), PI / 2)
+	_prop(o, "tramvay_sari", Vector3i(36, 0, TRAM_Z + 2), Vector2i(8, 2), -PI / 2)
+	_prop(o, "tramvay_mavi", Vector3i(-58, 0, TRAM_Z), Vector2i(8, 2), PI / 2)
+	for x0 in [48, -44, -4]:
+		_tram_stop(Vector3i(x0, 0, TRAM_Z + 4))
+
+
+func _tram_stop(p: Vector3i) -> void:
+	var o := Vector3i(0, Y0, 0)
+	_fill(o, p + Vector3i(0, 0, 2), p + Vector3i(4, 2, 2), Blocks.GLASS)
+	_fill(o, p + Vector3i(0, 3, 0), p + Vector3i(4, 3, 2), Blocks.TRIM_WHITE)
+	_prop(o, "bank", p + Vector3i(1, 0, 1), Vector2i(2, 1), PI)
+	_prop(o, "bilet_makinesi", p + Vector3i(4, 0, 1), Vector2i(1, 1), PI)
+	_fill(o, p + Vector3i(-1, 0, 1), p + Vector3i(-1, 3, 1), Blocks.STONE)
+	_put(o + p + Vector3i(-1, 4, 1), Blocks.TOY_BRICK_RED)
