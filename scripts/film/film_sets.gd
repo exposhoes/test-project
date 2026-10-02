@@ -23,6 +23,7 @@ const SETS := {
 	"ali_ev": Vector3i(38, GROUND + 1, 36),
 	"zeynep_ev": Vector3i(58, GROUND + 1, 36),
 	"ogretmen_ev": Vector3i(-60, GROUND + 1, 36),
+	"itfaiye": Vector3i(-26, GROUND + 1, 2),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -267,6 +268,17 @@ const POINTS := {
 		"kam_genel": Vector3(8.5, 7.0, 22.0),
 		"kam_gise": Vector3(9.5, 2.0, 12.0),
 	},
+	"itfaiye": {
+		"giris": Vector3(8.5, 0, 18.5),
+		"garaj": Vector3(5.5, 0, 14.0),
+		"arac_yani": Vector3(6.3, 0, 10.5),
+		"direk": Vector3(7.5, 0, 5.8),
+		"yatakhane": Vector3(4.5, 5, 10.0),
+		"kam_genel": Vector3(-2.0, 6.0, 27.0),
+		"kam_dis": Vector3(2.0, 3.0, 23.5),
+		"kam_garaj": Vector3(6.5, 2.3, 15.0),
+		"kam_yatakhane": Vector3(7.5, 7.3, 15.0),
+	},
 }
 
 var _blocks := {}  # Vector3i -> blok id
@@ -287,6 +299,7 @@ func _init() -> void:
 	_build_parking(SETS["otopark"])
 	for h: String in FAMILY_HOUSES:
 		_build_family_house(SETS[h], FAMILY_HOUSES[h])
+	_build_fire_station(SETS["itfaiye"])
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -1481,3 +1494,39 @@ func _build_family_house(o: Vector3i, wall: int) -> void:
 		if x != 4 and x != 13:
 			_put(o + Vector3i(x, 0, -1), Blocks.FLOWERS)
 	_tree(o + Vector3i(13, 0, -3))
+
+
+## İtfaiye (dış x 0..9, z 0..16; garaj kapısı güneyde caddeye): zeminde itfaiye aracı, kayma direği,
+## ekipman dolapları; üst katta yatakhane. Arka köşede hortum kulesi, önde beton apron ve yangın musluğu.
+func _build_fire_station(o: Vector3i) -> void:
+	_shell(o, Vector2i(0, 0), Vector2i(9, 16), 2, Blocks.BRICKS, Blocks.CONCRETE)
+	# Garaj kapısı (5 geniş, 3 yüksek) ve üstünde kırmızı-beyaz şerit; yanda giriş kapısı.
+	_fill(o, Vector3i(2, 0, 16), Vector3i(6, 2, 16), Blocks.AIR)
+	_awning(o, 1, 7, 3, 16, Blocks.TOY_BRICK_RED)
+	_door(o, Vector3i(8, 0, 16), true, true, true)
+	_prop(o, "itfaiye_araci", Vector3i(3, 0, 8), Vector2i(2, 5))
+	_prop(o, "itfaiye_diregi", Vector3i(7, 0, 4), Vector2i(1, 1))
+	_put(o + Vector3i(7, 4, 4), Blocks.AIR)
+	_prop(o, "gardirop", Vector3i(8, 0, 7), Vector2i(1, 2))
+	_prop(o, "gardirop", Vector3i(8, 0, 10), Vector2i(1, 2))
+	_prop(o, "koli", Vector3i(1, 0, 14), Vector2i(1, 1))
+	_fill(o, Vector3i(1, -1, 5), Vector3i(1, -1, 15), Blocks.TOY_BRICK_YELLOW)  # sarı güvenlik çizgisi
+	# Merdiven: arka duvar boyunca x 1..5.
+	for k in 5:
+		_fill(o, Vector3i(1 + k, 0, 1), Vector3i(1 + k, k, 2), Blocks.PLANKS)
+	_fill(o, Vector3i(1, 4, 1), Vector3i(4, 4, 2), Blocks.AIR)
+	# Üst kat yatakhane: üç yatak, masa.
+	for x in [2, 4, 6]:
+		_put(o + Vector3i(x, 5, 14), Blocks.BED)
+		_put(o + Vector3i(x, 5, 15), Blocks.BED)
+	_table4(o, Vector3i(2, 5, 7))
+	_prop(o, "gardirop", Vector3i(8, 5, 9), Vector2i(1, 2))
+	# Hortum kulesi (arka sol köşe) ve tepesinde kırmızı siren.
+	_walls(o, Vector3i(0, 10, 0), Vector3i(2, 15, 2), Blocks.BRICKS)
+	_put(o + Vector3i(1, 13, 0), Blocks.GLASS)
+	_fill(o, Vector3i(0, 16, 0), Vector3i(2, 16, 2), Blocks.CONCRETE)
+	_put(o + Vector3i(1, 17, 1), Blocks.TOY_BRICK_RED)
+	# Apron, yangın musluğu, lamba.
+	_fill(o, Vector3i(0, -1, 17), Vector3i(9, -1, 20), Blocks.CONCRETE)
+	_put(o + Vector3i(0, 0, 19), Blocks.TOY_BRICK_RED)
+	_put(o + Vector3i(9, 2, 17), Blocks.LANTERN)

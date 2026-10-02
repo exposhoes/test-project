@@ -10,7 +10,7 @@ const HEIGHTS := {
 	"buzdolabi": 1.9, "yemek_masasi": 0.8, "canta": 0.4, "komodin": 0.6, "ogretmen_masasi": 0.8, "market_rafi": 2.0, "oyuncak_kutusu": 0.6, "kalemlik": 0.18, "defter": 0.03,
 	"koltuk": 0.9, "sehpa": 0.45, "tv": 1.4, "kuvet": 0.6, "lavabo": 0.9, "klozet": 0.8, "camasir_makinesi": 0.9,
 	"sandalye": 1.0, "sira": 0.8, "kasa": 1.0, "bank": 0.9, "icecek_dolabi": 2.0, "meyve_reyonu": 0.9,
-	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
+	"basket_potasi": 3.5, "araba": 1.5, "ambulans": 2.0, "itfaiye_araci": 2.3, "itfaiye_diregi": 5.0, "saksi": 0.9, "semsiye": 2.4, "dus": 2.2, "havluluk": 1.1,
 	"ust_dolap": 0.7, "berjer": 0.9, "bitki": 1.3, "koli": 0.6, "kiler_rafi": 2.0, "tv_sehpasi": 1.4,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
@@ -398,6 +398,33 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 					_box(r, Vector3(0.03, [0.5, 0.15][k], [0.15, 0.5][k]), Vector3(-0.0 + 0.085, 1.3, d * 0.3), Color("d32f2f"))
 					_box(r, Vector3(0.03, [0.5, 0.15][k], [0.15, 0.5][k]), Vector3(w - 0.085, 1.3, d * 0.3), Color("d32f2f"))
 				_box(r, Vector3(0.5, 0.15, 0.25), Vector3(w / 2, 1.82, cab_z + cab_l / 2 - 0.2), Color("2e6fd8"))  # tepe lambası
+		"itfaiye_araci":
+			# Önü +Z. Kırmızı gövde, önde kabin, sırtta merdiven, beyaz şerit, tepe lambaları.
+			var red := Color("c8231e")
+			_box(r, Vector3(w - 0.15, 1.1, d - 0.2), Vector3(w / 2, 0.85, d * 0.42), red)  # arka gövde (dolaplar)
+			_box(r, Vector3(w - 0.15, 1.35, d * 0.22), Vector3(w / 2, 0.98, d * 0.86), red)  # kabin
+			_box(r, Vector3(w - 0.35, 0.5, 0.04), Vector3(w / 2, 1.3, d * 0.97 + 0.01), Color("27384a"))  # ön cam
+			for sx in [0.07, w - 0.07]:
+				_box(r, Vector3(0.03, 0.45, d * 0.16), Vector3(sx, 1.3, d * 0.86), Color("27384a"))
+				_box(r, Vector3(0.03, 0.12, d * 0.8), Vector3(sx, 0.6, d / 2), Color("f5f5f5"))  # şerit
+				for k in 3:
+					_box(r, Vector3(0.03, 0.55, 0.04), Vector3(sx, 0.95, 0.4 + k * d * 0.2), Color("9ea7ad"))  # dolap kapakları
+			for p in [Vector2(0.18, d * 0.15), Vector2(w - 0.18, d * 0.15), Vector2(0.18, d * 0.42), Vector2(w - 0.18, d * 0.42), Vector2(0.18, d * 0.85), Vector2(w - 0.18, d * 0.85)]:
+				_box(r, Vector3(0.22, 0.56, 0.56), Vector3(p.x, 0.28, p.y), Color("1b1b1b"))
+				_box(r, Vector3(0.23, 0.24, 0.24), Vector3(p.x, 0.28, p.y), Color("bdbdbd"))
+			# Merdiven: iki ray ve basamaklar.
+			for sx in [w / 2 - 0.3, w / 2 + 0.3]:
+				_box(r, Vector3(0.07, 0.07, d * 0.85), Vector3(sx, 1.5, d * 0.4), Color("cfd4d8"))
+			for k in int(d * 2.5):
+				_box(r, Vector3(0.6, 0.05, 0.05), Vector3(w / 2, 1.5, 0.25 + k * 0.4), Color("cfd4d8"))
+			_box(r, Vector3(w - 0.4, 0.15, 0.25), Vector3(w / 2, 1.73, d * 0.88), Color("2e6fd8"))  # tepe lambası
+			_box(r, Vector3(0.3, 0.16, 0.26), Vector3(w / 2, 1.74, d * 0.88), Color("d32f2f"))
+			for sx in [0.35, w - 0.35]:
+				_box(r, Vector3(0.3, 0.14, 0.04), Vector3(sx, 0.6, d - 0.05), Color("fff3b0"))
+			_box(r, Vector3(w - 0.4, 0.14, 0.05), Vector3(w / 2, 0.38, d - 0.04), Color("bdbdbd"))  # tampon
+		"itfaiye_diregi":
+			_box(r, Vector3(0.12, f.y, 0.12), Vector3(w / 2, f.y / 2, d / 2), Color("d9dde0"))
+			_box(r, Vector3(0.9, 0.06, 0.9), Vector3(w / 2, 0.03, d / 2), Color("8a8f94"))  # yumuşak minder
 		"saksi":
 			_box(r, Vector3(0.45, 0.4, 0.45), Vector3(w / 2, 0.2, d / 2), Color("b5562f"))
 			_box(r, Vector3(0.6, 0.45, 0.6), Vector3(w / 2, 0.65, d / 2), Color("3f8f3a"))
