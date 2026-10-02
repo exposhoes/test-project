@@ -493,6 +493,13 @@ static func _texture(name: String) -> Texture2D:
 		tex = load(path)
 	elif FileAccess.file_exists(path):
 		tex = ImageTexture.create_from_image(Image.load_from_file(path))
+	# Uzaktan bakınca ince desen (ahşap damarı) titreşip parlamasın: küçültülmüş kopyalar (mipmap) üret.
+	if tex and not tex.get_image().has_mipmaps():
+		var img := tex.get_image()
+		if img.is_compressed():
+			img.decompress()
+		img.generate_mipmaps()
+		tex = ImageTexture.create_from_image(img)
 	_tex_cache[name] = tex
 	return tex
 
@@ -529,7 +536,8 @@ static func _face(parent: Node3D, size: Vector3, center: Vector3, name: String, 
 	qm.size = Vector2(size.x, size.z if top else size.y)
 	var m := StandardMaterial3D.new()
 	m.albedo_texture = tex
-	m.roughness = 0.6
+	m.roughness = 0.9
+	m.metallic_specular = 0.2
 	qm.material = m
 	q.mesh = qm
 	if top:
@@ -560,7 +568,8 @@ static func _box(parent: Node3D, size: Vector3, center: Vector3, color: Color) -
 		mat.albedo_color = tint
 		mat.uv1_triplanar = true
 		mat.uv1_scale = Vector3(1.5, 1.5, 1.5)
-	mat.roughness = 0.8
+		mat.metallic_specular = 0.2  # mat yüzey; ışık lekesi yapmasın
+	mat.roughness = 0.8 if tex == null else 0.95
 	mesh.material = mat
 	mi.mesh = mesh
 	mi.position = center
