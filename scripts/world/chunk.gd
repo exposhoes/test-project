@@ -168,6 +168,12 @@ static func build_arrays(snap: Array) -> Dictionary:
 						_: n = blocks[i - SIZE] if z > 0 else (north[i + (SIZE - 1) * SIZE] if not north.is_empty() else Blocks.AIR)
 					if _transparent[n] == 0 or n == id:
 						continue
+					if id == Blocks.FENCE_WHITE and (f == 2 or f == 3):
+						# Çitin üstü ve altı çizilmez (çit dokusu yere yatmış gibi görünüyordu); çarpışması kalır.
+						for tri: Array in [[0, 1, 2], [0, 2, 3]]:
+							for v: int in tri:
+								extra_collision.append(Vector3(x, y, z) + _face_verts[f * 4 + v])
+						continue
 					var start := verts.size()
 					var k := (id * 6 + f) * 4
 					var p := Vector3(x, y, z)
