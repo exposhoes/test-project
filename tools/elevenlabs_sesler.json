@@ -42,6 +42,7 @@
     "_perde_aciklama":  "ElevenLabs aynı sesi her üretimde biraz kalın ya da ince okuyabiliyor. hedef_perde (Hz) yazılı karakterde replik, perdesi hedefin perde_payi oranı içinde çıkana kadar en çok \u0027deneme\u0027 kez üretilir, en yakını seçilir. Emir 305 Hz: Mehmet\u0027in beğendiği Bölüm 1 sesi.",
     "hedef_perde":  {
                         "emir":  305,
+                        "ali":  375,
                         "anne":  215
                     },
     "perde_payi":  0.1,

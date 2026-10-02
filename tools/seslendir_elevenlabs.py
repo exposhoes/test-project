@@ -67,6 +67,8 @@ def duygu_etiketi(metin: str) -> str:
         return "[shouting, shocked] "
     if "?!" in metin or kucuk.startswith(("eyvah", "hiii", "aa")):
         return "[surprised] "
+    if "bir... iki" in kucuk:
+        return "[excited, high-pitched child voice] "  # saklambaçta sayma; "thoughtful" sesi kalınlaştırıyordu
     if metin.rstrip().endswith("..."):
         return "[thoughtful] "
     if "!" in metin:
