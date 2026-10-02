@@ -56,6 +56,8 @@ var _logo := TextureRect.new()
 const ICON_PATHS := ["res://assets/textures/logo/simge_begen.png", "res://assets/textures/logo/simge_zil.png"]
 var _icons: Array[TextureRect] = []
 var _bars: Array[ColorRect] = []
+var _fade := ColorRect.new()  # sahne geçişinde yumuşak kararma
+var _fade_pending := false
 var _look := Vector3.ZERO
 var _cam_tween: Tween
 
@@ -192,11 +194,16 @@ func _run(s: Dictionary) -> void:
 		play_sfx(s["sfx"])
 		# Sahne geçiş sesi, ağır sahne değişiminden önce başlasın diye kısa bekleme
 		# (yoksa kayıtta bazen hiç duyulmuyordu).
+		# ve görüntü yumuşakça kararır; yeni çekimde yeniden açılır.
 		if s["sfx"] == "vuup":
+			_fade_pending = true
+			if not fast:
+				create_tween().tween_property(_fade, "color:a", 1.0, 0.35)
 			await _wait(0.35)
 	elif s.has("music"):
 		play_music(s["music"])
 	elif s.has("title"):
+		_fade_in()
 		play_sfx("baslik")
 		_hide_dialogue()
 		_show_title(s["title"])
@@ -227,6 +234,7 @@ func _run(s: Dictionary) -> void:
 			await get_tree().process_frame
 		_loading = false
 		_move_camera(FilmSets.point(s["cam"]), FilmSets.point(s["look"]) + Vector3(0, LOOK_HEIGHT, 0), s.get("t", 0.0))
+		_fade_in()
 		if s.get("t", 0.0) > 0:
 			await _wait(s["t"])
 	elif s.has("say"):
@@ -303,6 +311,7 @@ func _run_cuts(cuts: Array, text: String) -> void:
 
 
 func _say(id: String, text: String) -> void:
+	_fade_in()
 	var a := _actor(id)
 	_name_label.text = a.display_name()
 	_name_label.add_theme_color_override("font_color", a.data["color"])
@@ -393,7 +402,7 @@ func _frame_speaker(a: Actor, force := false) -> void:
 				if a._moving and dist < 1.9:
 					continue  # yürüyenin yoluna kamera koyma, içinden geçer
 				var pos: Vector3 = head + facing.rotated(Vector3.UP, ang) * dist + Vector3(0, lift, 0)
-				if sets.is_air(Vector3i(pos.floor())) and _shows(pos, head, a, false):
+				if sets.is_air(Vector3i(pos.floor())) and _clear_of_actors(pos) and _shows(pos, head, a, false):
 					_move_camera(pos, head - Vector3(0, 0.15, 0), 0)
 					return
 
@@ -401,6 +410,15 @@ func _frame_speaker(a: Actor, force := false) -> void:
 	# Hiç boş nokta yoksa en azından kafaya dön.
 	_look = head
 	camera.look_at(head)
+
+
+## Aday kamera yeri hiçbir karakterin başına MIN_CAM_DIST'ten yakın değil mi
+## (yakınsa _keep_distance geri iter, _watch_speaker yine oraya koyar: titreme).
+func _clear_of_actors(pos: Vector3) -> bool:
+	for o in Actor.everyone:
+		if is_instance_valid(o) and o.visible and Vector2(pos.x - o.position.x, pos.z - o.position.z).length() < MIN_CAM_DIST + 0.2:
+			return false
+	return true
 
 
 ## Kamera başa çok yukarıdan ya da aşağıdan mı bakıyor (25 dereceden dik).
@@ -493,6 +511,17 @@ static func _audio(folder: String, name: String) -> AudioStream:
 		mp3.data = FileAccess.get_file_as_bytes(raw)
 		return mp3
 	return null
+
+
+## Geçiş kararmasını açar (yeni çekim hazır).
+func _fade_in() -> void:
+	if not _fade_pending:
+		return
+	_fade_pending = false
+	if fast:
+		_fade.color.a = 0.0
+		return
+	create_tween().tween_property(_fade, "color:a", 0.0, 0.45)
 
 
 ## Efekt çalar ("bom", "baslik", "saskin", "gulme"...). Dosya yoksa bir şey olmaz.
@@ -670,6 +699,10 @@ func _build_ui() -> void:
 		bar.visible = false
 		_ui.add_child(bar)
 		_bars.append(bar)
+	_fade.color = Color(0, 0, 0, 0)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_ui.add_child(_fade)
 	# Diyalog kutusu.
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.05, 0.05, 0.1, 0.82)
