@@ -40,6 +40,8 @@ var _env := Environment.new()
 var _sky := ProceduralSkyMaterial.new()
 var _panel := MenuPanel.new()
 var _ui := Control.new()
+## Videolarda altyazı kutusu gösterilsin mi.
+const SHOW_SUBTITLES := false
 var _box := PanelContainer.new()
 var _name_label := Label.new()
 var _text_label := Label.new()
@@ -621,6 +623,9 @@ func _build_ui() -> void:
 	_box.offset_top = -210
 	_box.offset_bottom = -64
 	_box.visible = false
+	# Mehmet altyazı istemiyor: kutu görünmez kalır (konuşan takibi için visible bayrağı kullanılır).
+	if not SHOW_SUBTITLES:
+		_box.modulate.a = 0.0
 	var v := VBoxContainer.new()
 	_box.add_child(v)
 	_name_label.add_theme_font_size_override("font_size", 30)
