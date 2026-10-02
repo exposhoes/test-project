@@ -38,9 +38,9 @@ foreach ($b in $secilen) {
 	$avi = Join-Path $env:TEMP "emircraft_$($b.Id).avi"
 	# Pencere ekrana sığacak kadar küçük açılır; görüntü tam çözünürlükte işlenir.
 	$ayar = if ($dikey) {
-		"[display]`nwindow/size/viewport_width=1080`nwindow/size/viewport_height=1920`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=1.0`nwindow/size/window_width_override=405`nwindow/size/window_height_override=720`n"
+		"[display]`nwindow/size/viewport_width=1080`nwindow/size/viewport_height=1920`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=1.0`nwindow/size/window_width_override=405`nwindow/size/window_height_override=720`nwindow/size/always_on_top=true`n"
 	} else {
-		"[display]`nwindow/size/viewport_width=1920`nwindow/size/viewport_height=1080`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=1.5`nwindow/size/window_width_override=960`nwindow/size/window_height_override=540`n"
+		"[display]`nwindow/size/viewport_width=1920`nwindow/size/viewport_height=1080`nwindow/stretch/mode=`"viewport`"`nwindow/stretch/scale=1.5`nwindow/size/window_width_override=960`nwindow/size/window_height_override=540`nwindow/size/always_on_top=true`n"
 	}
 	Write-Host "Kaydediliyor: $ad"
 	Set-Content $override -Encoding ASCII -Value $ayar
