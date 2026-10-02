@@ -41,6 +41,7 @@ const FAMILY_POINTS := {
 	"kam_mutfak": Vector3(9.6, 2.3, 7.0),
 	"banyo": Vector3(5.5, 5, 7.8),
 	"kam_oda": Vector3(6.3, 7.3, 1.6),
+	"kam_banyo": Vector3(5.5, 7.6, 7.1),
 	"kam_ebeveyn": Vector3(12.5, 7.3, 7.0),
 }
 ## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
@@ -1504,6 +1505,8 @@ func _build_family_house(o: Vector3i, wall: int) -> void:
 	_fill(o, Vector3i(2, 4, 3), Vector3i(5, 4, 5), Blocks.RUG)
 	_decor(o, "tablo_kucuk", Vector3(1.03, 7.0, 1.6), PI / 2)
 	_decor(o, "perde", Vector3(1.5, 6.55, 1.04), 0.0)
+	_prop(o, "kitaplik", Vector3i(6, 5, 2), Vector2i(1, 1), -PI / 2)
+	_decor(o, "duvar_saati", Vector3(6.97, 7.4, 4.0), -PI / 2)
 	# Banyo (x 4..6, z 7..9): klozet, lavabo ve ayna, duş, havluluk.
 	_iwall(o, Vector3i(3, 5, 7), Vector3i(3, 5, 9))
 	_iwall(o, Vector3i(3, 5, 6), Vector3i(6, 5, 6))
@@ -1588,6 +1591,9 @@ func _family_extras() -> void:
 	_prop(z, "oyuncak_kutusu", Vector3i(6, 5, 1), Vector2i(1, 1))
 	_decor(z, "tablo_kucuk", Vector3(6.97, 6.8, 2.5), -PI / 2)
 	_decor(z, "oda_halisi", Vector3(4.0, 5, 3.8), 0.0)
+	_decor(z, "tablo_kucuk", Vector3(2.0, 7.0, 9.97), PI)
+	_prop(z, "bitki", Vector3i(13, 5, 7), Vector2i(1, 1))
 	var t: Vector3i = SETS["ogretmen_ev"]
 	_prop(t, "kitaplik", Vector3i(8, 5, 8), Vector2i(1, 2), PI / 2)
-	_prop(t, "kitaplik", Vector3i(6, 0, 1), Vector2i(1, 1))
+	_prop(t, "kitaplik", Vector3i(7, 0, 6), Vector2i(1, 2), -PI / 2)
+	_decor(t, "tablo", Vector3(1.03, 7.2, 4.5), PI / 2)
