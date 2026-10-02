@@ -48,6 +48,10 @@ var _box := PanelContainer.new()
 var _name_label := Label.new()
 var _text_label := Label.new()
 var _title := Label.new()
+## Başlıklarda yalnızca logo (bölüm adı yazılmaz). Logo görseli yoksa "EmirCRAFT" yazısı.
+const LOGO_ONLY := true
+const LOGO_PATH := "res://assets/textures/logo/emircraft_logo.png"
+var _logo := TextureRect.new()
 var _bars: Array[ColorRect] = []
 var _look := Vector3.ZERO
 var _cam_tween: Tween
@@ -191,6 +195,7 @@ func _run(s: Dictionary) -> void:
 		_show_title(s["title"])
 		await _wait(s.get("t", 2.0))
 		_title.visible = false
+		_logo.visible = false
 	elif s.has("place"):
 		var a := _actor(s["place"])
 		a.visible = true
@@ -650,6 +655,15 @@ func _build_ui() -> void:
 	_title.add_theme_constant_override("outline_size", 16)
 	_title.visible = false
 	_ui.add_child(_title)
+	_logo.set_anchors_preset(Control.PRESET_CENTER)
+	_logo.anchor_left = 0.1
+	_logo.anchor_right = 0.9
+	_logo.anchor_top = 0.3
+	_logo.anchor_bottom = 0.7
+	_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_logo.visible = false
+	_ui.add_child(_logo)
 	_panel.title = "Film Stüdyosu"
 	_panel.subtitle = "Bir bölüm seç, ekran kaydını başlat"
 	layer.add_child(_panel)
@@ -699,6 +713,16 @@ func set_portrait(on: bool) -> void:
 
 
 func _show_title(text: String) -> void:
+	# Mehmet'in kararı (2026-10-02): videolar birçok dilde yükleneceği için görüntüde yazı yok;
+	# başlık adımlarında yalnızca EmirCRAFT logosu görünür, bölüm adı YouTube başlığında durur.
+	if LOGO_ONLY:
+		if _logo.texture == null and ResourceLoader.exists(LOGO_PATH):
+			_logo.texture = load(LOGO_PATH)
+		if _logo.texture:
+			_logo.visible = true
+			_title.text = ""
+			return
+		text = "EmirCRAFT"
 	_title.text = text
 	_title.visible = true
 
