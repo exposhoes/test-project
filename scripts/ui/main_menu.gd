@@ -43,15 +43,24 @@ func _refresh() -> void:
 		if has_save:
 			buttons.append({"label": "Devam Et", "action": _continue})
 		buttons.append({"label": "Yeni Dünya", "action": _ask_new_world if has_save else _new_world})
-		buttons.append({"label": "Şehri Gez", "action": func() -> void:
-			Engine.set_meta("gezi", true)
-			get_tree().change_scene_to_file(GAME_SCENE)})
+		buttons.append({"label": "Şehri Gez", "action": _start_explore})
 		buttons.append({"label": "Film Stüdyosu", "action": func() -> void:
 			get_tree().change_scene_to_file(FILM_SCENE)})
 		buttons.append({"label": "Ayarlar", "action": func() -> void:
 			_settings = true
 			_refresh()})
 	_panel.set_buttons(buttons)
+
+
+## Şehir büyük, telefonda kurulması yarım dakika sürebilir: önce "yükleniyor" yazısı çıkar,
+## düğmeler kalkar (ikinci basış olmasın), sonra sahne değişir.
+func _start_explore() -> void:
+	_panel.subtitle = "Şehir yükleniyor, lütfen bekle..."
+	_panel.set_buttons([])
+	await get_tree().process_frame
+	await get_tree().process_frame
+	Engine.set_meta("gezi", true)
+	get_tree().change_scene_to_file(GAME_SCENE)
 
 
 func _continue() -> void:

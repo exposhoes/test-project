@@ -137,6 +137,9 @@ func _process(delta: float) -> void:
 	if explore:
 		_update_sun()
 		_swing_doors(delta)
+		# Şehrin altına düşerse (chunk geç yüklendiyse) Emir'in evinin önüne geri al.
+		if player.is_spawned() and player.global_position.y < 0.0:
+			player.teleport(FilmSets.point("ev.kapi_disi") + Vector3(0, 0.1, 0))
 		return
 	time_of_day = fposmod(time_of_day + delta / DAY_LENGTH, 1.0)
 	_update_sun()
