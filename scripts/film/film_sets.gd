@@ -20,6 +20,26 @@ const SETS := {
 	"lokanta": Vector3i(-60, GROUND + 1, -10),
 	"pastane": Vector3i(-26, GROUND + 1, -10),
 	"otopark": Vector3i(-60, GROUND + 1, -37),
+	"ali_ev": Vector3i(38, GROUND + 1, 36),
+	"zeynep_ev": Vector3i(58, GROUND + 1, 36),
+	"ogretmen_ev": Vector3i(-60, GROUND + 1, 36),
+}
+## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
+const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
+const FAMILY_POINTS := {
+	"kapi_disi": Vector3(4.5, 0, -2.0),
+	"kapi_ici": Vector3(4.5, 0, 1.6),
+	"bahce": Vector3(9.0, 0, -3.0),
+	"salon": Vector3(5.5, 0, 5.0),
+	"mutfak": Vector3(12.5, 0, 4.0),
+	"oda": Vector3(3.5, 5, 4.5),
+	"ebeveyn": Vector3(11.0, 5, 4.5),
+	"kam_genel": Vector3(2.0, 8.0, -19.0),
+	"kam_dis": Vector3(9.0, 3.0, -9.0),
+	"kam_salon": Vector3(7.2, 2.3, 2.0),
+	"kam_mutfak": Vector3(9.6, 2.3, 7.0),
+	"kam_oda": Vector3(5.8, 7.3, 8.5),
+	"kam_ebeveyn": Vector3(12.5, 7.3, 7.0),
 }
 ## Şehrin kapladığı alan (x, z); ağaçlar bunun dışında çıkar.
 const CITY_MIN := Vector2i(-64, -56)
@@ -27,6 +47,9 @@ const CITY_MAX := Vector2i(100, 52)
 
 ## Setlerdeki adlandırılmış noktalar (köşeye göre, blok ortası için .5).
 const POINTS := {
+	"ali_ev": FAMILY_POINTS,
+	"zeynep_ev": FAMILY_POINTS,
+	"ogretmen_ev": FAMILY_POINTS,
 	"ev": {
 		"yatak": Vector3(1.5, 0.42, 2.0),          # Emir'in uzandığı yer (yatak üstü)
 		"yatak_yani": Vector3(2.8, 0, 2.0),
@@ -262,6 +285,8 @@ func _init() -> void:
 	_build_restaurant(SETS["lokanta"])
 	_build_bakery(SETS["pastane"])
 	_build_parking(SETS["otopark"])
+	for h: String in FAMILY_HOUSES:
+		_build_family_house(SETS[h], FAMILY_HOUSES[h])
 	_connect_sets()
 	for pos: Vector3i in _blocks:
 		var key := Vector2i(floori(pos.x / float(Chunk.SIZE)), floori(pos.z / float(Chunk.SIZE)))
@@ -782,9 +807,9 @@ func _build_city() -> void:
 				_car(o + Vector3i(sx + (0 if i % 2 == 0 else 2), 0, z), CAR_COLORS[i % CAR_COLORS.size()], false)
 			i += 1
 	# Kuzey sırası: caddeye bakan apartmanlar ve altı dükkânlı binalar.
-	_row(Vector2i(-62, 32), Vector2i(-20, 32), -1)
+	_row(Vector2i(-40, 32), Vector2i(-20, 32), -1)  # batısında öğretmenin evi
 	_bazaar(SETS["pazar"])
-	_row(Vector2i(35, 32), Vector2i(72, 32), -1)
+	# x 35..72: Ali'nin ve Zeynep'in evleri (karakter evleri).
 	_playground(SETS["oyun"])
 	# Güney sırası.
 	_row(Vector2i(-62, -40), Vector2i(-20, -40), 1)
@@ -1396,3 +1421,63 @@ func _build_park(o: Vector3i) -> void:
 			_put(o + Vector3i(x, 0, -3), Blocks.LEAVES)
 	for z in range(-3, 17):
 		_put(o + Vector3i(33, 0, z), Blocks.LEAVES)
+
+
+## Karakter evi (Ali, Zeynep, öğretmen): iki katlı müstakil ev, önü caddeye (düşük z). Dış x 0..14 z 0..10.
+## Zemin: salon x1..7, mutfak/yemek x9..13 (arka köşede merdiven). Üst kat: çocuk odası x1..6,
+## anne-baba odası x8..13. Kiremit çatı, önde çitli bahçe, çakıl yol, çiçekler, ağaç.
+func _build_family_house(o: Vector3i, wall: int) -> void:
+	_shell(o, Vector2i(0, 0), Vector2i(14, 10), 2, wall, Blocks.PLANKS)
+	# Giriş kapısı, söveler.
+	_door(o, Vector3i(4, 0, 0), true, true, true)
+	_fill(o, Vector3i(3, 0, 0), Vector3i(3, 3, 0), Blocks.TRIM_WHITE)
+	_fill(o, Vector3i(5, 0, 0), Vector3i(5, 3, 0), Blocks.TRIM_WHITE)
+	# Zemin kat: salon | mutfak duvarı ve kapısı.
+	_iwall(o, Vector3i(8, 0, 1), Vector3i(8, 0, 9))
+	_door(o, Vector3i(8, 0, 4), false)
+	_prop(o, "koltuk", Vector3i(1, 0, 1), Vector2i(3, 1))
+	_prop(o, "sehpa", Vector3i(1, 0, 3), Vector2i(3, 1))
+	_prop(o, "tv", Vector3i(1, 0, 7), Vector2i(3, 1), PI)
+	_prop(o, "bitki", Vector3i(7, 0, 1), Vector2i(1, 1))
+	_fill(o, Vector3i(1, -1, 4), Vector3i(4, -1, 6), Blocks.RUG)
+	_prop(o, "mutfak_tezgahi", Vector3i(9, 0, 1), Vector2i(2, 1))
+	_prop(o, "ocak", Vector3i(11, 0, 1), Vector2i(1, 1))
+	_prop(o, "buzdolabi", Vector3i(12, 0, 1), Vector2i(1, 1))
+	_table4(o, Vector3i(10, 0, 4))
+	# Merdiven: mutfağın arkasında x 9..13 boyunca yukarı.
+	for k in 5:
+		_fill(o, Vector3i(9 + k, 0, 8), Vector3i(9 + k, k, 9), Blocks.PLANKS)
+	_fill(o, Vector3i(9, 4, 8), Vector3i(12, 4, 9), Blocks.AIR)
+	# Üst kat: çocuk odası | anne-baba odası.
+	_iwall(o, Vector3i(7, 5, 1), Vector3i(7, 5, 9))
+	_door(o, Vector3i(7, 5, 6), false)
+	_put(o + Vector3i(1, 5, 1), Blocks.BED)
+	_put(o + Vector3i(1, 5, 2), Blocks.BED)
+	_prop(o, "komodin", Vector3i(2, 5, 1), Vector2i(1, 1))
+	_prop(o, "gardirop", Vector3i(1, 5, 6), Vector2i(1, 2))
+	_prop(o, "calisma_masasi", Vector3i(3, 5, 9), Vector2i(2, 1))
+	_prop(o, "oyuncak_kutusu", Vector3i(5, 5, 1), Vector2i(1, 1))
+	_fill(o, Vector3i(2, 4, 3), Vector3i(5, 4, 6), Blocks.RUG)
+	for x in [10, 11]:
+		_put(o + Vector3i(x, 5, 1), Blocks.BED)
+		_put(o + Vector3i(x, 5, 2), Blocks.BED)
+	_prop(o, "komodin", Vector3i(9, 5, 1), Vector2i(1, 1))
+	_prop(o, "komodin", Vector3i(12, 5, 1), Vector2i(1, 1))
+	_prop(o, "gardirop", Vector3i(13, 5, 4), Vector2i(1, 2))
+	# Kiremit çatı: sırt x boyunca, alınlıklar yanlarda.
+	for st in 6:
+		_fill(o, Vector3i(-1, 10 + st, -1 + st), Vector3i(15, 10 + st, 11 - st), Blocks.ROOF_TERRACOTTA)
+		if st < 5:
+			_fill(o, Vector3i(0, 10 + st, st), Vector3i(0, 10 + st, 10 - st), wall)
+			_fill(o, Vector3i(14, 10 + st, st), Vector3i(14, 10 + st, 10 - st), wall)
+	_fill(o, Vector3i(11, 11, 6), Vector3i(11, 16, 6), Blocks.BRICKS)  # baca
+	# Ön bahçe: çit, çakıl yol, çiçek sırası, ağaç.
+	_fill(o, Vector3i(-1, 0, -5), Vector3i(15, 0, -5), Blocks.FENCE_WHITE)
+	_fill(o, Vector3i(-1, 0, -5), Vector3i(-1, 0, 11), Blocks.FENCE_WHITE)
+	_fill(o, Vector3i(15, 0, -5), Vector3i(15, 0, 11), Blocks.FENCE_WHITE)
+	_fill(o, Vector3i(4, -1, -6), Vector3i(4, -1, -1), Blocks.GRAVEL)
+	_put(o + Vector3i(4, 0, -5), Blocks.AIR)
+	for x in range(0, 15):
+		if x != 4 and x != 13:
+			_put(o + Vector3i(x, 0, -1), Blocks.FLOWERS)
+	_tree(o + Vector3i(13, 0, -3))
