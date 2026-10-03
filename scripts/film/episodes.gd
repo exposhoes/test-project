@@ -173,7 +173,7 @@ const LIST := [
 			{"turn": "emir", "to": "ev.mutfak_on"},
 			{"say": "anne", "text": "Günaydın uykucu! Önce elini yüzünü yıka, sonra kahvaltı."},
 			{"say": "emir", "text": "Günaydın anne! Kahvaltıda ne var?"},
-			{"say": "anne", "text": "Senin sevdiğin fırın elma ve çilek!"},
+			{"say": "anne", "text": "En sevdiğin sucuklu yumurta var!"},
 			{"say": "emir", "text": "Yaşasın! En sevdiğim!"},
 			{"walk": "emir", "to": "ev.canta"},
 			{"turn": "emir", "to": Vector3(2.0, 11, 6.5)},  # masadaki çanta/defter
