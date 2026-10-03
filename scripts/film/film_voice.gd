@@ -13,6 +13,7 @@ const TONES := {
 	"ogretmen": {"pitch": 1.0, "rate": 0.95},
 	"doktor": {"pitch": 0.8, "rate": 0.95},
 	"bakkal": {"pitch": 0.65, "rate": 0.9},
+	"tokmakci": {"pitch": 0.5, "rate": 0.85},
 }
 const VOICE_DIR := "res://assets/audio/voices/"
 

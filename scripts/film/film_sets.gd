@@ -39,6 +39,7 @@ const SETS := {
 	"spor": Vector3i(-60, GROUND + 1, 132),
 	"skate": Vector3i(-14, GROUND + 1, 146),
 	"kampus": Vector3i(34, GROUND + 1, 98),
+	"orman": Vector3i(-130, GROUND + 1, -10),
 }
 ## Karakter evleri (_build_family_house): aynı plan, farklı cephe. Noktalar FAMILY_POINTS'ten.
 const FAMILY_HOUSES := {"ali_ev": Blocks.BRICKS, "zeynep_ev": Blocks.PLASTER, "ogretmen_ev": Blocks.FACADE_CREAM}
@@ -177,6 +178,9 @@ const POINTS := {
 		"kam_eczane": Vector3(11.8, 2.4, -2.0),
 	},
 	"bakkal": {
+		"kaldirim": Vector3(4.4, 0, 14.5),
+		"kaldirim_ali": Vector3(7.2, 0, 14.5),
+		"kam_sokak": Vector3(5.8, 1.5, 19.8),
 		"kapi": Vector3(5.5, 0, 8.6),
 		"dis": Vector3(5.5, 0, 12.0),
 		"tezgah_on": Vector3(5.5, 0, 4.4),
@@ -186,6 +190,32 @@ const POINTS := {
 		"kam_ic": Vector3(9.0, 2.3, 3.8),
 		"kam_tezgah": Vector3(3.0, 2.0, 6.8),
 		"kam_dis": Vector3(9.0, 4.0, 16.0),
+	},
+	# Gölge Orman platosu: karanlık meşe ormanı, patikanın sonunda küçük bir açıklık. Kamera +z'den bakar.
+	"orman": {
+		"sandik": Vector3(12.5, 0, 5.5),
+		"emir": Vector3(10.4, 0, 9.6),
+		"ali": Vector3(12.5, 0, 7.6),
+		"kam_hedef_masa": Vector3(17.5, 0, 9.5),
+		"kam_hedef_tabela": Vector3(6.5, 0, 8.5),
+		"patika": Vector3(12.0, 0, 20.0),
+		"kac_son": Vector3(12.0, 0, 29.0),
+		"tokmak": Vector3(12.5, 0, 4.2),
+		"masa_iksir": Vector3(16.9, 0.85, 8.7),
+		"masa_yer": Vector3(16.9, 0, 10.6),
+		"saat": Vector3(17.5, 0.5, 6.0),
+		"kam_hedef_harita": Vector3(18.1, -0.4, 8.5),
+		"kam_hedef_sandik": Vector3(12.5, -0.9, 5.5),
+		"ali_sandik": Vector3(12.5, 0, 6.7),
+		"kam_sandik_yakin": Vector3(12.5, 0.85, 7.0),
+		"kam_saat": Vector3(17.5, 1.9, 11.0),
+		"kam_genel": Vector3(12.5, 4.5, 23.0),
+		"kam_alcak": Vector3(12.0, 0.45, 15.0),
+		"kam_sandik": Vector3(12.5, 0.9, 9.4),
+		"kam_ort": Vector3(12.5, 1.5, 16.0),
+		"kam_yuz": Vector3(12.0, 1.5, 3.2),
+		"kam_masa": Vector3(15.5, 1.4, 14.0),
+		"kam_kac": Vector3(12.0, 1.4, 27.5),
 	},
 	"park": {
 		"bank": Vector3(4.5, 0, 6.0),
@@ -483,6 +513,8 @@ func _init() -> void:
 	_build_gas_station(SETS["benzinlik"])
 	_furnish_new_buildings()
 	_additions()
+	_build_forest(SETS["orman"])
+	_shop_front(SETS["bakkal"])
 	_street_furniture()
 	_street_furniture_2()
 	_river()
@@ -934,6 +966,74 @@ func _build_shop(o: Vector3i) -> void:
 	_prop(o, "sepetlik", Vector3i(3, 0, 8), Vector2i(1, 1))
 	_prop(o, "koli", Vector3i(9, 0, 7), Vector2i(1, 1))
 	_prop(o, "koli", Vector3i(9, 0, 3), Vector2i(1, 1))
+
+
+## Bakkalın önü: vitrinin altında turuncu-kırmızı meyve kasaları, nostaljik kırmızı posta kutusu.
+func _shop_front(o: Vector3i) -> void:
+	for x in [1, 2, 8, 9]:
+		_prop(o, "meyve_kasasi", Vector3i(x, 0, 10), Vector2i(1, 1))
+	_prop(o, "posta_kutusu", Vector3i(7, 0, 13), Vector2i(1, 1))
+
+
+## Gölge Orman platosu: koyu meşe ağaçları, çakıl patika, solda kırık tabela, sağda eski meşe masa ve arkasında
+## guguklu saat asılı kulübe duvarı. Gece/sis havası film_studio'da {"mood": "orman"} adımıyla gelir.
+## Sahne alanı x 4..21, z 2..26 ağaçsız kalır; ağaçlar çevresinde.
+func _build_forest(o: Vector3i) -> void:
+	_fill(o, Vector3i(-3, 0, -3), Vector3i(33, 12, 34), Blocks.AIR)
+	_fill(o, Vector3i(-3, -1, -3), Vector3i(33, -1, 34), Blocks.DIRT)
+	# Yosunlu toprak lekeleri.
+	for z in range(-3, 35):
+		for x in range(-3, 34):
+			var h := hash(Vector2i(x, z))
+			if h % 7 == 0:
+				_put(o + Vector3i(x, -1, z), Blocks.COBBLESTONE)
+	# Kıvrılan çakıl patika (kamerayı sahneye getirir).
+	for z in range(-1, 34):
+		var cx := 12 + int(round(sin(float(z) * 0.3) * 2.0))
+		for x in range(cx - 1, cx + 2):
+			_put(o + Vector3i(x, -1, z), Blocks.GRAVEL if (x + z) % 3 != 0 else Blocks.COBBLESTONE)
+	# Çevre ağaçları: sahne alanının dışında, aralıklı ve boyları farklı.
+	for gz in range(-3, 34, 5):
+		for gx in range(-3, 34, 5):
+			var inside := gx > 2 and gx < 23 and gz > 0 and gz < 27
+			if inside:
+				continue
+			var h := absi(hash(Vector2i(gx, gz)))
+			_dark_tree(o + Vector3i(gx + h % 3, 0, gz + (h / 7) % 3), 6 + h % 4)
+	# Sahne alanının kenarında birkaç iri ağaç (kadraja çerçeve olur).
+	_dark_tree(o + Vector3i(2, 0, 13), 9)
+	_dark_tree(o + Vector3i(22, 0, 14), 10)
+	_dark_tree(o + Vector3i(3, 0, 24), 8)
+	_dark_tree(o + Vector3i(22, 0, 25), 8)
+	# Kulübe duvarı (masanın arkası) ve direği: guguklu saat burada asılı.
+	_fill(o, Vector3i(15, 0, 5), Vector3i(20, 3, 5), Blocks.DARK_PLANKS)
+	_fill(o, Vector3i(15, 4, 5), Vector3i(20, 4, 5), Blocks.PLANKS)
+	_fill(o, Vector3i(14, 0, 5), Vector3i(14, 4, 5), Blocks.LOG)
+	_fill(o, Vector3i(21, 0, 5), Vector3i(21, 4, 5), Blocks.LOG)
+	_decor(o, "guguklu_saat", Vector3(17.5, 1.8, 6.03), 0.0)
+	# Sağda eski meşe masa; üstünde harita ve çalar saat (kırık şişeyi bölüm koyar).
+	_prop(o, "yemek_masasi", Vector3i(16, 0, 8), Vector2i(3, 2))
+	_decor(o, "eski_harita", Vector3(18.1, 0.85, 8.5), 0.4)
+	_decor(o, "calar_saat", Vector3(16.8, 0.85, 8.8), 0.2)
+	# Solda yosunlu kırık tabela, yerde mantar gibi küçük taşlar.
+	_prop(o, "kirik_tabela", Vector3i(6, 0, 8), Vector2i(1, 1))
+	_put(o + Vector3i(7, 0, 10), Blocks.COBBLESTONE)
+	_put(o + Vector3i(5, 0, 11), Blocks.COBBLESTONE)
+	# Sandığın durduğu yer: etrafı kurumuş toprak.
+	_fill(o, Vector3i(11, -1, 4), Vector3i(13, -1, 6), Blocks.COBBLESTONE)
+
+
+## Karanlık meşe: kalın 2x2 gövde, geniş yuvarlak taç.
+func _dark_tree(p: Vector3i, height: int) -> void:
+	_fill(Vector3i.ZERO, p, p + Vector3i(1, height - 1, 1), Blocks.LOG)
+	for dy in range(0, 4):
+		var r := 3 if dy < 2 else (2 if dy == 2 else 1)
+		for dz in range(-r, r + 2):
+			for dx in range(-r, r + 2):
+				if absi(dx - 0) + absi(dz - 0) > r * 2 + 1 and r > 1:
+					continue
+				_put(p + Vector3i(dx, height - 2 + dy, dz), Blocks.LEAVES)
+	_fill(Vector3i.ZERO, p + Vector3i(0, height - 2, 0), p + Vector3i(1, height, 1), Blocks.LOG)
 
 
 ## Futbol sahası: beyaz çizgiler, iki kale, kenarda seyirci bankı.

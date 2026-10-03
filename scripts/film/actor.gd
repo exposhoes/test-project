@@ -115,6 +115,17 @@ const ACTORS := {
 			[Vector3(0.54, 0.12, 0.54), Vector3(0, 2.02, 0.02), Color("222222")],
 		],
 		"face": [0.46, Vector3(0, 1.73, -0.25)], "hair": Color("222222"), "eyes": Color("222222")},
+	# Tokmakçı (Gölge Orman canavarı): mob_tokmak.glb'nin Tripo modeli, dev boy.
+	"tokmakci": {"name": "Tokmakçı", "color": Color("ff8a3d"), "glb": "mob_tokmak", "height": 2.7,
+		"parts": [
+			[Vector3(0.5, 1.0, 0.4), Vector3(-0.28, 0.5, 0), Color("4a3a2a")],
+			[Vector3(0.5, 1.0, 0.4), Vector3(0.28, 0.5, 0), Color("4a3a2a")],
+			[Vector3(1.1, 1.1, 0.6), Vector3(0, 1.55, 0), Color("5a6f4a")],
+			[Vector3(0.3, 1.0, 0.3), Vector3(-0.7, 1.5, 0), Color("5a6f4a")],
+			[Vector3(0.3, 1.0, 0.3), Vector3(0.7, 1.5, 0), Color("5a6f4a")],
+			[Vector3(0.8, 0.8, 0.8), Vector3(0, 2.4, 0), Color("6b8a55")],
+		],
+		"face": [0.7, Vector3(0, 2.4, -0.41)], "hair": Color("2a1a10"), "eyes": Color("ff8a3d")},
 	"bakkal": {"name": "Bakkal Amca", "color": Color("ffb347"),
 		"parts": [
 			[Vector3(0.26, 0.8, 0.28), Vector3(-0.15, 0.4, 0), Color("5a4630")],
@@ -173,6 +184,8 @@ var _head_node: Node3D
 var _lids: Array[MeshInstance3D] = []
 var _blink_timer := 2.0
 var _moving := false
+## Hızlı yürüyüşte (koşu) modelin "run" animasyonu oynar, yoksa "walk".
+var _running := false
 
 
 static func create(id: String) -> Actor:
@@ -220,7 +233,7 @@ func _ready() -> void:
 var _anim: AnimationPlayer
 
 func _build_glb() -> bool:
-	var path := "res://assets/models/" + actor_id + ".glb"
+	var path := "res://assets/models/" + String(data.get("glb", actor_id)) + ".glb"
 	if not ResourceLoader.exists(path):
 		return false
 	var model: Node3D = load(path).instantiate()
@@ -402,6 +415,34 @@ func gesture(kind: String) -> void:
 	if n != "":
 		_anim.play(n, 0.2)
 		_gesture_left = minf(_anim.get_animation(n).length, 2.5)
+
+
+## Modelde varsa verilen önekle başlayan animasyonu bir kez oynatır (ör. ["afraid"], ["angry"], ["box", "slash"]);
+## hold saniye boyunca son karede kalır (0: animasyon süresi, en çok 3 sn). Animasyonun süresini döner (yoksa 0).
+func play_anim(prefixes: Array, hold := 0.0) -> float:
+	var n := _find_anim(prefixes)
+	if n == "":
+		return 0.0
+	_anim.play(n, 0.15)
+	var length := _anim.get_animation(n).length
+	_gesture_left = hold if hold > 0.0 else minf(length, 3.0)
+	return length
+
+
+## Elinde nesne tutar: modelin sağ/sol el kemiğine takılır (kemik yoksa gövdeye, kaba bir konumla).
+func hold_item(item: Node3D, right := true) -> void:
+	if _skeleton == null:
+		_init_head_bone(_body.get_child(0) if _body.get_child_count() > 0 else _body)
+	if _skeleton:
+		for i in _skeleton.get_bone_count():
+			if _skeleton.get_bone_name(i).ends_with("RightHand" if right else "LeftHand"):
+				var att := BoneAttachment3D.new()
+				att.bone_idx = i
+				_skeleton.add_child(att)
+				att.add_child(item)
+				return
+	item.position = Vector3(-0.4 if right else 0.4, 1.0, -0.1)
+	_body.add_child(item)
 
 
 func _play(name: String) -> void:
@@ -641,6 +682,7 @@ func walk_to(target: Vector3, speed := 2.2) -> void:
 		return
 	target = _stop_before_others(target)
 	_moving = true
+	_running = speed >= 3.6
 	# Bacaklar yerde kaymasın: yürüme animasyonunu gerçek hıza göre hızlandır/yavaşlat.
 	if _anim:
 		_anim.speed_scale = clampf(speed / float(data.get("walk_speed", 1.4)), 0.6, 2.5)
@@ -739,7 +781,7 @@ func _process(delta: float) -> void:
 	if _anim:
 		if _moving:
 			_gesture_left = 0.0
-			_play(_find_anim(["walk"]))
+			_play(_find_anim(["run", "walk"] if _running else ["walk"]))
 		elif _gesture_left > 0.0:
 			_gesture_left -= delta
 		elif talking and _find_anim(TALK_ANIMS) != "":

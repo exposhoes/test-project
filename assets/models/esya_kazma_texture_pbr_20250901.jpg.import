@@ -1,0 +1,37 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://c5ilr3bqg345c"
+path="res://.godot/imported/esya_kazma_texture_pbr_20250901.jpg-ac11fe35d1d8eb6d52bafa1346d2b6ce.ctex"
+metadata={
+"vram_texture": false
+}
+generator_parameters={
+"md5": "54a1618165c4763d815f2a411ddc2142"
+}
+
+[deps]
+
+source_file="res://assets/models/esya_kazma_texture_pbr_20250901.jpg"
+dest_files=["res://.godot/imported/esya_kazma_texture_pbr_20250901.jpg-ac11fe35d1d8eb6d52bafa1346d2b6ce.ctex"]
+
+[params]
+
+compress/mode=0
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/hdr_compression=1
+compress/normal_map=0
+compress/channel_pack=0
+mipmaps/generate=true
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=1

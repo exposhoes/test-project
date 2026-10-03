@@ -16,6 +16,7 @@ const HEIGHTS := {
 	"su_sebili": 1.4, "stant": 1.3, "sepetlik": 0.8,
 	"pasta_vitrini": 1.3, "ekmek_rafi": 2.0, "ogrenci_dolabi": 1.9, "cop_kutusu": 0.7,
 	"yangin_hortumu": 1.6, "kask_askisi": 1.9, "misir_makinesi": 1.7,
+	"sandik": 0.9, "kirik_tabela": 1.6, "posta_kutusu": 1.4, "meyve_kasasi": 0.45, "yemek_masasi_buyuk": 0.85,
 }
 ## Yedek kutular: [boyut, merkez (tabana göre, taban 0..size), renk]. Taban 1x1 için yazıldı,
 ## daha geniş tabanlarda x/z ölçeklenir.
@@ -75,7 +76,12 @@ static func _build(id: String, size: Vector2i, turn_override = null) -> Node3D:
 	var side := absf(sin(turn)) > 0.5
 	var foot := Vector3(size.y if side else size.x, height(id), size.x if side else size.y)
 	var model := Node3D.new()
-	var glb := _load_glb(id, foot)
+	# Mehmet'in büyük yemek masası GLB'si: en az 2 bloklukta (uzun masa) esnetilerek tabana oturur.
+	var glb: Node3D = null
+	if id == "yemek_masasi" and size.x * size.y >= 2:
+		glb = _load_glb_stretched("yemek_masasi_buyuk", foot)
+	if glb == null:
+		glb = _load_glb(id, foot)
 	if glb:
 		model.add_child(glb)
 	else:
@@ -183,6 +189,47 @@ static func _load_glb(id: String, foot: Vector3) -> Node3D:
 	var c := box.get_center() * k
 	model.position = Vector3(foot.x / 2 - c.x, -box.position.y * k, foot.z / 2 - c.z)
 	return holder
+
+
+## Uzun eşya GLB'si: modelin uzun kenarı tabanın uzun kenarına çevrilir, en/boy/yüksekliğe tam oturacak
+## biçimde esnetilir (masa 2x1 ya da 3x2 blokta da doğru görünsün). Pivot zeminde, tabanın köşesinde.
+static func _load_glb_stretched(id: String, foot: Vector3) -> Node3D:
+	var path := "res://assets/models/esya_%s.glb" % id
+	if not ResourceLoader.exists(path):
+		return null
+	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var box := _glb_box(model)
+	if box.size.y <= 0.0:
+		return model
+	var turn := (box.size.z > box.size.x) != (foot.z > foot.x)
+	var bx := box.size.z if turn else box.size.x
+	var bz := box.size.x if turn else box.size.z
+	var holder := Node3D.new()
+	var pivot := Node3D.new()
+	holder.add_child(pivot)
+	pivot.add_child(model)
+	pivot.rotation.y = PI / 2.0 if turn else 0.0
+	pivot.scale = Vector3(foot.x / maxf(bx, 0.01), foot.y / box.size.y, foot.z / maxf(bz, 0.01))
+	var c := box.get_center()
+	var rc := Vector3(-c.z, 0, c.x) if turn else Vector3(c.x, 0, c.z)  # merkez, dönmeden sonra
+	pivot.position = Vector3(foot.x / 2 - rc.x * pivot.scale.x, -box.position.y * pivot.scale.y, foot.z / 2 - rc.z * pivot.scale.z)
+	return holder
+
+
+static func _glb_box(model: Node3D) -> AABB:
+	var box := AABB()
+	var first := true
+	for m in model.find_children("*", "MeshInstance3D", true, false):
+		var mi := m as MeshInstance3D
+		var t := Transform3D.IDENTITY
+		var p: Node = mi
+		while p != model and p is Node3D:
+			t = (p as Node3D).transform * t
+			p = p.get_parent()
+		var b := t * mi.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	return box
 
 
 ## Köşeli eşya modeli. Yerel düzen: en x, derinlik z, ön yüz +Z (z = f.z), taban y = 0.
@@ -955,6 +1002,48 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 			_box(r, Vector3(0.56, 0.3, 0.46), Vector3(w / 2, 1.0, d / 2), Color("ffe082"))
 			_box(r, Vector3(0.76, 0.12, 0.66), Vector3(w / 2, 1.52, d / 2), Color("c62828"))
 			_box(r, Vector3(0.5, 0.1, 0.4), Vector3(w / 2, 1.64, d / 2), Color("fdd835"))
+		"sandik":
+			# Antik meşe sandık: paslı demir şeritler, kapak arkadan menteşeli ("Kapak" düğümü açılabilir).
+			var c := _tone(id, Color("6b4423"))
+			var iron := Color("4a4a4f")
+			var bw := minf(w, 0.95)
+			var bd := d * 0.62
+			var mx := w / 2
+			var mz := d / 2
+			_box(r, Vector3(bw, 0.5, bd), Vector3(mx, 0.25, mz), c)
+			for dx in [-0.3, 0.3]:
+				_box(r, Vector3(0.08, 0.52, bd + 0.02), Vector3(mx + dx, 0.25, mz), iron)
+			var lid := Node3D.new()
+			lid.name = "Kapak"
+			lid.position = Vector3(mx, 0.5, mz - bd / 2)
+			r.add_child(lid)
+			_box(lid, Vector3(bw, 0.2, bd), Vector3(0, 0.1, bd / 2), c.lightened(0.06))
+			for dx in [-0.3, 0.3]:
+				_box(lid, Vector3(0.08, 0.22, bd + 0.02), Vector3(dx, 0.1, bd / 2), iron)
+			_box(r, Vector3(0.14, 0.18, 0.05), Vector3(mx, 0.5, mz + bd / 2 + 0.02), Color("d9b44a"))
+		"kirik_tabela":
+			# Yosunlu kırık tabela: eğri direk, çatlak tahta.
+			_box(r, Vector3(0.14, 1.4, 0.14), Vector3(w / 2, 0.7, d / 2), Color("5a4630"))
+			var board := Node3D.new()
+			board.position = Vector3(w / 2, 1.2, d / 2 + 0.1)
+			board.rotation.z = 0.2
+			r.add_child(board)
+			_box(board, Vector3(0.8, 0.34, 0.06), Vector3.ZERO, Color("7a6040"))
+			_box(board, Vector3(0.8, 0.07, 0.07), Vector3(0, 0.18, 0), Color("3f7a3a"))
+			_box(board, Vector3(0.3, 0.1, 0.07), Vector3(-0.2, -0.1, 0), Color("4a8a3f"))
+			_box(r, Vector3(0.22, 0.12, 0.2), Vector3(w / 2, 0.06, d / 2), Color("3f7a3a"))
+		"posta_kutusu":
+			# Nostaljik kırmızı posta kutusu.
+			_box(r, Vector3(0.12, 0.9, 0.12), Vector3(w / 2, 0.45, d / 2), Color("37474f"))
+			_box(r, Vector3(0.5, 0.45, 0.4), Vector3(w / 2, 1.1, d / 2), Color("c62828"))
+			_box(r, Vector3(0.5, 0.1, 0.4), Vector3(w / 2, 1.38, d / 2), Color("b71c1c"))
+			_box(r, Vector3(0.3, 0.05, 0.02), Vector3(w / 2, 1.15, d / 2 + 0.21), Color("212121"))
+		"meyve_kasasi":
+			# Ahşap kasa: üstü turuncu ve kırmızı meyve dolu.
+			_box(r, Vector3(0.8, 0.35, 0.5), Vector3(w / 2, 0.175, d / 2), Color("a8743f"))
+			for k in 8:
+				var col := Color("f08a1c") if k % 2 == 0 else Color("d32f2f")
+				_box(r, Vector3(0.18, 0.14, 0.18), Vector3(w / 2 - 0.3 + (k % 4) * 0.2, 0.4, d / 2 - 0.1 + (k / 4) * 0.2), col)
 		_:
 			_box(r, f, f / 2, WOOD)
 
@@ -1088,6 +1177,8 @@ const DECOR_SIZE := {
 	"salon_halisi": Vector3(3.0, 0.02, 2.2), "bilgisayar": Vector3(0.7, 0.5, 0.45), "buyuk_saat": Vector3(2.2, 2.2, 0.1), "ayna_duvar": Vector3(0.6, 0.9, 0.03),
 	"pano": Vector3(1.8, 1.1, 0.04), "harita": Vector3(1.5, 1.0, 0.03), "sofra": Vector3(1.6, 0.12, 0.7),
 	"ucus_tabelasi": Vector3(2.6, 1.5, 0.08),
+	"iksir": Vector3(0.25, 0.5, 0.25), "kazma": Vector3(0.7, 1.0, 0.2), "eski_harita": Vector3(0.55, 0.08, 0.5),
+	"calar_saat": Vector3(0.3, 0.3, 0.12), "guguklu_saat": Vector3(0.7, 0.9, 0.35), "cam_kirigi": Vector3(0.4, 0.08, 0.4),
 }
 
 
@@ -1113,6 +1204,33 @@ static func _build_decor(id: String) -> Node3D:
 		root.add_child(glb)
 		return root
 	match id:
+		"calar_saat":
+			# Kare çalar saat: kırmızı gövde, beyaz kadran, çılgın dönen akrep-yelkovan (kadran sürekli döner).
+			_box(root, Vector3(0.3, 0.3, 0.12), Vector3(0, 0.15, 0), Color("c62828"))
+			_box(root, Vector3(0.24, 0.24, 0.02), Vector3(0, 0.15, 0.065), Color("fafafa"))
+			var hand := Node3D.new()
+			hand.name = "Akrep"
+			hand.position = Vector3(0, 0.15, 0.085)
+			root.add_child(hand)
+			_box(hand, Vector3(0.02, 0.1, 0.01), Vector3(0, 0.05, 0), Color("212121"))
+			_box(root, Vector3(0.05, 0.05, 0.05), Vector3(-0.1, 0.32, 0), Color("ffd23f"))
+			_box(root, Vector3(0.05, 0.05, 0.05), Vector3(0.1, 0.32, 0), Color("ffd23f"))
+		"guguklu_saat":
+			# Tahta guguklu saat: kulübe çatılı gövde, kadran gece yarısını (12:00) gösterir, sarkaç.
+			_box(root, Vector3(0.5, 0.55, 0.28), Vector3(0, 0.55, 0), Color("6b4423"))
+			_box(root, Vector3(0.62, 0.1, 0.34), Vector3(0, 0.88, 0), Color("4a2f18"))
+			_box(root, Vector3(0.4, 0.1, 0.3), Vector3(0, 0.96, 0), Color("4a2f18"))
+			_box(root, Vector3(0.28, 0.28, 0.02), Vector3(0, 0.55, 0.15), Color("f2e2b8"))
+			_box(root, Vector3(0.025, 0.12, 0.01), Vector3(0, 0.61, 0.165), Color("212121"))
+			_box(root, Vector3(0.025, 0.08, 0.01), Vector3(0, 0.6, 0.17), Color("212121"))
+			_box(root, Vector3(0.04, 0.3, 0.03), Vector3(0, 0.12, 0.05), Color("8a6a3a"))
+			_box(root, Vector3(0.12, 0.12, 0.05), Vector3(0, 0.0, 0.05), Color("d9b44a"))
+		"cam_kirigi":
+			# Kırık iksir şişesi parçaları (yeşil cam).
+			for k in 9:
+				var a := float(k) * 2.4
+				var sh := Vector3(0.07 + 0.04 * (k % 3), 0.03, 0.05 + 0.03 * (k % 2))
+				_box(root, sh, Vector3(cos(a) * (0.05 + 0.03 * k), 0.015, sin(a) * (0.05 + 0.03 * k)), Color("3fd96b") if k % 2 == 0 else Color("1f8a42"))
 		"poster":
 			_box(root, size, Vector3(0, 0, 0), Color("1f3b73"))
 			_box(root, Vector3(0.6, 0.5, 0.01), Vector3(0, 0.15, 0.02), Color("ffd23f"))

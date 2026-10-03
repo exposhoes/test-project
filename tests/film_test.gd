@@ -62,7 +62,10 @@ func _init() -> void:
 	if studio.route_failures > 0:
 		fails += 1
 		print("FAIL eşyalara takılmadan yol bulunamayan yürüyüş: ", studio.route_failures)
-	# Yatak seti gerçekten evde mi?
+	# Yatak seti gerçekten evde mi? (Son bölüm başka bir sette bitmiş olabilir: önce eve dön.)
+	studio.world.update_center(FilmSets.point("ev.yatak"))
+	while not studio.world.is_meshed_at(FilmSets.point("ev.yatak")):
+		await process_frame
 	if studio.world.get_block(Vector3i(FilmSets.SETS["ev"]) + Vector3i(1, 5, 1)) != Blocks.BED:
 		fails += 1
 		print("FAIL evde yatak yok")

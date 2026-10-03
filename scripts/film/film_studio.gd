@@ -60,6 +60,10 @@ var _fade := ColorRect.new()  # sahne geçişinde yumuşak kararma
 var _fade_pending := false
 var _look := Vector3.ZERO
 var _cam_tween: Tween
+## Bölüm içinde eklenen/oynatılan sahne nesneleri (sandık, kazma...): anahtar -> Node3D.
+var _dyn := {}
+## Kamera yan yatması (Dutch angle), derece.
+var _roll := 0.0
 
 
 func _ready() -> void:
@@ -201,7 +205,7 @@ func _run(s: Dictionary) -> void:
 				create_tween().tween_property(_fade, "color:a", 1.0, 0.35)
 			await _wait(0.35)
 	elif s.has("music"):
-		play_music(s["music"])
+		play_music(s["music"], s.get("fallback", "neseli"))
 	elif s.has("title"):
 		_fade_in()
 		play_sfx("baslik")
@@ -233,7 +237,7 @@ func _run(s: Dictionary) -> void:
 		while not world.is_meshed_at(to):
 			await get_tree().process_frame
 		_loading = false
-		_move_camera(FilmSets.point(s["cam"]), FilmSets.point(s["look"]) + Vector3(0, LOOK_HEIGHT, 0), s.get("t", 0.0))
+		_move_camera(FilmSets.point(s["cam"]), FilmSets.point(s["look"]) + Vector3(0, s.get("dy", LOOK_HEIGHT), 0), s.get("t", 0.0))
 		_fade_in()
 		if s.get("t", 0.0) > 0:
 			await _wait(s["t"])
@@ -245,7 +249,7 @@ func _run(s: Dictionary) -> void:
 		_hold_cam = false
 	elif s.has("walk"):
 		var a := _actor(s["walk"])
-		var speed := 0.0 if fast else 2.2
+		var speed := 0.0 if fast else float(s.get("speed", 2.2))
 		# Başka kattaki hedef (ör. üst kattaki oda ↔ mutfak): yol bulucu tek katta çalışır, sahne kesmesiyle geç.
 		if absf(FilmSets.point(s["to"]).y - a.position.y) > 2.0:
 			a.position = FilmSets.point(s["to"])
@@ -279,6 +283,8 @@ func _run(s: Dictionary) -> void:
 		tw.tween_property(camera, "fov", BASE_FOV, 0.2)
 		if not fast:
 			await tw.finished
+	elif _run_extra(s):
+		await _extra_wait
 	elif s.has("shake"):
 		play_sfx("saskin")
 		var base := camera.position
@@ -288,6 +294,208 @@ func _run(s: Dictionary) -> void:
 		tw.tween_property(camera, "position", base, 0.05)
 		if not fast:
 			await tw.finished
+
+
+# ---- Gölge Orman bölümüyle gelen sahne adımları ----------------------------------------------------
+##   {"mood": "orman"|"bosluk"|"gun"}          ortam: mor sisli gece, simsiyah boşluk, normal gün
+##   {"black": true|false, "t": sn}            ekranı tam karartır / açar
+##   {"roll": derece}                          kamera yan yatar (Dutch angle); 0 düzeltir
+##   {"spawn": anahtar, "prop": ad, "at": nokta, "size": [x, z], "yaw": rad, "y": yükseklik,
+##    "decor": true, "light": [renk, güç, menzil]}   sahneye nesne koyar (decor: küçük süs nesnesi, ör. kazma)
+##   {"move": anahtar, "to": nokta, "rot": Vector3(derece), "t": sn, "block": false}   nesneyi götürür / döndürür
+##   {"open": anahtar, "deg": 70, "t": sn}     sandık kapağını ("Kapak" düğümü) açar
+##   {"burst": nokta, "kind": "kiymik"|"altin"|"cam", "n": 24}   parçacık patlaması
+##   {"carry": oyuncu, "key": anahtar, "prop": ad, "pos": Vector3, "rot": Vector3(derece)}   oyuncunun eline nesne verir
+##   {"release": anahtar, "to": nokta, "rot": Vector3(derece), "t": sn}   eldeki nesneyi bırakır / düşürür
+##   {"unspawn": anahtar}                      nesneyi kaldırır
+##   {"anim": oyuncu, "name": ["afraid"], "hold": sn}   modelin animasyonunu oynatır
+##   {"pop": oyuncu, "t": sn}                  oyuncu küçükten büyüğe fırlar
+var _extra_wait: Signal
+
+
+func _apply_roll() -> void:
+	if _roll != 0.0:
+		camera.rotate_object_local(Vector3.BACK, deg_to_rad(_roll))
+
+
+func _reset_mood() -> void:
+	_env.fog_enabled = false
+	_sun.light_energy = 1.0
+	_env.ambient_light_color = Color.WHITE
+	_env.ambient_light_energy = 1.0
+
+
+func set_mood(m: String) -> void:
+	match m:
+		"orman":
+			# Mor sisli, aydınsız gece; sahneyi turuncu sandık ışığı aydınlatır.
+			_sky.sky_top_color = Color("07060f")
+			_sky.sky_horizon_color = Color("2d1c4a")
+			_sky.ground_horizon_color = _sky.sky_horizon_color
+			_sky.ground_bottom_color = _sky.sky_horizon_color
+			_sun.light_color = Color("8f84ff")
+			_sun.light_energy = 0.28
+			_env.ambient_light_color = Color("6a58a8")
+			_env.ambient_light_energy = 0.7
+			_env.fog_enabled = true
+			_env.fog_light_color = Color("3d2560")
+			_env.fog_density = 0.028
+		"bosluk":
+			# Çevresi görünmeyen simsiyah boşluk: yakındaki sandık dışında her şey sisle yutulur.
+			_sky.sky_top_color = Color.BLACK
+			_sky.sky_horizon_color = Color.BLACK
+			_sky.ground_horizon_color = Color.BLACK
+			_sky.ground_bottom_color = Color.BLACK
+			_sun.light_energy = 0.0
+			_env.ambient_light_color = Color.BLACK
+			_env.ambient_light_energy = 0.0
+			_env.fog_enabled = true
+			_env.fog_light_color = Color.BLACK
+			_env.fog_density = 0.55
+		_:
+			set_time(0.4)
+
+
+func _run_extra(s: Dictionary) -> bool:
+	_extra_wait = get_tree().process_frame
+	if s.has("mood"):
+		set_mood(s["mood"])
+	elif s.has("black"):
+		var on: bool = s["black"]
+		var t: float = s.get("t", 0.0)
+		_fade_pending = false
+		if fast or t <= 0.0:
+			_fade.color.a = 1.0 if on else 0.0
+		else:
+			var tw := create_tween()
+			tw.tween_property(_fade, "color:a", 1.0 if on else 0.0, t)
+			_extra_wait = tw.finished
+	elif s.has("roll"):
+		_roll = float(s["roll"])
+		_apply_roll()
+	elif s.has("spawn"):
+		_spawn_prop(s)
+	elif s.has("unspawn"):
+		if _dyn.has(s["unspawn"]):
+			(_dyn[s["unspawn"]] as Node).queue_free()
+			_dyn.erase(s["unspawn"])
+	elif s.has("move"):
+		var n: Node3D = _dyn.get(s["move"])
+		if n:
+			var t: float = 0.0 if fast else float(s.get("t", 0.5))
+			var tw := create_tween().set_parallel().set_trans(Tween.TRANS_QUAD)
+			if s.has("to"):
+				var to: Vector3 = FilmSets.point(s["to"]) + (n.get_meta("off") as Vector3)
+				tw.tween_property(n, "global_position", to, maxf(t, 0.001))
+			if s.has("rot"):
+				var r: Vector3 = s["rot"]
+				tw.tween_property(n, "rotation", Vector3(deg_to_rad(r.x), deg_to_rad(r.y), deg_to_rad(r.z)), maxf(t, 0.001))
+			if t > 0.0 and s.get("block", true):
+				_extra_wait = tw.finished
+	elif s.has("open"):
+		var n: Node3D = _dyn.get(s["open"])
+		var lid := n.find_child("Kapak", true, false) as Node3D if n else null
+		if lid:
+			var tw := create_tween()
+			tw.tween_property(lid, "rotation:x", deg_to_rad(-float(s.get("deg", 70.0))), 0.001 if fast else float(s.get("t", 0.25)))
+			_extra_wait = tw.finished
+	elif s.has("burst"):
+		_burst(FilmSets.point(s["burst"]), s.get("kind", "kiymik"), int(s.get("n", 24)))
+	elif s.has("carry"):
+		var a := _actor(s["carry"])
+		var item := FilmProps.build_decor(s["prop"])
+		item.position = s.get("pos", Vector3.ZERO)
+		var r: Vector3 = s.get("rot", Vector3.ZERO)
+		item.rotation = Vector3(deg_to_rad(r.x), deg_to_rad(r.y), deg_to_rad(r.z))
+		a.hold_item(item, s.get("hand", "right") == "right")
+		_dyn[s.get("key", s["prop"])] = item
+		item.set_meta("off", Vector3.ZERO)
+	elif s.has("release"):
+		var n: Node3D = _dyn.get(s["release"])
+		if n:
+			var xf := n.global_transform
+			n.get_parent().remove_child(n)
+			add_child(n)
+			n.global_transform = xf
+			var t: float = 0.0 if fast else float(s.get("t", 0.4))
+			var tw := create_tween().set_parallel().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+			if s.has("to"):
+				tw.tween_property(n, "global_position", FilmSets.point(s["to"]), maxf(t, 0.001))
+			if s.has("rot"):
+				var r: Vector3 = s["rot"]
+				tw.tween_property(n, "rotation", Vector3(deg_to_rad(r.x), deg_to_rad(r.y), deg_to_rad(r.z)), maxf(t, 0.001))
+			if t > 0.0 and s.get("block", false):
+				_extra_wait = tw.finished
+	elif s.has("anim"):
+		_actor(s["anim"]).play_anim(s.get("name", []), float(s.get("hold", 0.0)))
+	elif s.has("pop"):
+		var a := _actor(s["pop"])
+		a.visible = true
+		if fast:
+			a.scale = Vector3.ONE
+		else:
+			a.scale = Vector3.ONE * 0.05
+			var tw := create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tw.tween_property(a, "scale", Vector3.ONE, float(s.get("t", 0.3)))
+			_extra_wait = tw.finished
+	else:
+		return false
+	return true
+
+
+func _spawn_prop(s: Dictionary) -> void:
+	var key: String = s["spawn"]
+	if _dyn.has(key):
+		(_dyn[key] as Node).queue_free()
+	var size: Array = s.get("size", [1, 1])
+	var n: Node3D
+	var off := Vector3.ZERO
+	if s.get("decor", false):
+		n = FilmProps.build_decor(s["prop"])
+	else:
+		n = FilmProps.build(s["prop"], Vector2i(size[0], size[1]))
+		off = Vector3(-size[0] / 2.0, 0, -size[1] / 2.0)
+	n.set_meta("off", off)
+	add_child(n)
+	n.position = FilmSets.point(s["at"]) + off + Vector3(0, float(s.get("y", 0.0)), 0)
+	n.rotation.y = float(s.get("yaw", 0.0))
+	if s.has("light"):
+		var l: Array = s["light"]
+		var lamp := OmniLight3D.new()
+		lamp.light_color = l[0]
+		lamp.light_energy = l[1]
+		lamp.omni_range = l[2]
+		lamp.position = Vector3(size[0] / 2.0, 0.7, size[1] / 2.0) if not s.get("decor", false) else Vector3(0, 0.4, 0)
+		n.add_child(lamp)
+	_dyn[key] = n
+
+
+## Parçacık patlaması: kıymık (kahverengi), altın (parlak sarı), cam (yeşil); balistik düşüp kaybolur.
+func _burst(center: Vector3, kind: String, count: int) -> void:
+	if fast:
+		return
+	var colors := {"kiymik": [Color("8a5a2b"), Color("b07a3a"), Color("5a3a1a")], "altin": [Color("ffd23f"), Color("ffec8a")], "cam": [Color("3fd96b"), Color("1f8a42"), Color("b8ffd0")]}
+	var pal: Array = colors.get(kind, colors["kiymik"])
+	for i in count:
+		var mi := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		var sz := randf_range(0.04, 0.13) if kind != "kiymik" else randf_range(0.05, 0.16)
+		bm.size = Vector3(sz, sz * (3.0 if kind == "kiymik" else 1.0), sz)
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = pal[i % pal.size()]
+		if kind == "altin":
+			mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		bm.material = mat
+		mi.mesh = bm
+		add_child(mi)
+		mi.position = center
+		var v := Vector3(randf_range(-2.2, 2.2), randf_range(2.0, 4.8), randf_range(-2.2, 2.2))
+		var spin := Vector3(randf_range(-9, 9), randf_range(-9, 9), randf_range(-9, 9))
+		var tw := create_tween()
+		tw.tween_method(func(t: float) -> void:
+			mi.position = center + v * t + Vector3(0, -4.9 * t * t, 0)
+			mi.rotation = spin * t, 0.0, 0.9, 0.9)
+		tw.tween_callback(mi.queue_free)
 
 
 ## Replik sürerken anlatılan yerlere kesme: "cuts": [[oran, kamera, bakış], ...]; oran 0-1,
@@ -540,11 +748,11 @@ func play_sfx(name: String) -> void:
 
 
 ## Arka plan müziği ("neseli", "gerilim", "duygusal"); "" müziği durdurur.
-func play_music(name: String) -> void:
+func play_music(name: String, fallback := "neseli") -> void:
 	var st := _audio("music", name) if name != "" and not fast else null
-	# Bölüme özel müzik henüz indirilmediyse varsayılan neşeli müzik çalsın.
+	# Bölüme özel müzik henüz indirilmediyse yedek müzik çalsın (varsayılan neşeli).
 	if st == null and name != "" and not fast:
-		st = _audio("music", "neseli")
+		st = _audio("music", fallback)
 	if st == null:
 		_music.stop()
 		return
@@ -640,17 +848,20 @@ func _move_camera(pos: Vector3, look: Vector3, t: float) -> void:
 	if t <= 0.0 or fast:
 		_look = look
 		camera.look_at_from_position(pos, look)
+		_apply_roll()
 		return
 	_cam_tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE)
 	_cam_tween.tween_property(camera, "position", pos, t)
 	_cam_tween.tween_method(func(l: Vector3) -> void:
 		_look = l
 		if camera.position.distance_to(l) > 0.01:
-			camera.look_at(l), _look, look, t)
+			camera.look_at(l)
+			_apply_roll(), _look, look, t)
 
 
 ## Günün saati (0.25 gündoğumu, 0.5 öğle, 0.75 günbatımı).
 func set_time(t: float) -> void:
+	_reset_mood()
 	var elevation := sin((t - 0.25) * TAU)
 	_sun.rotation = Vector3(-asin(clampf(elevation, 0.05, 1.0)), deg_to_rad(35), 0)
 	var warm := clampf(1.0 - elevation * 2.0, 0.0, 1.0)
