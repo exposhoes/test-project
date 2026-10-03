@@ -1,0 +1,1 @@
+﻿Eşya yüzey dokuları buraya konur. Adlar ve istemler: docs/gorsel-istemleri-esya-dokulari.md

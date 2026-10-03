@@ -1,0 +1,25 @@
+# Godot 4
+.godot/
+/android/
+/export/
+*.apk
+*.aab
+*.ipa
+
+# Claude Code Game Studios (yerel ve oturum dosyaları)
+.claude/settings.local.json
+.claude/agent-memory/
+CLAUDE.local.md
+project.local.yaml
+production/session-logs/
+production/session-state/*
+!production/session-state/.gitkeep
+.scratch/
+videolar/
+
+# Video kaydı sırasında geçici ayar (tools/kayit.ps1)
+override.cfg
+__pycache__/
+
+# Eşya görsellerinin temizlenmeden önceki yedekleri (tools/art/esya_kenar_temizle.py)
+*.png.orijinal
