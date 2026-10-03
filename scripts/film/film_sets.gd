@@ -1006,7 +1006,7 @@ func _build_forest(o: Vector3i) -> void:
 	_dark_tree(o + Vector3i(3, 0, 24), 8)
 	_dark_tree(o + Vector3i(22, 0, 25), 8)
 	# Kulübe duvarı (masanın arkası) ve direği: guguklu saat burada asılı.
-	_fill(o, Vector3i(15, 0, 5), Vector3i(20, 3, 5), Blocks.DARK_PLANKS)
+	_fill(o, Vector3i(15, 0, 5), Vector3i(20, 3, 5), Blocks.PLANKS)
 	_fill(o, Vector3i(15, 4, 5), Vector3i(20, 4, 5), Blocks.PLANKS)
 	_fill(o, Vector3i(14, 0, 5), Vector3i(14, 4, 5), Blocks.LOG)
 	_fill(o, Vector3i(21, 0, 5), Vector3i(21, 4, 5), Blocks.LOG)

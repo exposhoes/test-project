@@ -36,7 +36,7 @@ func _initialize() -> void:
 	m.position = Vector3(-box.get_center().x * k, -box.position.y * k, -box.get_center().z * k)
 	holder.position = base
 	var sz := maxf(box.size.x, box.size.z) * k
-	studio._move_camera(base + Vector3(sz * 0.8, sz * 0.9 + 0.5, sz * 1.1 + 1.0), base + Vector3(0, box.size.y * k * 0.4, 0), 0)
+	studio._move_camera(base + Vector3(sz * 0.6, sz * 0.4 + 0.7, sz * 1.3 + 0.8), base + Vector3(0, box.size.y * k * 0.4, 0), 0)
 	while not studio.world.is_meshed_at(base):
 		await process_frame
 	for i in 60:

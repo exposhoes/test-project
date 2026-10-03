@@ -232,6 +232,18 @@ static func _glb_box(model: Node3D) -> AABB:
 	return box
 
 
+## Cips paketi (Mehmet'in market ürünü GLB'si): boy large/medium/small, çeşit a/b/c; "_open" açık paket.
+const SNACK_SIZES := ["large", "medium", "small"]
+const SNACK_KINDS := ["a", "b", "c"]
+const SNACK_BOX := {"large": Vector3(0.28, 0.4, 0.3), "medium": Vector3(0.24, 0.34, 0.26), "small": Vector3(0.2, 0.28, 0.22)}
+
+
+static func _snack(id: String) -> Node3D:
+	if not ResourceLoader.exists("res://assets/models/esya_%s.glb" % id):
+		return null
+	return build_decor(id)
+
+
 ## Köşeli eşya modeli. Yerel düzen: en x, derinlik z, ön yüz +Z (z = f.z), taban y = 0.
 static func _model(r: Node3D, id: String, f: Vector3) -> void:
 	var w := f.x
@@ -337,6 +349,12 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				_box(r, Vector3(w - 0.1, 0.04, d - 0.12), Vector3(w / 2, sy, d / 2), c.darkened(0.15))
 				var n := int((w - 0.2) / 0.3)
 				for k in n:
+					# Mehmet'in cips paketi GLB'leri varsa raf onlarla dolar, yoksa renkli kutular.
+					var bag := _snack("cips_" + SNACK_SIZES[(i + k) % 3] + "_" + SNACK_KINDS[(i * 2 + k) % 3])
+					if bag:
+						bag.position = Vector3(0.2 + k * 0.3, sy + 0.02, d / 2 + 0.05)
+						r.add_child(bag)
+						continue
 					var hh := 0.2 + float((i * 7 + k * 3) % 3) * 0.06
 					_box(r, Vector3(0.24, hh, d * 0.55), Vector3(0.2 + k * 0.3, sy + 0.02 + hh / 2, d / 2 + 0.05), cols[(i * 3 + k) % cols.size()])
 		"koltuk":
@@ -932,6 +950,12 @@ static func _model(r: Node3D, id: String, f: Vector3) -> void:
 				_box(r, Vector3(w - 0.1, 0.03, d - 0.25), Vector3(w / 2, sy, d / 2), Color("c8c8c8"))
 				for j in int((w - 0.2) / 0.22):
 					for side in [-1.0, 1.0]:
+						var bag := _snack("cips_small_" + SNACK_KINDS[(j + k + (1 if side > 0 else 2)) % 3])
+						if bag:
+							bag.position = Vector3(0.2 + j * 0.22, sy + 0.02, d / 2 + side * 0.17)
+							bag.rotation.y = 0.0 if side > 0 else PI
+							r.add_child(bag)
+							continue
 						_box(r, Vector3(0.17, 0.24, 0.17), Vector3(0.2 + j * 0.22, sy + 0.135, d / 2 + side * 0.22), sc[(j + k + (1 if side > 0 else 3)) % sc.size()])
 		"sepetlik":
 			# Üst üste alışveriş sepetleri.
@@ -1191,6 +1215,8 @@ static func build_decor(id: String) -> Node3D:
 
 static func _build_decor(id: String) -> Node3D:
 	var size: Vector3 = DECOR_SIZE.get(id, Vector3.ONE * 0.5)
+	if id.begins_with("cips_"):
+		size = SNACK_BOX[id.get_slice("_", 1)]
 	var root := Node3D.new()
 	root.name = "Sus_" + id
 	if id != "futbol_topu":

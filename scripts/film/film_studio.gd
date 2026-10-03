@@ -333,13 +333,13 @@ func set_mood(m: String) -> void:
 			_sky.sky_horizon_color = Color("2d1c4a")
 			_sky.ground_horizon_color = _sky.sky_horizon_color
 			_sky.ground_bottom_color = _sky.sky_horizon_color
-			_sun.light_color = Color("8f84ff")
-			_sun.light_energy = 0.28
-			_env.ambient_light_color = Color("6a58a8")
-			_env.ambient_light_energy = 0.7
+			_sun.light_color = Color("a89cff")
+			_sun.light_energy = 0.55
+			_env.ambient_light_color = Color("8a78c8")
+			_env.ambient_light_energy = 1.0
 			_env.fog_enabled = true
-			_env.fog_light_color = Color("3d2560")
-			_env.fog_density = 0.028
+			_env.fog_light_color = Color("4a2d73")
+			_env.fog_density = 0.017
 		"bosluk":
 			# Çevresi görünmeyen simsiyah boşluk: yakındaki sandık dışında her şey sisle yutulur.
 			_sky.sky_top_color = Color.BLACK
