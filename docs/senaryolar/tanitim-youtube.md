@@ -36,13 +36,13 @@ Her hafta yeni maceralar, komik anlar ve sürprizler bu kanalda!
 
 ⏱ Bölümler
 0:00 Merhaba! Ben Emir
-0:12 Annem ve mutfağımız
-0:25 Arkadaşlarım Ali ve Zeynep
-0:42 Okulumuz ve Kemal Öğretmen
-0:52 Hasan Amca'nın bakkalı
-1:03 Doktor Amca
+0:15 Annem ve mutfağımız
+0:28 Arkadaşlarım Ali ve Zeynep
+0:45 Okulumuz ve Kemal Öğretmen
+0:55 Hasan Amca'nın bakkalı
+1:04 Doktor Amca
 1:13 Şehir turu: tramvay, park, AVM, havalimanı, deniz
-1:32 Görüşmek üzere!
+1:35 Görüşmek üzere!
 
 Emir'in Dünyası, çocuklar için hazırlanan blok dünyası animasyonlarıdır. Bölümlerde arkadaşlık,
 okul, aile ve mahalle hayatı eğlenceli ve güvenli bir dille anlatılır.
@@ -50,7 +50,7 @@ okul, aile ve mahalle hayatı eğlenceli ve güvenli bir dille anlatılır.
 #EmirinDünyası #MinecraftAnimasyon #ÇocukVideoları
 ```
 
-Bölüm süreleri son kayda göre düzeltilecek (kayıt bitince gerçek saniyeleri yazarım).
+Bölüm süreleri onaylı kayda (1 dk 49 sn) göre ölçüldü.
 
 ## Etiketler
 
