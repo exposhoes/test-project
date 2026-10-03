@@ -184,7 +184,12 @@ const LIST := [
 			{"say": "anne", "text": "Beslenmeni unutma. Arkadaşlarına iyi davran!"},
 			{"say": "emir", "text": "Merak etme anne. Görüşürüz!"},
 			{"cam": "ev.kam_kapi", "look": "ev.kapi_disi", "t": 0},
-			{"walk": "emir", "to": "ev.yol"},
+			{"walk": "emir", "to": "ev.yol", "wait": false},
+			# Anne kapıya çıkıp arkasından seslenir; arkada çocuk kahkahası (Mehmet istedi).
+			{"walk": "anne", "to": "ev.kapi_disi"},
+			{"turn": "anne", "to": "ev.yol"},
+			{"sfx": "gulme"},
+			{"say": "anne", "text": "Benim akıllı oğlum yine çantasını almadan gidiyor!"},
 			{"title": "Yarın: Okulda ilk gün!", "t": 2.5},
 		],
 	},
